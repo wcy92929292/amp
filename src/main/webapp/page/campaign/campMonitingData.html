@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>活动监测数据</title>
+    <link href="../../css/com/bootstrap.css" rel="stylesheet">
+    <link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+    <link href="../../css/com/ie.css" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <!-- 头部和底部css -->
+    <link href="../../css/headerorfooter.css" rel="stylesheet">
+    <script src="../../js/com/jquery-1.9.1.js"></script>
+    <script src="../../js/com/bootstrap.min.js"></script>
+    <script src="../../js/com/jquery.cookie.js"></script>
+    <script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+    <script src="../../js/udbac.js"></script>
+    <script src="../../js/campMonitingData.js"></script>
+    <!-- echarts -->
+    <script src="../../js/echarts/echarts-all.js"></script>
+    <!-- 日期选择控件 -->
+    <script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+    <!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<script type="text/html" id="template">
+<tr style='border:1px solid #ddd;'>
+	<td style="width:145px;" data-content="activityName" ></td>
+	<td style="width:145px;" data-content="activityCode" ></td>
+	<td style="width:145px;" data-content="customerName" ></td>
+	<td style="width:145px;" data-content="mediaName" ></td>
+	<td style="width:145px;" data-content="pointLocation" ></td>
+	<td style="width:145px;" data-content="putFunction" ></td>
+	<td style="width:145px;" data-content="createDate" ></td>
+	<td style="width:175px;" data-content="mic" ></td>
+	<td style="width:145px;" data-content="terminalType" ></td>
+	<td style="width:145px;" data-content="exposureAvg" ></td>
+	<td style="width:145px;" data-content="monitorExposurePv" ></td>
+	<td style="width:145px;" data-content="monitorExposureUv" ></td>
+	<td style="width:145px;" data-content="clickAvg" ></td>
+	<td style="width:145px;" data-content="monitorClickPv" ></td>
+	<td style="width:145px;" data-content="monitorClickUv" ></td>
+	<td style="width:145px;" data-content="ctr"></td> 
+	<td style="width:145px;" data-content="visit" ></td>
+	<td style="width:145px;" data-content="visitor" ></td>
+	<td style="width:145px;" data-content="click" ></td>
+	<td style="width:145px;" data-content="pv" ></td>
+	<td style="width:145px;" data-content="bounceVisit" ></td>
+	<td style="width:145px;" data-content="jump"></td>
+	<td style="width:145px;" data-content="visitsTime" ></td>
+	<td style="width:145px;" data-content="effectiveConversionRate" ></td>
+	<td style="width:145px;" data-content="businessSuccessRate" ></td>
+	<td style="width:550px;" data-content="urlUpdate" ></td>
+	<td style="width:145px;"></td>
+</tr>
+</script>
+</head>
+<body>
+<!-- 头部 -->
+<div class="headers"></div>
+<div class="contain">
+	<div class="zxy_contain1">
+		<!-- 菜单导航 -->
+		<div id="template-nav" ></div>
+		<div class="row zxy_row_one" style="min-width:1025px;">
+			<div class="m_s_title">活动监测数据</div>
+			<br><br><br>
+			<div class="zxy_monitor">
+				<span>
+					<input type="radio" id="check0" name="_date" value="">历史数据&nbsp;&nbsp;</span>
+				<span>
+					<input type="radio" id="check1" name="_date" value="">当天数据&nbsp;&nbsp;</span>
+				<span>
+					<input type="radio" id="check2" name="_date" value="">分小时数据</span>
+				<br></br>
+				<span>监测开始时间：
+					<input placeholder="开始时间:" style="display:inline-block"type="text" id="sdate_id" onfocus="WdatePicker({skin:'twoer'})"/>
+				</span>
+				<span>&nbsp;&nbsp;监测结束时间：
+					<input placeholder="结束时间:" style="display:inline-block" type="text" id="edate_id" onfocus="WdatePicker({skin:'twoer'})"/>
+					<input placeholder="结束时间:" style="display:none" id="endShijian" type="text" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'})">
+				</span>
+				<span>&nbsp;&nbsp;媒体名称：
+					<input placeholder="媒体名称" type="text" id="mediaName_id" />&nbsp;&nbsp;
+				</span>
+				
+				<span>营销码：
+					<input placeholder="营销码" type="text" id="marketingCode_id" />
+				</span>
+				
+				<!-- 查询按钮 -->
+				<input name="" type="button" id="query_id" value="查询" class="button_style" />
+				<input type='hidden' id='activityCode_id' />
+				<input type='hidden' id='realityStartDate_id' />
+				
+				<!-- 返回按钮 -->
+				<input name="" type="button" id="cancal_id" value="返回" class="button_style" onclick="$('#back')[0].click();" />
+				<a id="back" style="display: none;" href="../campaign/campaign.html?back"></a>
+			</div>
+			
+			<div class="col-sm-8" align="right">
+				<div class="row"></div>
+			</div>
+		</div>
+		<div id="zxy_yxiao_content2">
+			<ul id="zxy_ul_yingxiao2" class="yingxiao">
+				<li><b>活动名称</b></li>
+				<li><b>活动编号</b></li>
+				<li><b>投放机构</b></li>
+				<li><b>投放媒体</b></li>
+				<li><b>投放位置</b></li>
+				<li><b>投放形式</b></li>
+				<li><b>投放日期</b></li>
+				<li style="width:175px;"><b>营销识别码</b></li>
+				<li><b>投放类型</b></li>
+				<li><b>预估曝光次数</b></li>
+				<li><b>监测曝光PV</b></li>
+				<li><b>监测曝光UV</b></li>
+				<li><b>预估点击次数</b></li>
+				<li><b>监测点击PV</b></li>
+				<li><b>监测点击UV</b></li>
+				<li><b>点击率CTR</b></li>
+				<li><b>到站访次</b></li>
+				<li><b>到站访客</b></li>
+				<li><b>到站点击</b></li>
+				<li><b>到站PV</b></li>
+				<li><b>跳出访次</b></li>
+				<li><b>跳出率</b></li>
+				<li><b>平均访问时长(s)</b></li>
+				<li><b>曝光完成率</b></li>
+				<li><b>点击完成率</b></li>
+				<li style="width:550px;"><b>URL</b></li>
+				<li><b>备注</b></li>
+			</ul>
+	       	<table class="table table-striped table-hover" id="table_id" style="width:4354px; max-width:4354px; margin: 40px auto 0;">
+	            <tbody id="tbody_id" class="zxy_tab4"></tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div style="z-index: 19891015; background-color: #000; display: none; opacity: 0.3; filter: alpha(opacity = 30);" class="xubox_shade" id="mb" times="1"></div>
+<!-- 固定表头的JS文件 -->
+<script>
+$(function()
+	{
+		$("#zxy_yxiao_content2").off("scroll").on("scroll",function()//解除绑定滚动事件
+		{
+			var height = $(this).scrollTop() + "px";//定义ul的定位后的top值等于滚动条滚动的高度
+			$("#zxy_ul_yingxiao2").css("top",height);
+		});
+	});
+</script>
+</body>
+</html>

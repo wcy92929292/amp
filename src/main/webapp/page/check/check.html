@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>上线核查展示</title>
+<!-- <link href="../../css/com/bootstrap.css" rel="stylesheet"> -->
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<link href="../../css/com/bootstrap.min.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<script src="../../js/todo.js"></script>
+<script src="../../js/uploadPreview.js" type="text/javascript"></script>
+
+<script src="../../js/jquerysession.js"></script>
+<script src="../../js/ajaxfileupload.js"></script>
+<script src="../../js/onlineCheck.js"></script>
+<script src="../../js/onlineCheck_Tab.js"></script>
+
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/rili_js/laydate.js"></script>
+<script type="text/javascript" src="../../js/rili_js/style.js"></script>
+
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+body{
+	font-family: "Roboto", "Helvetica Neue", "Helvetica";
+	font-size: 14px;
+	margin: 0;
+	padding: 0;
+	background:url(../../images/bg2.jpg) top center;
+	background-attachment:fixed;
+	background-size:100% 100%;
+	-moz-background-size:100%;
+	-webkit-background-size:100%;
+	-o-background-size:100%;
+	background-size: cover;
+}
+.layui-layer-btn{
+	margin-right: 8px;
+}
+input, textarea, .uneditable-input {
+    width: 20px;
+}
+</style>
+<!-- 防刷新固定tab页 -->
+<script>
+$(document).ready(function() {
+    if(location.hash) {
+        $('a[href=' + location.hash + ']').tab('show');
+    }
+    $(document.body).on("click", "a[data-toggle]", function(event) {
+        location.hash = this.getAttribute("href");
+    });
+});
+$(window).on('popstate', function() {
+    var anchor = location.hash || $("a[data-toggle=tab]").first().attr("href");
+    $('a[href=' + anchor + ']').tab('show');
+});
+</script>
+</head>
+<body>
+
+<div class="headers"></div>
+<div class="contain">
+	<div class="zxy_contain1" style="overflow:hidden;">
+		<!-- 菜单导航 -->
+		<div id="template-nav"></div>
+		<!-- 头固定 -->
+		<div id="zxy_pos_hecha">
+			<!-- 两个li切换页 -->
+			<ul id="myTab" class="nav nav-tabs">
+				<li class="active">
+					<a href="#home" data-toggle="tab" id="date1" onclick="getTab(this)"></a>
+					<!-- <a href="#home" data-toggle="tab" id="date1" onclick="initData();"></a> -->
+				</li>
+				<li>
+					<a href="#two" data-toggle="tab" id="date2" onclick="getTab(this)"></a>
+					<!-- <a href="#two" data-toggle="tab" id="date2" onclick="initData2();"></a> -->
+				</li>
+			</ul>
+			<!-- 两个li切换页结束 -->
+			
+			<!-- 第一个li的筛选按钮 -->
+			<div class="dropdown" style="display: block;" id="dro_one">
+				<button type="button" class="btn dropdown-toggle top" id="dropdownMenu1" data-toggle="dropdown"> 问题数据筛选 
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" name="selectOne" aria-labelledby="dropdownMenu1"></ul>
+				
+				<span  style="width: 5px; ">
+				     <font color="red" id="sumcus"></font>
+				</span>
+				
+				<span class="zxy_sp_hecha">
+					<span class="calendar" style="float: right;">
+						<input type="text" class="ipt_zxy" style="visibility: hidden;">
+					</span>
+				</span>
+				<span>
+				     <select name="cusName" class="zxy_FilterUnit" onchange="getCusName(this)">
+				     	<option value="all">全部客户</option>
+				     </select>
+				</span>
+				
+				<span>
+					<input type="text" class="text-input" id="put_date" placeholder="输入短代码" list="mic-search">	
+					<!-- <input name="" type="button" id="query01" value="查询" class="button_style_moniSel"> -->
+				</span>
+				
+				<span>
+					<input type="text" class="text-input" id="put_date" placeholder="输入活动编号" list="activity1-search">	
+					<input name="" type="button" id="activity01" value="查询" class="button_style_moniSel">
+				</span>
+				
+				<span>
+					<!-- <font color="white">我的收藏</font>
+					<input id ="myfirst" type="checkbox" style="width: 10%"> -->
+					
+					<select name="isShowMy" class="zxy_FilterUnit" style="width: 80px;" onchange="isShowMy(this)">
+						<option value="0">显示所有</option>
+						<option value="1">显示我的</option>
+					</select>
+						
+				
+				</span>
+			</div>
+			
+			<!-- 第二个li的筛选按钮 -->
+			<div class="dropdown" style="display: none;" id="dro_two">
+				<button type="button" class="btn dropdown-toggle t_top" id="dropdownMenu2" data-toggle="dropdown">上线状态查看 
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" name="tab_li"  aria-labelledby="dropdownMenu2"></ul>
+				
+				<span  style="width: 5px; ">
+				     <font color="red" id="sumcus2"></font>
+				</span>
+				
+				<span class="zxy_sp_hecha">
+					<span class="calendar">
+						<input type="text" placeholder="选择日期" class="text-input text-input-1 day-time" id="put_date" onfocus="WdatePicker({skin:'twoer'})">
+					</span>
+					<span class="message" style="color: red; float: right; margin-right: 80px; display: none; padding-top: 6px;">预留
+					</span>
+				</span>
+				
+				<span>
+				     <select name="cusName2" class="zxy_FilterUnit" onchange="getCusNameTab(this)">
+				     	<option value="all">全部客户</option>
+				     </select>
+				</span>
+				
+				<span>
+					<input type="text" class="text-input" id="put_date" placeholder="输入短代码" list="mic-search2">	
+					<!-- <input name="" type="button" id="query02" value="查询" class="button_style_moniSel"> -->
+				</span>
+				
+				<span>
+					<input type="text" class="text-input" id="put_date" placeholder="输入活动编号" list="activity2-search">	
+					<input name="" type="button" id="activity02" value="查询" class="button_style_moniSel">
+				</span>
+				
+				<span>
+					<!-- <font color="white">我的收藏</font>
+					<input type="checkbox" id="mytwo" style="width: 10%"> -->
+					<select name="isShowMyTab" class="zxy_FilterUnit" style="width: 80px;" onchange="isShowMyTab(this)">
+						<option value="0">显示所有</option>
+						<option value="1">显示我的</option>
+					</select>
+				</span>
+			</div>
+			<div style="clear:both;"></div>
+		</div>
+		<div id="myTabContent" class="tab-content" >
+			<ul id="zxy_ul_hecha">
+				<li><b>是否正常</b></li>
+				<li><b>投放单位</b></li>
+				<li><b>活动编号</b></li>
+				<li><b>活动名称</b></li>
+				<li><b>媒体名称</b></li>
+				<li><b>广告位置</b></li>
+				<li><b>投放形式</b></li>
+				<li><b>短代码</b></li>
+				<li><b>点击预估</b></li>
+				<li><b>曝光预估</b></li>
+				<li><b>当前点击</b></li>
+				<li><b>当前曝光</b></li>
+				<li><b>曝光及点击核查</b></li>
+				<li><b>点位状态</b></li>
+				<li><b>备注</b></li>
+				<li><b>收藏</b></li>
+				<li><b>反馈</b></li>
+				<li>
+					<button type="button" class="btn btn-primary btn-sm" onClick="checkMic()">收藏</button>
+					<button type="button" class="btn btn-primary btn-sm" onclick="deleteCheckMic()">取消</button>
+				</li>
+			</ul>
+			<div class="tab-pane fade in active" id="home">
+				<div id="tb">
+					<!-- 放的是第1个tab页的内容 -->
+				</div>
+			</div>
+			
+			<!-- tab页，第二个页分割线 -->
+			<div class="tab-pane fade" id="two">
+				<div id="tb2">
+					<!-- 放的是第二个tab页的内容 -->
+				</div>
+			</div>
+		</div>
+		<!-- 上传图片框（Modal） -->
+		<div class="modal fade" id="myMod" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel_text"></h4>
+						<div class="col-sm-6">
+							<input type="file" name="filename" id="filename"/>
+							<button id="up" type="submit" class="btn btn-danger btn-sm" onclick="ajaxFileUpload()" >上传</button>
+							<span class="msg">显示区域</span>
+							<div id="imgdiv">
+								<img id="imgShow">
+							</div>
+						</div>	
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 已查图片框（Modal） -->
+
+<div class="modal fade hideModal" id="myPic" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog ">
+		<div class="modal-content" >
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel">已查图片<button style="margin-left: 36px; margin-top: -8px; background-color: #2d6a77;" type="button" class="btn btn-danger btn-sm reupload" data-toggle="modal" data-target="#myMod" >重传</button></h4>
+			</div>
+			<div class="modal-body">
+				<img src="" class="img-responsive" alt="Cinque Terre" id="show_pic">
+				<a class="downloadfile" href="" style="font-size:1.5em; color:#efefef;">压缩包下载</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 延时加载遮罩层 -->
+<div class="zxy_mask">
+	<div class="rect1"></div>
+	<div class="rect2"></div>
+	<div class="rect3"></div>
+	<div class="rect4"></div>
+	<div class="rect5"></div><br>
+	<span>小小U，正在为您努力加载数据，请您稍等片刻^_^</span>
+</div>
+
+<div id = "mailContent" style="margin-left: 18px; display: none;">
+	
+		当前点位：<input type="text" class="form-control" style="width: 95%" disabled="disabled">
+		
+		反馈人：<input type="text" class="form-control" style="width: 95%" disabled="disabled">
+		
+		收件人：<input type="text" id="tofrom" class="form-control" placeholder="多个收件人逗号(英文)隔开" style="width: 95%">
+	
+		要求反馈时间：<input type="text" id="requireDate" class="form-control" placeholder="选择日期" style="width: 95%" onfocus="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+	
+		反馈内容：<textarea class="form-control" id="content" placeholder="输入内容" rows="4" style="width: 95%"></textarea>
+</div>
+
+
+
+</body>
+<!--定时器延迟加载  -->
+<script type="text/javascript" src="../../js/time.js"></script>
+
+<!-- 这里JS代表选取当前li的时候后面跟着当前li里面筛选按钮 -->
+<script>
+window.onload = function()
+{
+	var oDiv = document.getElementById("zxy_pos_hecha");
+	var oUl = document.getElementById("myTab");
+	var aLi = oUl.getElementsByTagName("li");
+	var aDiv = oDiv.getElementsByTagName("div");
+	
+	for(var i = 0; i<aLi.length; i++) 
+	{
+		aLi[i].index = i;
+		aLi[i].onclick = function()
+		{
+			for(var i = 0; i<aLi.length; i++)
+			{
+				aDiv[i].style.display = "none";
+			}
+			aDiv[this.index].style.display = "block";
+		};
+	}
+};
+
+/* 上线核查固定表头ul的JS部分 */
+$(function()
+	{
+		$("#myTabContent").off("scroll").on("scroll",function()//解除绑定滚动事件
+		{
+			var height = $(this).scrollTop() + "px";//定义ul的定位后的top值等于滚动条滚动的高度
+			$("#zxy_ul_hecha").css("top",height);
+		});
+	});
+</script>
+</html>

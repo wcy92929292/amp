@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>用户一览</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<script src="../../js/user/userquery.js"></script>
+<!-- echarts -->
+<script src="../../js/echarts/echarts-all.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<Link Rel="ICON NAME" href="../../images/logoIcon.ico">
+<script type="text/html" id="template">
+<tr>
+	<td data-content="createDate" scope="row"></td>
+	<td data-content="userName"></td>
+	<td data-content="realName"></td>
+	<td data-content="customerName"></td>
+	<td data-content="role_Name"></td>
+	<td data-content="phoneNumber"></td>
+	<td data-content="mailbox"></td>
+	<td data-content="userState"></td>
+	<td>
+		<input name="" type="button" id="del_id" value="删除" class="button_style" onclick="del(this)"  />
+		<input name="" type="button" id="update_id" value="编辑" class="button_style" onclick="update(this)"  />
+	</td>
+</tr>
+</script>
+
+
+</head>
+<body>
+<!-- 头部 -->
+<div class="headers"></div>
+<div class="contain">
+	<div class="zxy_contain1">
+		<!-- 菜单导航 -->
+		<div id="template-nav"></div>
+		<div class="row zxy_row_one" style="width:1400px;">
+			<div class="m_s_title">用户展示</div><br><br><br>
+				
+			<div class="zxy_role">
+				<span>&nbsp;&nbsp;姓名：
+					<input placeholder="姓名" class="text-input text-input-1" type="text" id="uname" name="uname" />&nbsp;&nbsp;&nbsp;&nbsp;
+				</span> 
+				
+				<span>角色：
+					<input placeholder="角色" class="text-input text-input-1" type="text" id="role_id" name="role" />&nbsp;&nbsp;&nbsp;&nbsp;
+				</span>
+				
+				<span>&nbsp;&nbsp;开始时间：
+					<input type="text" id="sdate_id"  onfocus="WdatePicker({skin:'twoer'})" />&nbsp;&nbsp;&nbsp;&nbsp;
+				</span>
+				
+				<span>结束时间：
+					<input placeholder="结束时间:" class="text-input text-input-1 day-time" type="text" id="edate_id" onfocus="WdatePicker({skin:'twoer'})" />&nbsp;&nbsp;&nbsp;&nbsp;
+				</span>
+				<input name="" type="button" id="query_id" value="查询" class="button_style" />&nbsp;&nbsp; 
+			</div>
+			<div class="col-sm-8" align="right">
+				<div class="row"></div>
+			</div>
+		</div>
+		
+		<div id="zxy_pos_user">
+			<ul id="zxy_ul_jiaose" class="yingxiao">
+				<li><b>注册时间</b></li>
+				<li><b>用户名</b></li>
+				<li><b>姓名</b></li>
+				<li><b>省份</b></li>
+				<li><b>角色</b></li>
+				<li><b>电话</b></li>
+				<li><b>邮箱</b></li>
+				<li><b>用户状态</b></li>
+				<li><b>操作</b></li>
+			</ul>
+			<table class="zxy_tab_one" id="table_id" style="width:1400px; margin: 20 auto">
+				<tbody id="tbody_id" class="zxy_tab4"></tbody>    
+			</table>
+		</div>
+	</div>	
+</div>
+</body>
+<script>
+$(function()
+	{
+		$("#zxy_pos_user").off("scroll").on("scroll",function()//解除绑定滚动事件
+		{
+			var height = $(this).scrollTop() + "px";//定义ul的定位后的top值等于滚动条滚动的高度
+			$("#zxy_ul_jiaose").css("top",height);
+		});
+	});
+</script>
+</html>

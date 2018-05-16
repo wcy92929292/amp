@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.udbac.dao.ScheduleDao">
+    
+    <sql id="scheduleBaseColumn">
+        create_time,
+        MARKETING_CODE,
+		MIC,
+		ACTIVITY_CODE,
+		MEDIA_ID,
+		URL_PC,
+		TERMINAL_TYPE,
+		UNIT,
+		URL_UPDATE,
+		URL_UPDATE_TIME,
+		CLICK_AVG,
+		EXPOSURE_AVG,
+		ENABLE,
+		IS_FREQUENCY,
+		NUM_FREQUENCY,
+		PERIOD_FREQUENCY,
+		FUN_FREQUENCY,
+		create_user,
+		data_Caliber,
+		group_id,
+		mic_no,
+		is_key_schedule,
+		imp_data_caliber,
+		clk_data_caliber
+    </sql>
+    
+    <sql id="scheduleExtenColumn">
+        MIC,
+		POINT_LOCATION,
+		PUT_FUNCTION,
+		MATERIAL_REQUIRE,
+		RESOURCE_TYPE,
+		PLAN_NAME,
+		UNIT_NAME,
+		KEY_NAME,
+		CLEAR_CODE,
+		RESOURCE_POSITION,
+		PUT_FREQUENCY,
+		EXPOSURE_METERIAL,
+		SUPPORT_EXPOSURE,
+		SUPPORT_CLICK,
+		CLICK_METERIAL,
+		CLICK_URL,
+		EXPOSURE_URL,
+		AREA
+    </sql>
+    
+    <!-- 通过活动编号查找排期基本信息 -->
+    <select id="findScheduleByActCode" resultMap="scheduleMap">
+       SELECT 
+	       	create_time,
+	        MARKETING_CODE,
+			sche.MIC,
+			ACTIVITY_CODE,
+			MEDIA_ID,
+			URL_PC,
+			TERMINAL_TYPE,
+			UNIT,
+			URL_UPDATE,
+			URL_UPDATE_TIME,
+			CLICK_AVG,
+			EXPOSURE_AVG,
+			ENABLE,
+			IS_FREQUENCY,
+			NUM_FREQUENCY,
+			PERIOD_FREQUENCY,
+			FUN_FREQUENCY,
+	       	POINT_LOCATION,
+			PUT_FUNCTION,
+			MATERIAL_REQUIRE,
+			RESOURCE_TYPE,
+			PLAN_NAME,
+			UNIT_NAME,
+			KEY_NAME,
+			CLEAR_CODE,
+			RESOURCE_POSITION,
+			PUT_FREQUENCY,
+			EXPOSURE_METERIAL,
+			SUPPORT_EXPOSURE,
+			SUPPORT_CLICK,
+			CLICK_METERIAL,
+			CLICK_URL,
+			EXPOSURE_URL,
+			AREA,
+			create_user,
+			data_Caliber,
+			group_id,
+			mic_no
+       FROM 
+       		tb_amp_basic_schedule_info sche,
+       		tb_amp_basic_schedule_extend_info extend
+       WHERE 
+       		sche.activity_code = #{actCode}
+       AND
+       		sche.mic = extend.mic;
+    </select>
+    
+    <insert id="insertSchedules">
+        <foreach collection="schedules" item="sche" index="i" >
+            INSERT INTO 
+            	tb_amp_basic_schedule_info(<include refid="scheduleBaseColumn" />)
+            VALUES(
+            	now(),
+            	#{sche.marketingCode},
+            	#{sche.mic},
+            	#{sche.activityInfo.activityCode},
+            	#{sche.media.mediaId},
+            	#{sche.urlPc},
+            	#{sche.terminalType},
+            	#{sche.unit},
+            	#{sche.urlUpdate},
+            	#{sche.urlUpdateTime},
+            	#{sche.clickAvg},
+            	#{sche.exposureAvg},
+            	1,
+            	#{sche.isFrequency},
+            	#{sche.numFrequency},
+            	#{sche.periodFrequency},
+            	#{sche.funFrequency},
+            	#{sche.createUser},
+            	#{sche.dataCaliber},
+            	#{sche.groupId},
+            	#{sche.micNo},
+            	#{sche.isKeySchedule},
+            	#{sche.dataCaliber},
+            	#{sche.dataCaliber}
+            );
+        </foreach>
+    </insert>
+    
+    <select id="findByMicAndActCode" resultMap="scheduleMap">
+        SELECT mic,url_pc 
+        FROM tb_amp_basic_schedule_info
+        WHERE activity_code = #{actCode}
+        AND mic in(
+        	<foreach collection="mics" item="mic" index="i" separator="," close="">
+				#{mic}        	    
+        	</foreach>
+        )
+    </select>
+    
+    
+    <insert id="insertScheduleExtens">
+        <foreach collection="scheduleExtens" index="i" item="sche">
+			INSERT INTO
+				tb_amp_basic_schedule_extend_info(<include refid="scheduleExtenColumn" />)
+			VALUES(
+				#{sche.extenInfo.mic},
+				#{sche.extenInfo.pointLocation},
+				#{sche.extenInfo.putFunction},
+				#{sche.extenInfo.materialRequire},
+				#{sche.extenInfo.resourceType},
+				#{sche.extenInfo.planName},
+				#{sche.extenInfo.unitName},
+				#{sche.extenInfo.keyName},
+				#{sche.extenInfo.clearCode},
+				#{sche.extenInfo.resourcePosition},
+				#{sche.extenInfo.putFrequency},
+				0,
+				#{sche.extenInfo.supportExposure},
+				#{sche.extenInfo.supportClick},
+				0,
+				#{sche.extenInfo.clickUrl},
+				#{sche.extenInfo.exposureUrl},
+				#{sche.extenInfo.area}
+			);          
+        </foreach>
+    </insert>
+    
+    <!-- 更改排期预估 -->
+    <update id="updateClickAndExposureAvg">
+        <foreach collection="schedules" index="i" item="sche">
+	        UPDATE TB_AMP_BASIC_SCHEDULE_INFO
+	        SET
+	        	click_avg = #{sche.clickAvg},
+	        	exposure_avg = #{sche.exposureAvg},
+	        	url_update_time = now()
+	        WHERE
+	        	mic = #{sche.mic};
+        </foreach>
+    </update>
+    
+    <!-- 更改排期点位循序编号 -->
+    <update id="updateMicNo">
+        <foreach collection="schedules" index="i" item="sche">
+			UPDATE TB_AMP_BASIC_SCHEDULE_INFO
+	        SET
+	        	mic_no = #{sche.micNo}
+	        WHERE
+	        	mic = #{sche.mic};		            
+        </foreach>
+    </update>
+    
+    <!-- 根据活动编号删除排期 -->
+    <delete id="deleteScheduleByActCode">
+        DELETE FROM
+			tb_amp_basic_schedule_info
+        WHERE 
+        	activity_code = #{actCode}
+    </delete>
+    
+    
+     <!-- 根据活动编号删除排期 -->
+    <delete id="deleteExtendByActCode">
+        DELETE FROM
+			tb_amp_basic_schedule_extend_info
+        WHERE 
+        	mic IN (
+        		SELECT mic 
+        		FROM tb_amp_basic_schedule_info
+        		WHERE activity_code = #{actCode}
+        	);
+    </delete>
+   
+    <!-- 查找活动结束 60天至今的同步跳转表 -->
+    <select id="micAndUrl" resultMap="scheduleMap">
+        SELECT 
+        	sche.MIC MIC,sche.URL_PC URL_PC,extend.SUPPORT_CLICK,extend.SUPPORT_EXPOSURE
+        FROM
+        	tb_amp_basic_schedule_extend_info extend,
+        	tb_amp_basic_schedule_info sche,
+        	tb_amp_basic_activity_info act
+        WHERE 
+        	extend.mic = sche.mic
+        AND
+        	sche.activity_code = act.activity_code
+        AND
+        <![CDATA[now() - act.activity_end_date < '60 days'::interval]]>
+    </select>
+    
+     <resultMap id="scheduleMap" type="com.udbac.entity.TbAmpBasicScheduleInfo" >
+        <id column="mic" property="mic"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="MARKETING_CODE" property="marketingCode"/>
+        <result column="ACTIVITY_CODE" property="activityCode"/>
+        <result column="URL_PC" property="urlPc"/>
+        <result column="TERMINAL_TYPE" property="terminalType"/>
+        <result column="UNIT" property="unit"/>
+        <result column="URL_UPDATE" property="urlUpdate"/>
+        <result column="URL_UPDATE_TIME" property="urlUpdateTime"/>
+        <result column="CLICK_AVG" property="clickAvg"/>
+        <result column="EXPOSURE_AVG" property="exposureAvg"/>
+        <result column="ENABLE" property="enable"/>
+        <result column="IS_FREQUENCY" property="isFrequency"/>
+        <result column="NUM_FREQUENCY" property="numFrequency"/>
+        <result column="PERIOD_FREQUENCY" property="periodFrequency"/>
+        <result column="FUN_FREQUENCY" property="funFrequency"/>
+        <result column="create_user" property="createUser"/>
+        <result column="data_caliber" property="dataCaliber"/>
+        <result column="group_id" property="groupId"/>
+        <result column="mic_no" property="micNo"/>
+        <association property="activityInfo" column="ACTIVITY_CODE" select="com.udbac.dao.MonitorPlanDao.findByCode"/>
+        <association property="media" column="MEDIA_ID" select="com.udbac.dao.MediaDao.findMediaById" />
+        <association property="extenInfo" resultMap="scheduleExtenMap" />
+        <collection property="calendarInfo" column="mic" select="com.udbac.dao.ScheduleCalendarDao.findScheduleCalendarBymic" ofType="com.udbac.entity.TbAmpBasicSchedulCalendarInfo" />
+    </resultMap>
+    
+     <resultMap id="scheduleExtenMap" type="com.udbac.entity.TbAmpBasicScheduleExtenInfo">
+        <id column="mic" property="mic"/>
+        <result column="POINT_LOCATION" property="pointLocation"/>
+        <result column="PUT_FUNCTION" property="putFunction"/>
+        <result column="MATERIAL_REQUIRE" property="materialRequire"/>
+        <result column="RESOURCE_TYPE" property="resourceType"/>
+        <result column="PLAN_NAME" property="planName"/>
+        <result column="UNIT_NAME" property="unitName"/>
+        <result column="KEY_NAME" property="keyName"/>
+        <result column="CLEAR_CODE" property="clearCode"/>
+        <result column="RESOURCE_POSITION" property="resourcePosition"/>
+        <result column="PUT_FREQUENCY" property="putFrequency"/>
+        <result column="EXPOSURE_METERIAL" property="exposureMeterial"/>
+        <result column="SUPPORT_EXPOSURE" property="supportExposure"/>
+        <result column="SUPPORT_CLICK" property="supportClick"/>
+        <result column="CLICK_METERIAL" property="clickMeterial"/>
+        <result column="CLICK_URL" property="clickUrl"/>
+        <result column="EXPOSURE_URL" property="exposureUrl"/>
+        <result column="AREA" property="area"/>
+    </resultMap>
+    
+</mapper>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.udbac.dao.MonitorPlanDao">
+
+	<select id="monitorPlanDetail" parameterType="java.util.List"
+		resultType="com.udbac.entity.AddMonitorPlanBean">
+		SELECT
+		predict_start_date,
+		activity_name,
+		a.activity_code,
+		parent_activity_code,
+		a.monitor_people,
+		a.font_support_people,
+		a.after_support_people,
+		memo,
+		parent_idf,
+		a.customer_id,
+		b.customer_name ,
+		c.real_name after_support_people_name,
+		d.real_name font_support_people_name,
+		e.real_name monitor_people_name,
+		CASE WHEN t2.button_type::INTEGER=11 THEN '终端' 
+ WHEN t2.button_type::INTEGER=12 THEN '业务'
+ WHEN t2.button_type::INTEGER=13 THEN '充值'
+ WHEN t2.button_type::INTEGER=14 THEN '推广'
+ WHEN t2.button_type::INTEGER=15 THEN '配件'
+ WHEN t2.button_type::INTEGER=16 THEN '终端和配件'
+ WHEN t2.button_type::INTEGER=21 THEN '买手机'
+ WHEN t2.button_type::INTEGER=22 THEN '办业务'
+ WHEN t2.button_type::INTEGER=23 THEN '办套餐'
+ WHEN t2.button_type::INTEGER=24 THEN '挑配件' END button_type,
+CASE WHEN t2.involve_index::INTEGER=1 THEN '有效行为转换率'
+WHEN t2.involve_index::INTEGER=2 THEN '业务成功转换率' END involve_index,
+
+	page_url,button_name,button_id,page_name,button_event
+		FROM
+		tb_amp_basic_customer_info b,
+		tb_amp_basic_activity_info a INNER JOIN tb_amp_basic_user_info c ON a.after_support_people::integer=c.user_id,
+		(SELECT
+		monitor_people,
+		font_support_people,
+		c.real_name
+
+		FROM
+		tb_amp_basic_activity_info a  LEFT JOIN tb_amp_basic_user_info c ON a.font_support_people::integer=c.user_id
+		WHERE a.activity_code = #{actCode})d,
+		(SELECT
+		monitor_people,
+		font_support_people,
+		c.real_name
+
+		FROM
+		tb_amp_basic_activity_info a  LEFT JOIN tb_amp_basic_user_info c ON a.monitor_people::integer=c.user_id
+		WHERE a.activity_code = #{actCode})e,
+		(SELECT
+		j.*
+
+		FROM
+		tb_amp_basic_activity_info a  left JOIN tb_amp_basic_monitor_scheme_info j ON j.activity_code=a.activity_code
+		WHERE a.activity_code = #{actCode}) t2
+
+
+		WHERE
+		a.customer_id::integer=b.customer_id
+		and a.activity_code = #{actCode}
+		
+	</select>
+	<select id="showMonitorPlan" parameterType="java.util.List"
+		resultType="com.udbac.entity.AddMonitorPlanBean">
+		SELECT
+		predict_start_date,
+		activity_name,
+		activity_code,
+		parent_activity_code,
+		monitor_people,
+		font_support_people,
+		after_support_people,
+		memo,
+		stat_mark,
+		parent_idf,
+		customer_id
+		FROM
+		tb_amp_basic_activity_info
+		WHERE
+		activity_code = #{actCode}
+	</select>
+
+	<select id="getUser" resultType="com.udbac.entity.User">
+		SELECT
+		tb_user.user_id,
+		tb_role.role_id,
+		tb_user.role_id,
+		tb_role.role_name,
+		tb_user.real_name
+		FROM
+		tb_amp_basic_role_info as tb_role ,
+		tb_amp_basic_user_info as tb_user
+		WHERE
+		tb_user.role_id = tb_role.role_id
+		ORDER
+		BY
+		tb_role.role_id ASC
+
+	</select>
+	
+	
+	<!-- 监测方案下面的信息查询 -->
+	<resultMap type="com.udbac.entity.AddMonitorPlanBean" id="planBeanMap">
+		<result property="activity_code" column="activity_code" />
+		<result property="activity_name" column="activity_name" />
+		<collection property="planInfo" ofType="com.udbac.entity.AddMoniterPlanInfo">
+			<result property="PAGE_NAME" column="page_name" />
+			<result property="PAGE_ID" column="page_id" />
+			<collection property="BTN_INFO" ofType="com.udbac.entity.ButtonInfo">
+				<result property="DCSID_S" column="dcsid_s" />
+				<result property="BTN_TYPE" column="button_type" />
+				<result property="BTN_NAME" column="button_name" />
+				<result property="BTN_ID" column="button_id" />
+				<result property="PAGE_URL" column="page_url" />
+				<result property="MATCH_RULE" column="url_match" />
+				<collection property="KEY_VALUE" ofType="com.udbac.entity.KeyValueInfo">
+					<result property="KEY" column="target_key" />
+					<result property="VALUE" column="target_value" />
+					<result property="OPERATION" column="target_operator" />
+					<result property="SCHEME_ID" column="scheme_id" />	
+				</collection>		
+			</collection>	
+		</collection>
+	</resultMap>
+	
+	<select id="planBean" resultMap="planBeanMap">
+		SELECT
+		activity_name,
+		a.activity_code,
+		t2.*
+		FROM
+		tb_amp_basic_customer_info b,
+		tb_amp_basic_activity_info a INNER JOIN tb_amp_basic_user_info c ON a.after_support_people::integer=c.user_id,
+		(SELECT
+		monitor_people,
+		font_support_people,
+		c.real_name
+
+		FROM
+		tb_amp_basic_activity_info a  LEFT JOIN tb_amp_basic_user_info c ON a.font_support_people::integer=c.user_id
+		WHERE a.activity_code = #{actCode})d,
+		(SELECT
+		monitor_people,
+		font_support_people,
+		c.real_name
+
+		FROM
+		tb_amp_basic_activity_info a  LEFT JOIN tb_amp_basic_user_info c ON a.monitor_people::integer=c.user_id
+		WHERE a.activity_code = #{actCode})e,
+		(SELECT
+		j.*
+
+		FROM
+		tb_amp_basic_activity_info a  left JOIN tb_amp_basic_monitor_scheme_info_tmp j ON j.activity_code=a.activity_code
+		WHERE a.activity_code = #{actCode}) t2
+
+
+		WHERE
+		a.customer_id::integer=b.customer_id
+		and a.activity_code = #{actCode}
+	</select>
+
+</mapper>

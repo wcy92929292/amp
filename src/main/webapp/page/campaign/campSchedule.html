@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="x-ua-compatible" content="IE=edge,chrome=1">
+<title>活动投放排期</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<script src="../../js/campSchedule.js"></script>
+<!-- 模板 -->
+<script type="text/javascript" src="../../js/com/jquery.tmpl.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../css/model.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<script type="text/html" id="template">
+<tr class="trline">
+	<td nowrap="nowrap"><div style="width:90px;">${media_type}</div></td>
+	<td nowrap="nowrap"><div style="width:90px;">${media_name}</div></td>
+	<td nowrap="nowrap"><div style="width:110px;">${resource_type}</div></td>
+	<td nowrap="nowrap"><div style="width:170px;">${point_location}</div></td>
+	<td nowrap="nowrap"><div style="width:300px;">${url_pc}</div></td>
+	<td nowrap="nowrap"><div style="width:240px;">${put_function}</div></td>
+	<td nowrap="nowrap"><div style="width:370px;">${material_require}</div></td>
+	<td nowrap="nowrap"><div style="width:75px;">${unit}</td>
+	<td nowrap="nowrap"><div style="width:125px;">${resource_position}</div></td>
+	<td nowrap="nowrap"><div style="width:125px;">${put_frequency}</div></td>
+	<td nowrap="nowrap" class="click" onclick="changeClick()"><div style="width:125px; cursor:pointer;">${click_avg}</div></td>
+	<td nowrap="nowrap" class="exposure" onclick="changeClick()"><div style="width:125px; cursor:pointer;">${exposure_avg}</div></td>
+	<td nowrap="nowrap"><div style="width:215px;">${support_exposure}</div></td>
+	<td nowrap="nowrap"><div style="width:215px;">${support_click}</div></td>
+	<td nowrap="nowrap"><div style="width:215px;">${exposure_meterial}</div></td>
+	<td nowrap="nowrap"><div style="width:215px;">${click_meterial}</div></td>
+	<td nowrap="nowrap"><div style="width:200px;">${mic}</div></td>
+	<td nowrap="nowrap"><div style="width:124px;">${imp_data_caliber}</div></td>
+	<td nowrap="nowrap"><div style="width:120px;">${clk_data_caliber}</div></td>
+	<td nowrap="nowrap"><div style="width:340px;">${exposure_url}</div></td>
+	<td nowrap="nowrap"><div style="width:340px;">${click_url}</div></td>
+</tr>
+</script>
+</head>
+<body>
+<!-- 头部 -->
+<div class="headers"></div>
+<div class="contain">
+	<div class="zxy_contain1" style="overflow-x: hidden;">
+		<!-- 菜单导航 -->
+		<div id="template-nav"></div>
+		<div class="row zxy_row_one" style="min-width:770px;">
+			<div class="m_s_title">监测活动展示</div>
+			<span style="display: none" class="msg"><font color="red">预留</font></span>
+			<div class="col-sm-8" align="right">
+				<div class="row"></div>
+			</div>
+			<input type="button" id="cancal_id" value="返回" class="button_style" style="margin-top: 10px;" onclick="$('#back')[0].click();" />
+			<a id="back" style="display: none;" href="../campaign/campaign.html?back"></a>
+		</div>
+		<!--弹出框-->
+		<div class="cd-popup3">
+			<div class="cd-popup-container3">
+				<h4>修改日均点击量预估</h4><br>
+				<div class="cd-buttons">
+					<span style="display:none; color: red;" id="updateShow"></span><br>
+					点位短代码：<input type="text" disabled="disabled" id="orgMic" ><br><br>
+					原来的点击量预估值：<input type="text" disabled="disabled" id="orgClick" ><br><br>
+					要修改的点击量预估值:<input type="text" id="newClick">
+				</div>
+				<a href="" class="cd-popup-close">close</a><br>
+				<input type="button" id="updateBtn" value="修改" class="button_style">
+		    </div>
+		</div>
+		
+		<div class="cd-popup2">
+			<div class="cd-popup-container2">
+				<h4>修改日均曝光量预估</h4><br>
+				<div class="cd-buttons">
+					<span style="display:none; color: red;" id="updateShow2"></span><br>
+					点位短代码：<input type="text" disabled="disabled" id="orgMic2"><br><br>
+					原来的曝光量预估值：<input type="text" disabled="disabled" id="orgExposure"><br><br>
+					要修改的曝光量预估值:<input type="text" id="newExposure">
+		        </div>
+		        <a href="" class="cd-popup-close">close</a><br>
+		        <input type="button" id="updateBtn2" value="修改" class="button_style">
+		    </div>
+		</div>
+		
+		<div class="table-responsive" id="div_table" style="height:89%; width:100%; overflow:auto; position:relative;">
+			<table class="table table-striped table-hover" id="table_id" style="margin:0; position:relative;">
+				<thead id='thead_1' style="position:absolute; z-index:2;">
+					<tr id="row_one">
+						<td id="row_td_id" rowspan="2" style="padding: 8px 20px;">媒体类别</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 20px;">媒体名称</td>
+						<td id="row_td_id" rowspan="2" class="resource" style="padding: 8px 30px;">资源类型</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 60px;">投放位置</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 110px;">投放位置网址</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 95px;">投放形式</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 160px;">物料要求</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 12.5px;">投放单位</td>
+						<td class="row_td_id" rowspan="2" style="padding: 8px 37.5px;">资源定位</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 37.5px;">投放频次</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 15px;">日均点击量预估</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 15px;">日均曝光量预估</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 15.5px;">可添加第三方曝光监测(是/否)</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 15.5px;">可添加第三方点击监测(是/否)</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 30.5px;">曝光代码嵌入物料(是/否)</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 30.5px;">点击代码嵌入物料(是/否)</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 67.5px;">点位短代码</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 20px;">曝光去重口径</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 20px;">点击去重口径</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 115px;">广告曝光监测代码</td>
+						<td id="row_td_id" rowspan="2" style="padding: 8px 115px;">广告点击监测代码</td>
+					</tr>
+					<tr class="row_td"></tr>
+				</thead>
+
+				<tbody id="tbody_id" class="zxy_tab5" style="position: absolute; top: 75px; z-index: 1;"></tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div style="z-index: 19891015; background-color: #000; display: none; opacity: 0.3; filter: alpha(opacity = 30);" class="xubox_shade" id="mb" times="1"></div>
+<script>
+$(function()
+	{
+		$(".table-responsive").off("scroll").on("scroll",function()//解除绑定滚动事件
+		{
+			var height = $(this).scrollTop() + "px";//定义ul的定位后的top值等于滚动条滚动的高度
+			$("#thead_1").css("top",height);
+		});
+	});
+</script>
+</body>
+</html>

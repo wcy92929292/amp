@@ -1,0 +1,40 @@
+<script src="../../js/common.js"></script>
+<script type="text/javascript" src="/amp/js/cookie.js"></script>
+<script type="text/javascript">
+	//客户 隐藏监测方案和营销活动的导航
+	var role = getCookie("roleName");
+	if(role.indexOf("客户") >= 0){
+		$("#nav li").eq(2).remove();
+		$("#nav li").eq(3).remove();
+	}
+</script>
+
+<div class="zxy_header">
+	<ul id="nav">
+		<li>
+			<a href="http://udbac.com/">UDBAC广告监测数据平台</a>
+		</li>
+		<li style="/* visibility: hidden; 位置暂留误删*/ display:none;">
+			<div  class="zxy_search">
+				<input type="text" placeholder="搜索..." />
+				<img src="../../images/main/search.png">
+			</div>
+		</li>
+		<li>
+			<div class="zxy_bg"><a href="/amp/page/campaign/campaign.html">营销活动</a></div>
+			<span>营销活动</span>
+		</li>
+		<li>
+			<div class="zxy_bg"><a href="/amp/page/check/check.html?mic=">上线核查</a></div>
+			<span>上线核查</span>
+		</li>
+		<li>
+			<div class="zxy_bg"><a href="/amp/page/monitorPlan/monitorPlan.html">监测方案</a></div>
+			<span>监测方案</span>
+		</li>
+		<li>
+			<div class="zxy_bg"><a href="/amp/page/index/index.html">概览</a></div>
+			<span>概览</span>
+		</li>
+	</ul>
+</div>

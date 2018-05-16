@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>URL变更</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/data.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<!-- echarts -->
+<script src="../../js/com/echarts-all.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/rili_js/laydate.js"></script>
+<script type="text/javascript" src="../../js/rili_js/style.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<script src="../../js/updateUrl.js"></script>
+<!-- 头部 -->
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		$(".headers").loadTemplate("../../common/header.html", {});
+	});
+</script>
+
+</head>
+<body>
+	<div class="headers"></div>
+	<div class="contain">
+		<div class="zxy_contain1">
+			<!-- 菜单导航 -->
+			<div id="template-nav" ></div>
+	
+			<div class="tab-content">
+				<div id="message"></div>
+				<table class="table table-striped table-hover" id="table_id1">
+					<tbody>
+						<tr>
+							<td colspan="4">更改URL_
+								<span id="state" style="color:red;">新增</span>
+								<input type="hidden" id="updateBatch"/>
+							</td>
+						</tr>
+						<tr>
+							<td><label >活动名称</label></td>
+							<td>
+								<input type="text" class="form-control" name="actName" disabled="disabled"/>
+							</td>
+							<td><label >活动编号</label></td>
+							<td>
+								<input type="text" class="form-control" name="actCode" disabled="disabled" />
+							</td>
+						</tr>
+						<tr>
+							<td><label>生效时间</label></td>
+							<td>
+								<input id="sj" placeholder="点击选择时间" class="form-control" name="urlUpdateTime" onClick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+							</td>
+							<td><label>新链接</label></td>
+							<td>
+								<input type="text" class="form-control" name="newUrl"/>
+							</td>
+						</tr>
+						<tr>
+							<td><label>创建人</label> </td>
+							<td>
+								<input type="text" class="form-control" disabled="disabled" name="createUser">
+							</td>
+							<td><label>指定后端技术支撑角色人员</label></td>
+							<td>
+								<select id="after" style="width: 100%;">
+									<option value="-1">---请选择---</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label>短代码(一行一个)</label>
+							</td>
+							<td >
+								<textarea class="form-control" rows="3" name="mics"></textarea>
+							</td>
+							<td>
+								<label>备注</label></td>
+							<td>
+								<textarea class="form-control" rows="3" name="memo"></textarea>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+	
+				<div class="table-responsive" id="div_table">
+					<table class="table table-striped table-hover" id="table_id2">
+						<thead id='thead_1'>
+							<tr>
+								<th>按钮名称</th>
+								<th>按钮ID</th>
+								<th>按钮事件</th>
+								<th>涉及指标</th>
+								<th>按钮类别</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody class="tab">
+							<tr>
+								<td><input type="text" class="form-control" name="buttonName"/></td>
+								<td><input type="text" class="form-control" name="buttonID"/></td>
+								<td><input type="text" class="form-control" name="buttonEvent"/></td>
+								<td>
+									<select class="select" name="involveIndex" onchange="changeInvolveIndex(this);"></select>
+								</td>
+								<td>
+									<select class="select" name="buttonType"></select>
+								</td>
+								<td>
+									<div class="btn-group">
+										<button type="button" onclick="$(this).parents('tr').remove();" class="button_style">删除</button>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td colspan="6" style="text-align:left;">
+									<button type="button" id="addtr" class="button_style">增加</button>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="6">
+									<button type="button" id="update_id" class="button_style" style="display:none;">OK</button>
+									<button type="button" id="comfirm_id" name="comfirm_id" value="2" class="button_style">OK</button>
+									<button type="button" name="comfirm_id" value="3" class="button_style" style="width:6em;">审核不通过</button>
+									<select id="updateBatchSelect" class="select"></select>
+									<button type="button" id="cancal_id" class="button_style" onclick="$('#back')[0].click();">关闭</button>
+									<a id="back" style="display: none;" href="../campaign/campaign.html?back"></a>
+								</td>
+							</tr>
+						</tfoot>
+					</table>	
+				</div>
+			</div>
+			<div id="result">
+				<h4>使用的跳转链接（一行一个）</h4>
+				<div>
+				 	<span></span>
+				</div>
+				<h4>需要通知媒体更改URL（使用以上跳转链接）的点位（一行一个）</h4>
+				<div>
+					 <span></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

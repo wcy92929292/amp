@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 营销活动——活动监测数据 by LiQ 2016-04-18-->
+<mapper namespace="com.udbac.dao.CampaignDao">
+	<resultMap id="MonitingDateResultMap" type="com.udbac.entity.CampMonitingDateBean" >
+		<!-- <result column="createDate" property="createDate" /> -->
+		<result column="createDate" property="createDate" />
+		<result column="customer_name" property="customerName"  jdbcType="VARCHAR"/>
+		<result column="activity_code" property="activityCode" />
+		<result column="activity_name" property="activityName" />
+		<result column="reality_start_date" property="realityStartDate" />
+		<result column="activity_end_date" property="activityEndDate" />
+		<result column="media_name" property="mediaName"  jdbcType="VARCHAR"/>
+		<result column="point_location" property="pointLocation"  jdbcType="VARCHAR"/>
+		<result column="put_function" property="putFunction"  jdbcType="VARCHAR"/>
+		<result column="unit" property="unit"  jdbcType="VARCHAR"/>
+		<result column="go_live_type" property="goLiveType"/>
+		<result column="terminal_type" property="terminalType" jdbcType="VARCHAR"/>
+		<result column="marketing_code" property="marketingCode" jdbcType="VARCHAR"/>
+		<result column="mic" property="mic" jdbcType="VARCHAR"/>
+		<result column="click_avg" property="clickAvg" jdbcType="INTEGER"/>
+		<result column="exposure_avg" property="exposureAvg" jdbcType="INTEGER"/>
+		<result column="monitor_exposure_pv" property="monitorExposurePv" jdbcType="INTEGER"/>
+		<result column="monitor_exposure_uv" property="monitorExposureUv" jdbcType="INTEGER"/>
+		<result column="monitor_click_pv" property="monitorClickPv" jdbcType="INTEGER"/>
+		<result column="monitor_click_uv" property="monitorClickUv" jdbcType="INTEGER"/>
+		<result column="visits" property="visit" jdbcType="INTEGER"/>
+		<result column="visitor" property="visitor" jdbcType="INTEGER"/>
+		<result column="click" property="click" jdbcType="INTEGER"/>
+		<result column="pv" property="pv"  jdbcType="INTEGER"/>
+		<result column="bounce_visit" property="bounceVisit"  jdbcType="VARCHAR"/>
+		<result column="visits_time" property="visitsTime"  jdbcType="VARCHAR" />
+		<result column="url_update" property="urlUpdate"  jdbcType="VARCHAR"/>
+		<result column="resource_position" property="resourcePosition"  jdbcType="VARCHAR"/>
+		<result column="resource_type" property="resourceType"  jdbcType="VARCHAR"/>
+		<result column="effective_conversion_rate" property="effectiveConversionRate"  jdbcType="VARCHAR"/>
+		<result column="business_success_rate" property="businessSuccessRate"  jdbcType="VARCHAR"/>
+
+	</resultMap>
+	<!-- 根据上一页面传来的activityCode 查询  by LiQ -->
+	<select id="queryMonitingData" resultMap="MonitingDateResultMap2" parameterType="map">
+	SELECT 	calendar.PUT_DATE createDate,
+				customer.CUSTOMER_NAME customer_name,
+				activity.ACTIVITY_CODE activity_code,
+				activity.ACTIVITY_NAME activity_name,
+				activity.REALITY_START_DATE reality_start_date,
+				activity.ACTIVITY_END_DATE activity_end_date,
+				media.media_name,
+				scheduleExtend.POINT_LOCATION point_location,
+				scheduleExtend.PUT_FUNCTION put_function,
+				schedule.UNIT unit,
+				activity.GO_LIVE_TYPE go_live_type,
+				schedule.TERMINAL_TYPE terminal_type,
+				schedule.MIC mic,
+				schedule.CLICK_AVG click_avg,
+				schedule.EXPOSURE_AVG exposure_avg,
+				b.fore_imp_pv,b.fore_clk_pv,b.fore_imp_uv,b.fore_clk_uv,
+
+ 				back.vv visits,
+ 				back.uv visitor,
+				back.clk click,
+ 				back.pv pv,
+ 				back.bounce_times bounce_visit,
+ 				back.time_spent visits_time,
+				schedule.URL_PC url_update,
+				scheduleExtend.RESOURCE_POSITION resource_position,
+				scheduleExtend.RESOURCE_TYPE resource_type,
+  			CASE WHEN b.fore_imp_pv!=0 THEN
+  			 	CAST	(((b.fore_clk_pv*1.00)/b.fore_imp_pv)*100 as decimal ( 18, 2))||'%'  END AS ctr,
+  				
+  			CASE WHEN back.pv!=0 THEN
+  				CAST (((back.bounce_times*1.00)/back.pv)*100  as decimal ( 18, 2))||'%' END  AS jump,
+ 				
+  			CASE WHEN schedule.EXPOSURE_AVG::INTEGER!=0 THEN
+  				CAST (((fore_imp_pv*1.00)/schedule.EXPOSURE_AVG::INTEGER)*100  as decimal ( 18, 2))||'%' END  AS imp_comp,
+  			CASE WHEN schedule.CLICK_AVG::INTEGER!=0 THEN
+  				CAST (((fore_clk_pv*1.00)/schedule.CLICK_AVG::INTEGER)*100  as decimal ( 18, 2))||'%' END  AS clk_comp
+			FROM tb_amp_basic_schedule_calendar_info AS calendar,
+				 (SELECT foreDayMonitor.mic,foreDayMonitor.put_date,   
+				 case 
+			 	  when schedule.imp_data_caliber ='1' then foreDayMonitor.clean_imp_pv  
+		     	  when schedule.imp_data_caliber ='2' then foreDayMonitor.dclean_imp_pv 
+		     	else foreDayMonitor.dirty_imp_pv end fore_imp_pv,
+		     	case 
+			 	  when schedule.clk_data_caliber ='1' then foreDayMonitor.clean_clk_pv  
+		     	  when schedule.clk_data_caliber ='2' then foreDayMonitor.dclean_clk_pv 
+		     	else foreDayMonitor.dirty_clk_pv end fore_clk_pv,
+		     	case 
+			 	  when schedule.imp_data_caliber ='1' then foreDayMonitor.clean_imp_uv  
+		     	  when schedule.imp_data_caliber ='2' then foreDayMonitor.dclean_imp_uv 
+		     	else foreDayMonitor.dirty_imp_uv end fore_imp_uv,
+		     	case 
+			 	  when schedule.clk_data_caliber ='1' then foreDayMonitor.clean_clk_uv  
+		     	  when schedule.clk_data_caliber ='2' then foreDayMonitor.dclean_clk_uv 
+		     	else foreDayMonitor.dirty_clk_uv end fore_clk_uv 
+				FROM tb_amp_sum_fore_d AS foreDayMonitor,
+						tb_amp_basic_schedule_info AS schedule
+				WHERE schedule.mic= foreDayMonitor.mic
+				<if test="null != activityCode and '' != activityCode">
+				AND foreDayMonitor.ACTIVITY_CODE=#{activityCode}
+				</if>
+				<if test="sdate != null and '' != sdate">
+				<![CDATA[ AND to_char(foreDayMonitor.PUT_DATE,'YYYY-MM-DD')>= #{sdate} ]]></if>
+				<if test="edate != null and '' != edate">
+				<![CDATA[ AND to_char(foreDayMonitor.PUT_DATE,'YYYY-MM-DD')<= #{edate} ]]></if>
+				 ) b,
+					tb_amp_basic_schedule_info AS schedule,
+				 tb_amp_basic_activity_info AS activity,
+				 tb_amp_basic_schedule_extend_info AS scheduleExtend,
+
+				 tb_amp_sum_fore_d AS foreDayMonitor 	     
+   			full join
+				 tb_amp_sum_back_d back
+			on	foreDayMonitor.put_date = back.daytime and foreDayMonitor.mic=back.mic ,
+				 tb_amp_basic_customer_info AS customer,
+				 tb_amp_basic_media_info AS media
+			WHERE calendar.mic = schedule.mic
+			AND to_char(calendar.put_date,'YYYY-MM-DD') = to_char(foreDayMonitor.put_date,'YYYY-MM-DD')
+			AND calendar.mic=b.mic
+			AND to_char(calendar.put_date,'YYYY-MM-DD') = to_char(b.put_date,'YYYY-MM-DD')	
+			AND activity.ACTIVITY_CODE=schedule.ACTIVITY_CODE
+			AND activity.ACTIVITY_CODE= foreDayMonitor.activity_code
+			AND scheduleExtend.mic = schedule.mic
+			AND schedule.MEDIA_ID::integer=media.MEDIA_ID
+			AND foreDayMonitor.mic=calendar.mic
+			AND activity.CUSTOMER_ID::integer=customer.CUSTOMER_ID
+			<if test="null != mediaName and '' != mediaName">
+				AND media.MEDIA_NAME LIKE '%${mediaName}%'
+			</if>
+			<if test="null != activityCode and '' != activityCode">
+				AND activity.ACTIVITY_CODE=#{activityCode}
+			</if>
+			<if test="null != marketingCode and '' != marketingCode">
+				AND schedule.MIC LIKE '%${marketingCode}%'
+			</if>
+			<if test="sdate != null and '' != sdate">
+				<![CDATA[ AND to_char(calendar.PUT_DATE,'YYYY-MM-DD')>= #{sdate} ]]></if>
+			<if test="edate != null and '' != edate">
+				<![CDATA[ AND to_char(calendar.PUT_DATE,'YYYY-MM-DD')<= #{edate} ]]></if>
+				
+	
+	</select>
+	
+	<!-- 本页面条件查询  by LiQ -->
+	<select id="searchMonitingData" resultMap="MonitingDateResultMap2" parameterType="map">
+			SELECT 	calendar.PUT_DATE createDate,
+				customer.CUSTOMER_NAME customer_name,
+				activity.ACTIVITY_CODE activity_code,
+				activity.ACTIVITY_NAME activity_name,
+				activity.REALITY_START_DATE reality_start_date,
+				activity.ACTIVITY_END_DATE activity_end_date,
+				media.media_name,
+				scheduleExtend.POINT_LOCATION point_location,
+				scheduleExtend.PUT_FUNCTION put_function,
+				schedule.UNIT unit,
+				activity.GO_LIVE_TYPE go_live_type,
+				schedule.TERMINAL_TYPE terminal_type,
+				schedule.MIC mic,
+				schedule.CLICK_AVG click_avg,
+				schedule.EXPOSURE_AVG exposure_avg,
+				b.fore_imp_pv,b.fore_clk_pv,b.fore_imp_uv,b.fore_clk_uv,
+
+ 				back.vv visits,
+ 				back.uv visitor,
+				back.clk click,
+ 				back.pv pv,
+ 				back.bounce_times bounce_visit,
+ 				back.time_spent visits_time,
+				schedule.URL_PC url_update,
+				scheduleExtend.RESOURCE_POSITION resource_position,
+				scheduleExtend.RESOURCE_TYPE resource_type,
+  			CASE WHEN b.fore_imp_pv!=0 THEN
+  			 	CAST	(((b.fore_clk_pv*1.00)/b.fore_imp_pv)*100 as decimal ( 18, 2))||'%'  END AS ctr,
+  				
+  			CASE WHEN back.pv!=0 THEN
+  				CAST (((back.bounce_times*1.00)/back.pv)*100  as decimal ( 18, 2))||'%' END  AS jump,
+ 				
+  			CASE WHEN schedule.EXPOSURE_AVG::INTEGER!=0 THEN
+  				CAST (((fore_imp_pv*1.00)/schedule.EXPOSURE_AVG::INTEGER)*100  as decimal ( 18, 2))||'%' END  AS imp_comp,
+  			CASE WHEN schedule.CLICK_AVG::INTEGER!=0 THEN
+  				CAST (((fore_clk_pv*1.00)/schedule.CLICK_AVG::INTEGER)*100  as decimal ( 18, 2))||'%' END  AS clk_comp
+			FROM tb_amp_basic_schedule_calendar_info AS calendar,
+				 (SELECT foreDayMonitor.mic,foreDayMonitor.put_date,   
+				 case 
+			 	  when schedule.imp_data_caliber ='1' then foreDayMonitor.clean_imp_pv  
+		     	  when schedule.imp_data_caliber ='2' then foreDayMonitor.dclean_imp_pv 
+		     	else foreDayMonitor.dirty_imp_pv end fore_imp_pv,
+		     	case 
+			 	  when schedule.clk_data_caliber ='1' then foreDayMonitor.clean_clk_pv  
+		     	  when schedule.clk_data_caliber ='2' then foreDayMonitor.dclean_clk_pv 
+		     	else foreDayMonitor.dirty_clk_pv end fore_clk_pv,
+		     	case 
+			 	  when schedule.imp_data_caliber ='1' then foreDayMonitor.clean_imp_uv  
+		     	  when schedule.imp_data_caliber ='2' then foreDayMonitor.dclean_imp_uv 
+		     	else foreDayMonitor.dirty_imp_uv end fore_imp_uv,
+		     	case 
+			 	  when schedule.clk_data_caliber ='1' then foreDayMonitor.clean_clk_uv  
+		     	  when schedule.clk_data_caliber ='2' then foreDayMonitor.dclean_clk_uv 
+		     	else foreDayMonitor.dirty_clk_uv end fore_clk_uv 
+				FROM tb_amp_sum_fore_d AS foreDayMonitor,
+						tb_amp_basic_schedule_info AS schedule
+				WHERE schedule.mic= foreDayMonitor.mic
+				<if test="null != activityCode and '' != activityCode">
+				AND foreDayMonitor.ACTIVITY_CODE=#{activityCode}
+				</if>
+				<if test="sdate != null and '' != sdate">
+				<![CDATA[ AND to_char(foreDayMonitor.PUT_DATE,'YYYY-MM-DD')>= #{sdate} ]]></if>
+				<if test="edate != null and '' != edate">
+				<![CDATA[ AND to_char(foreDayMonitor.PUT_DATE,'YYYY-MM-DD')<= #{edate} ]]></if>
+				 ) b,
+					tb_amp_basic_schedule_info AS schedule,
+				 tb_amp_basic_activity_info AS activity,
+				 tb_amp_basic_schedule_extend_info AS scheduleExtend,
+
+				 tb_amp_sum_fore_d AS foreDayMonitor 	     
+   			full join
+				 tb_amp_sum_back_d back
+			on	foreDayMonitor.put_date = back.daytime and foreDayMonitor.mic=back.mic ,
+				 tb_amp_basic_customer_info AS customer,
+				 tb_amp_basic_media_info AS media
+			WHERE calendar.mic = schedule.mic
+			AND to_char(calendar.put_date,'YYYY-MM-DD') = to_char(foreDayMonitor.put_date,'YYYY-MM-DD')
+			AND calendar.mic=b.mic
+			AND to_char(calendar.put_date,'YYYY-MM-DD') = to_char(b.put_date,'YYYY-MM-DD')	
+			AND activity.ACTIVITY_CODE=schedule.ACTIVITY_CODE
+			AND activity.ACTIVITY_CODE= foreDayMonitor.activity_code
+			AND scheduleExtend.mic = schedule.mic
+			AND schedule.MEDIA_ID::integer=media.MEDIA_ID
+			AND foreDayMonitor.mic=calendar.mic
+			AND activity.CUSTOMER_ID::integer=customer.CUSTOMER_ID
+			<if test="null != mediaName and '' != mediaName">
+				AND media.MEDIA_NAME LIKE '%${mediaName}%'
+			</if>
+			<if test="null != activityCode and '' != activityCode">
+				AND activity.ACTIVITY_CODE=#{activityCode}
+			</if>
+			<if test="null != marketingCode and '' != marketingCode">
+				AND schedule.MIC LIKE '%${marketingCode}%'
+			</if>
+			<if test="sdate != null and '' != sdate">
+				<![CDATA[ AND to_char(calendar.PUT_DATE,'YYYY-MM-DD')>= #{sdate} ]]></if>
+			<if test="edate != null and '' != edate">
+				<![CDATA[ AND to_char(calendar.PUT_DATE,'YYYY-MM-DD')<= #{edate} ]]></if>
+		
+	</select>
+	<resultMap id="MonitingDateResultMap2" type="com.udbac.entity.CampMonitingDateBean" >
+		<!-- <result column="createDate" property="createDate" /> -->
+		<result column="createDate" property="createDate" />
+		<result column="customer_name" property="customerName"  jdbcType="VARCHAR"/>
+		<result column="activity_code" property="activityCode" />
+		<result column="activity_name" property="activityName" />
+		<result column="reality_start_date" property="realityStartDate" />
+		<result column="activity_end_date" property="activityEndDate" />
+		<result column="media_name" property="mediaName"  jdbcType="VARCHAR"/>
+		<result column="point_location" property="pointLocation"  jdbcType="VARCHAR"/>
+		<result column="put_function" property="putFunction"  jdbcType="VARCHAR"/>
+		<result column="unit" property="unit"  jdbcType="VARCHAR"/>
+		<result column="go_live_type" property="goLiveType"/>
+		<result column="terminal_type" property="terminalType" jdbcType="VARCHAR"/>
+		<result column="marketing_code" property="marketingCode" jdbcType="VARCHAR"/>
+		<result column="mic" property="mic" jdbcType="VARCHAR"/>
+		<result column="click_avg" property="clickAvg" jdbcType="INTEGER"/>
+		<result column="exposure_avg" property="exposureAvg" jdbcType="INTEGER"/>
+		<result column="fore_imp_pv" property="monitorExposurePv" jdbcType="INTEGER"/>
+		<result column="fore_imp_uv" property="monitorExposureUv" jdbcType="INTEGER"/>
+		<result column="fore_clk_pv" property="monitorClickPv" jdbcType="INTEGER"/>
+		<result column="fore_clk_uv" property="monitorClickUv" jdbcType="INTEGER"/>
+		<result column="visits" property="visit" jdbcType="INTEGER"/>
+		<result column="visitor" property="visitor" jdbcType="INTEGER"/>
+		<result column="click" property="click" jdbcType="INTEGER"/>
+		<result column="pv" property="pv"  jdbcType="INTEGER"/>
+		<result column="bounce_visit" property="bounceVisit"  jdbcType="VARCHAR"/>
+		<result column="visits_time" property="visitsTime"  jdbcType="VARCHAR" />
+		<result column="url_update" property="urlUpdate"  jdbcType="VARCHAR"/>
+		<result column="resource_position" property="resourcePosition"  jdbcType="VARCHAR"/>
+		<result column="resource_type" property="resourceType"  jdbcType="VARCHAR"/>
+		<result column="imp_comp" property="effectiveConversionRate"  jdbcType="VARCHAR"/>
+		<result column="clk_comp" property="businessSuccessRate"  jdbcType="VARCHAR"/>
+		<result column="ctr" property="ctr"  jdbcType="VARCHAR"/>
+		<result column="jump" property="jump"  jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="searchHourMonitingData" resultMap="MonitingDateResultMap2" parameterType="map">
+	SELECT 		
+				b.mic mic,
+				b.createDate createDate,
+				customer.CUSTOMER_NAME customer_name,
+				activity.ACTIVITY_CODE activity_code,
+				activity.ACTIVITY_NAME activity_name,
+				activity.REALITY_START_DATE reality_start_date,
+				activity.ACTIVITY_END_DATE activity_end_date,
+				media.media_name,
+				scheduleExtend.POINT_LOCATION point_location,
+				scheduleExtend.PUT_FUNCTION put_function,
+				schedule.UNIT unit,
+				activity.GO_LIVE_TYPE go_live_type,
+				schedule.TERMINAL_TYPE terminal_type,
+				schedule.URL_PC url_update,
+				schedule.EXPOSURE_AVG,
+				schedule.CLICK_AVG,
+				 b.fore_imp_pv,b.fore_clk_pv,b.fore_imp_uv,b.fore_clk_uv,
+				CASE WHEN b.fore_imp_pv!=0 THEN
+  			 	CAST	(((b.fore_clk_pv*1.00)/b.fore_imp_pv)*100 as decimal ( 18, 2))||'%'  END AS ctr,
+  				
+  			
+ 				
+  			CASE WHEN schedule.EXPOSURE_AVG::INTEGER!=0 THEN
+  				CAST (((fore_imp_pv*1.00)/schedule.EXPOSURE_AVG::INTEGER)*100  as decimal ( 18, 2))||'%' END  AS imp_comp,
+  			CASE WHEN schedule.CLICK_AVG::INTEGER!=0 THEN
+  				CAST (((fore_clk_pv*1.00)/schedule.CLICK_AVG::INTEGER)*100  as decimal ( 18, 2))||'%' END  AS clk_comp
+	FROM 
+		 tb_amp_basic_schedule_calendar_info AS calendar,
+(SELECT  HourMonitor.mic mic,
+					HourMonitor.daytime createDate,
+					
+					case 
+			 	  when schedule.imp_data_caliber ='1' then HourMonitor.clean_imp_pv  
+		     	  when schedule.imp_data_caliber ='2' then HourMonitor.dclean_imp_pv
+		     	else HourMonitor.dirty_imp_pv end fore_imp_pv,
+		     	case 
+			 	  when schedule.clk_data_caliber ='1' then HourMonitor.clean_clk_pv  
+		     	  when schedule.clk_data_caliber ='2' then HourMonitor.dclean_clk_pv
+		     	else HourMonitor.dirty_clk_pv end fore_clk_pv,
+		     	case 
+			 	  when schedule.imp_data_caliber ='1' then HourMonitor.clean_imp_uv  
+		     	  when schedule.imp_data_caliber ='2' then HourMonitor.dclean_imp_uv 
+		     	else HourMonitor.dirty_imp_uv end fore_imp_uv,
+		     	case 
+			 	  when schedule.clk_data_caliber ='1' then HourMonitor.clean_clk_uv  
+		     	  when schedule.clk_data_caliber ='2' then HourMonitor.dclean_clk_uv 
+		     	else HourMonitor.dirty_clk_uv end fore_clk_uv 
+FROM tb_amp_basic_hour_monitor_date AS HourMonitor,
+			tb_amp_basic_schedule_info AS schedule,
+			tb_amp_basic_activity_info AS activity
+WHERE
+			schedule.mic= HourMonitor.mic	
+			AND activity.activity_code= schedule.activity_code
+			<if test="null != activityCode and '' != activityCode">
+				AND activity.ACTIVITY_CODE=#{activityCode}
+			</if>
+			<if test="_sdate != null and '' != _sdate and _edate !=null and '' !=_edate" >
+				<![CDATA[ AND HourMonitor.daytime >= #{_sdate} and HourMonitor.daytime<=#{_edate}
+				 ]]></if>
+			) b,
+		
+
+		 tb_amp_basic_schedule_info AS schedule,
+			tb_amp_basic_activity_info AS activity,
+		 tb_amp_basic_schedule_extend_info AS scheduleExtend,
+		 tb_amp_basic_customer_info AS customer,
+		 tb_amp_basic_media_info AS media
+	WHERE calendar.mic = schedule.mic
+	
+	AND b.mic=schedule.mic
+	AND activity.ACTIVITY_CODE=schedule.ACTIVITY_CODE
+	AND scheduleExtend.mic = schedule.mic
+	
+	
+	AND schedule.MEDIA_ID::integer=media.MEDIA_ID
+	AND b.mic=calendar.mic
+	AND activity.CUSTOMER_ID::integer=customer.CUSTOMER_ID
+	<if test="null != _mediaName and '' != _mediaName">
+				AND media.MEDIA_NAME LIKE '%${_mediaName}%'
+			</if>
+			<if test="null != activityCode and '' != activityCode">
+				AND activity.ACTIVITY_CODE=#{activityCode}
+			</if>
+			<if test="null != _marketingCode and '' != _marketingCode">
+				AND schedule.MIC LIKE '%${_marketingCode}%'
+			</if>
+			<if test="_sdate != null and '' != _sdate and _edate !=null and '' !=_edate" >
+				<![CDATA[ AND calendar.PUT_DATE >= #{_sdate} and calendar.PUT_DATE<=#{_edate}
+				 ]]></if>
+	
+		order by mic,createDate		
+				
+	</select>  
+	<select id="searchTodayMonitingData" resultMap="MonitingDateResultMap2" parameterType="map">
+	SELECT 		
+				b.mic mic,
+				b.createDate createDate,
+				customer.CUSTOMER_NAME customer_name,
+				activity.ACTIVITY_CODE activity_code,
+				activity.ACTIVITY_NAME activity_name,
+				activity.REALITY_START_DATE reality_start_date,
+				activity.ACTIVITY_END_DATE activity_end_date,
+				media.media_name,
+				scheduleExtend.POINT_LOCATION point_location,
+				scheduleExtend.PUT_FUNCTION put_function,
+				schedule.UNIT unit,
+				activity.GO_LIVE_TYPE go_live_type,
+				schedule.TERMINAL_TYPE terminal_type,
+				schedule.URL_PC url_update,
+				schedule.EXPOSURE_AVG,
+				schedule.CLICK_AVG,
+				 b.fore_imp_pv,b.fore_clk_pv,b.fore_imp_uv,b.fore_clk_uv,
+				CASE WHEN b.fore_imp_pv!=0 THEN
+  			 	CAST	(((b.fore_clk_pv*1.00)/b.fore_imp_pv)*100 as decimal ( 18, 2))||'%'  END AS ctr,
+  				
+  			
+ 				
+  			CASE WHEN schedule.EXPOSURE_AVG::INTEGER!=0 THEN
+  				CAST (((fore_imp_pv*1.00)/schedule.EXPOSURE_AVG::INTEGER)*100  as decimal ( 18, 2))||'%' END  AS imp_comp,
+  			CASE WHEN schedule.CLICK_AVG::INTEGER!=0 THEN
+  				CAST (((fore_clk_pv*1.00)/schedule.CLICK_AVG::INTEGER)*100  as decimal ( 18, 2))||'%' END  AS clk_comp
+	FROM 
+		 tb_amp_basic_schedule_calendar_info AS calendar,
+(SELECT  HourMonitor.mic mic,
+					to_char(HourMonitor.daytime,'YYYY-MM-DD') createDate,
+					schedule.data_caliber,
+					case 
+			 	  when schedule.imp_data_caliber ='1' then SUM(HourMonitor.clean_imp_pv)  
+		     	  when schedule.imp_data_caliber ='2' then SUM(HourMonitor.dclean_imp_pv) 
+		     	else SUM(HourMonitor.dirty_imp_pv) end fore_imp_pv,
+		     	case 
+			 	  when schedule.clk_data_caliber ='1' then SUM(HourMonitor.clean_clk_pv)  
+		     	  when schedule.clk_data_caliber ='2' then SUM(HourMonitor.dclean_clk_pv) 
+		     	else SUM(HourMonitor.dirty_clk_pv) end fore_clk_pv,
+		     	case 
+			 	  when schedule.imp_data_caliber ='1' then SUM(HourMonitor.clean_imp_uv)  
+		     	  when schedule.imp_data_caliber ='2' then SUM(HourMonitor.dclean_imp_uv) 
+		     	else SUM(HourMonitor.dirty_imp_uv) end fore_imp_uv,
+		     	case 
+			 	  when schedule.clk_data_caliber ='1' then SUM(HourMonitor.clean_clk_uv)  
+		     	  when schedule.clk_data_caliber ='2' then SUM(HourMonitor.dclean_clk_uv) 
+		     	else SUM(HourMonitor.dirty_clk_uv) end fore_clk_uv 
+FROM tb_amp_basic_hour_monitor_date AS HourMonitor,
+			tb_amp_basic_schedule_info AS schedule,
+			tb_amp_basic_activity_info AS activity
+WHERE
+			schedule.mic= HourMonitor.mic	
+			AND activity.activity_code= schedule.activity_code
+			<if test="null != activityCode and '' != activityCode">
+				AND activity.ACTIVITY_CODE=#{activityCode}
+			</if>
+			<if test="nowDate != null and '' != nowDate">
+				<![CDATA[ AND to_char(HourMonitor.daytime,'YYYY-MM-DD')>= #{nowDate} ]]></if>
+			GROUP BY HourMonitor.mic,to_char(HourMonitor.daytime,'YYYY-MM-DD'),schedule.data_caliber) b,
+		
+
+		 tb_amp_basic_schedule_info AS schedule,
+			tb_amp_basic_activity_info AS activity,
+		 tb_amp_basic_schedule_extend_info AS scheduleExtend,
+		 tb_amp_basic_customer_info AS customer,
+		 tb_amp_basic_media_info AS media
+	WHERE calendar.mic = schedule.mic
+	
+	AND b.mic=schedule.mic
+	AND b.createDate=to_char(calendar.put_date,'YYYY-MM-DD') 
+	AND activity.ACTIVITY_CODE=schedule.ACTIVITY_CODE
+	AND scheduleExtend.mic = schedule.mic
+	
+	
+	AND schedule.MEDIA_ID::integer=media.MEDIA_ID
+	AND b.mic=calendar.mic
+	AND activity.CUSTOMER_ID::integer=customer.CUSTOMER_ID
+	<if test="null != mediaName and '' != mediaName">
+				AND media.MEDIA_NAME LIKE '%${mediaName}%'
+			</if>
+			<if test="null != activityCode and '' != activityCode">
+				AND activity.ACTIVITY_CODE=#{activityCode}
+			</if>
+			<if test="null != marketingCode and '' != marketingCode">
+				AND schedule.MIC LIKE '%${marketingCode}%'
+			</if>
+			<if test="nowDate != null and '' != nowDate">
+				<![CDATA[ AND to_char(calendar.PUT_DATE,'YYYY-MM-DD')>= #{nowDate} ]]></if>
+	</select>
+	
+
+</mapper>

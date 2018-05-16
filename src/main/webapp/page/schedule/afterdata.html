@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>导后端数据</title>
+<script src="../../js/com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<script src="../../js/afterdata.js"></script>
+</head>
+<body>
+
+	<form action="" method="post" enctype="multipart/form-data">
+		<input id="startDate" placeholder="开始时间" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+		<input id="endDate" placeholder="结束时间" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})"> <br>
+		<br>
+		<textarea rows="3" cols="5" name="mic" style="width: 260px; height: 200px;" placeholder="输入短代码"></textarea>
+		<br>
+		<br>
+		<input type="button" value="导出" onclick="send()">
+	</form>
+	
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>我的TODO</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap.min.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<link href="../../css/plan.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/udbac.js"></script>
+<script src="../../js/todo.js"></script>
+<!-- 模板 -->
+<script type="text/javascript" src="../../js/com/jquery.tmpl.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<Link Rel="ICON NAME" href="../../images/logoIcon.ico">
+<!--定时器延迟加载  -->
+<script type="text/javascript" src="../../js/time.js"></script>
+
+<script>
+	jQuery(document).ready(function() {
+		$(".headers").loadTemplate("../../common/header.html", {});
+		queryActivityByUser();
+		$.ajaxSetup({
+			async : false
+		});
+	});
+
+	// $('table tr:not(:first)').each(function() { $(this).children('td:not(:first)').hover(function() { $(this).css('color', 'red'); }, function() { $(this).css('color', 'black'); }).click(function() { alert($(this).html()); }); });
+
+</script>
+</head>
+<body style="overflow-x:hidden;">
+	<!-- 头部 -->
+	<div class="headers"></div>
+	<div class="contain">
+		<div class="zxy_contain1">
+			<!-- 菜单导航 -->
+			<div id="template-nav"></div>
+			<div class="zxy_zong">
+				<div class="zxy_jiantou zxy_jiantouL"></div>
+				<div id="myTabDiv">
+					<ul id="myTab" style="border:none;">
+					</ul>
+				</div>
+				<div class="zxy_jiantou zxy_jiantouR"></div>
+			</div>
+			<div style="clear: both;"></div>
+			<div id="myTabContent" class="tab-content zxy_tab_con1"></div>
+		</div>
+	</div>
+
+	<div style="z-index:19891015;background-color:#000;display:none; opacity:0.3;filter: alpha(opacity = 30);" class="xubox_shade" id="mb" times="1">
+	</div>
+</body>
+<script>
+	var left = 0;
+	var width = 0;
+	$(function() {
+		divWidth = $("#myTabDiv").width();
+		$(".zxy_jiantouR").on("click", function() {
+			width = $("#myTab").width();
+
+			if ((Math.abs(left - 100) + divWidth) > width + 100) {
+				return false;
+			}
+			left -= 100;
+			$("#myTab").css("margin-left", left + "px");
+
+		});
+		$(".zxy_jiantouL").on("click", function() {
+			width = $("#myTab").width();
+			if (left + 100 > 0) {
+				return false;
+			}
+			left += 100;
+			$("#myTab").css("margin-left", left + "px");
+		}); 
+	});
+</script>
+<script>
+	 function getLi() {
+		var myTabLi = $("#myTab li");
+		myTabLi.click(function(){
+			$(this).addClass("selected").siblings("li").removeClass("selected");
+		});
+	}
+</script>
+</html>

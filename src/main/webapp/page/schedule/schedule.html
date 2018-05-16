@@ -1,0 +1,110 @@
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<!-- <script src="../../js/cookie.js"></script> -->
+<script type="text/javascript">
+			var scheduleForm;
+			var scheduleFile;	
+			var scheduleType;
+			var updateFile;
+
+			//上传文件路径，解决IE8的安全设置 c:fackpath
+			function getPath(obj){    
+			if(obj)    
+			  {    
+			  if (window.navigator.userAgent.indexOf("MSIE")>=1)    
+			    {    
+			      obj.select();    
+			 
+			    return document.selection.createRange().text;    
+			    }    
+			 
+			  else if(window.navigator.userAgent.indexOf("Firefox")>=1)    
+			    {    
+			    if(obj.files)    
+			      {    
+			 
+			      return obj.files.item(0).getAsDataURL();    
+			      }    
+			    return obj.value;    
+			    }    
+			  return obj.value;    
+			  }    
+			} //end getPath
+			
+			$(function(){
+				scheduleForm = $("#scheduleForm");
+				scheduleFile = $("#scheduleFile");
+				scheduleType = $("#scheduleType");
+				updateFile = $("#updateFile");
+			});
+			
+			//选择排期文件
+			function selectFile(){
+				scheduleFile[0].click();
+				scheduleFile.change(function(){
+					parent.selectChangeSchedule(getPath(scheduleFile[0]));
+				});
+			}
+
+			//选择强制插码文件
+			function selectUpdateFile(){
+				updateFile[0].click();
+				updateFile.change(function(){
+					parent.selectChangeUpdate(updateFile.val());
+				});
+			}
+				
+			//提交插码
+			function submitForm(type,after,before,center,isAddPoint){
+				scheduleType.val(type);
+				var fileName = scheduleFile.val();
+				$("#after").val(after);
+				$("#before").val(before);
+				$("#center").val(center);
+				$("#isAddPoint").val(isAddPoint);
+				if(fileName.substring(fileName.lastIndexOf("."),fileName.length) != ".xlsx"){
+					parent.error("文件格式不正确,只能使用 .xlsx文件");
+					return false;
+				}
+				
+				scheduleForm[0].submit();
+			}//end submitForm()
+			
+			//增加频控属性
+		/* 	function addPointLine(pointLine){
+				$("#scheduleForm").append("<input name='pointLine' value="+pointLine+" />");
+			} */
+			
+			</script>
+		</head>
+		<body>
+			<!-- 插码FORM -->
+			<form id="scheduleForm" action="/amp/schedule/plugInCode.do" method="POST" enctype="multipart/form-data">
+				<input type="file" id="scheduleFile" name="scheduleFile"/>
+				<input type="file" id="updateFile" name="updateFile"/>
+				<input type="text" id="scheduleType" name="scheduleType"/>
+				<input type="hidden" id="after" name="after" />
+				<input type="hidden" id="before" name="before" />
+				<input type="hidden" id="center" name="center" />
+				<input type="hidden" id="isAddPoint" name="isAddPoint" />
+			</form>
+		</body>
+		
+		<form method="post" action="/amp/media/mapMedia.do">
+			<input name="newMediaName"/>
+			<select name="mediaId" id="mediaId"></select>
+			<input type="submit" />
+		</form>
+		<script type="text/javascript">
+		/* 	$.post("/amp/media/list.do",{},function(medias){
+				console.log(medias);
+				for(var i=0;i<medias.length;i++){
+					$("#mediaId").append("<option value='"+medias[i].mediaId+"'>"+medias[i].mediaName+"</option>");	
+				}
+			}) */
+		</script>
+		
+</html>

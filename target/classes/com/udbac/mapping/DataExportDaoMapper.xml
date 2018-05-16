@@ -1,0 +1,857 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.udbac.dao.DataExportDao">
+<select id="sumHour" resultType="java.lang.Integer" parameterType="java.util.List">
+	select count(*) from (
+	select  act.activity_name,
+	        media.media_name,
+	        ext.point_location,--广告位
+	        ext.put_function,--投放形式
+	        sche.terminal_Type,--投放类型
+	        ext.support_Exposure supportexposure,
+	        ext.support_Click supportclick,
+	        fore.mic,
+	        fore.daytime put_date,
+	        sche.activity_code,
+	        case when sche.imp_data_caliber ='1' then fore.clean_imp_pv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_pv 
+            else fore.dirty_imp_pv 
+            end   pv ,
+            case when sche.imp_data_caliber ='1' then fore.clean_imp_uv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_uv 
+            else fore.dirty_imp_uv 
+            end   uv,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_pv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_pv 
+            else fore.dirty_clk_pv 
+            end   _pv ,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_uv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_uv 
+            else fore.dirty_clk_uv 
+            end   _uv,
+	         -1  exposure_avg,
+	         -1 click_avg,
+	         -1 a_vv,
+	         -1 a_uv,
+	         -1 a_pv,
+	         -1 bounce_t,
+	         -1 time_s,
+	         -1  clk,
+	         -1 put_value,
+		sche.unit,
+		sche.url_pc
+	        from   
+	        tb_amp_basic_activity_info act,
+		tb_amp_basic_media_info  media, 
+		tb_amp_basic_schedule_extend_info ext,
+		tb_amp_basic_hour_monitor_date fore,
+		tb_amp_basic_schedule_info sche
+		where fore.mic=ext.mic 
+			 and ext.mic=sche.mic 
+			 and act.activity_code = sche.activity_code 
+			 and  media.media_id = sche.media_id ::integer 
+			 and act.customer_id in(${customer_id})
+			  <if test="actName!=null and actName!=''">  
+		     and act.activity_name = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   	 and act.activity_code= #{actCode}
+		   </if>
+		   <if test="mic!=null and mic!=''">  
+		   	   and sche.mic = #{mic}
+		   </if>
+		     and fore.daytime between   #{date} and #{dt1} 
+		 order by media.media_id,mic,fore.daytime 
+)a
+</select>
+<select id="listHourInfo" resultType="com.udbac.entity.DataExport" parameterType="java.util.List">
+		select  act.activity_name,
+	        media.media_name,
+	        ext.point_location,--广告位
+	        ext.put_function,--投放形式
+	        sche.terminal_Type,--投放类型
+	        sche.group_id,
+	        ext.support_Exposure supportexposure,
+	        ext.support_Click supportclick,
+	        fore.mic,
+	        fore.daytime put_date,
+	        sche.activity_code,
+	        customer_name,
+	        case when sche.imp_data_caliber ='1' then fore.clean_imp_pv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_pv 
+            else fore.dirty_imp_pv 
+            end   pv ,
+            case when sche.imp_data_caliber ='1' then fore.clean_imp_uv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_uv 
+            else fore.dirty_imp_uv 
+            end   uv,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_pv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_pv 
+            else fore.dirty_clk_pv 
+            end   _pv ,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_uv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_uv 
+            else fore.dirty_clk_uv 
+            end   _uv,
+	         -1  exposure_avg,
+	         -1 click_avg,
+	         -1 a_vv,
+	         -1 a_uv,
+	         -1 a_pv,
+	         -1 bounce_t,
+	         -1 time_s,
+	         -1  clk,
+	         -1 put_value,
+		sche.unit,
+		sche.url_pc
+	        from   
+	        tb_amp_basic_activity_info act,
+		tb_amp_basic_media_info  media, 
+		tb_amp_basic_schedule_extend_info ext,
+		tb_amp_basic_hour_monitor_date fore,
+		tb_amp_basic_schedule_info sche,
+		tb_amp_basic_customer_info cus
+		where fore.mic=ext.mic 
+			 and ext.mic=sche.mic 
+			 and act.activity_code = sche.activity_code 
+			 and  media.media_id = sche.media_id ::integer 
+			 and act.customer_id :: integer=cus.customer_id
+			 and act.customer_id in(${customer_id})
+			  <if test="actName!=null and actName!=''">  
+		     and act.activity_name = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   	 and act.activity_code= #{actCode}
+		   </if>
+		   <if test="mic!=null and mic!=''">  
+		   	   and sche.mic = #{mic}
+		   </if>
+		     and fore.daytime between   #{date} and #{dt1} 
+		  order by fore.daytime,media.media_id,point_location
+
+</select>
+<select id="sumDays" resultType="java.lang.Integer" parameterType="java.util.List">
+select count(*)from (
+select  act.activity_name,
+	        media.media_name,
+	        ext.point_location,--广告位
+	        ext.put_function,--投放形式
+	        sche.terminal_Type,--投放类型
+	        ext.support_Exposure supportexposure,
+	        ext.support_Click supportclick,
+	        fore.mic,
+	        fore.daytime,
+	        act.activity_code,
+	        case when sche.imp_data_caliber ='1' then fore.clean_imp_pv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_pv 
+            else fore.dirty_imp_pv 
+            end   pv ,
+            case when sche.imp_data_caliber ='1' then fore.clean_imp_uv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_uv 
+            else fore.dirty_imp_uv 
+            end   uv,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_pv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_pv 
+            else fore.dirty_clk_pv 
+            end   _pv ,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_uv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_uv 
+            else fore.dirty_clk_uv 
+            end   _uv,
+	       fore.a_vv, fore.a_uv,fore.a_pv,bounce_t,time_s,
+	         case when  sche.exposure_avg='' then '-1'
+	       	when sche.exposure_avg is null then '-1'
+		    else sche.exposure_avg
+	        end  exposure_avg,
+	       case when sche.click_avg='' then '-1' 
+	       when sche.click_avg is null then '-1'
+	       else sche.click_avg
+	        end click_avg,
+	       fore.clk,
+	       fore.put_value,
+		sche.unit,
+		sche.url_pc
+	        from   
+	        tb_amp_basic_activity_info act,
+		tb_amp_basic_media_info  media, 
+		tb_amp_basic_schedule_extend_info ext,
+
+(
+select  frre.daytime, frre.mic, dirty_imp_uv, dirty_imp_pv, dirty_clk_uv, dirty_clk_pv, 
+       clean_imp_uv, clean_imp_pv, clean_clk_uv, clean_clk_pv, dclean_imp_uv, 
+       dclean_imp_pv, dclean_clk_uv, dclean_clk_pv ,cale.put_value,
+	case when  back.vv is null then -1
+                else back.vv end a_vv,
+                case when  back.uv is null then -1
+                else back.uv end a_uv,
+                case when back.pv is null then -1
+                else back.pv end a_pv,
+	        case when back.bounce_times is null then -1
+	        else back.bounce_times 
+	        end bounce_t,
+	        case when back.time_spent is null then -1
+	        else back.time_spent end time_s,
+	        case when back.clk is null then -1
+	        else back.clk end clk
+        from (
+	select 
+	sum(dirty_imp_uv)dirty_imp_uv, 
+	sum(dirty_imp_pv)dirty_imp_pv,
+	sum(dirty_clk_uv)dirty_clk_uv,
+	sum(dirty_clk_pv)dirty_clk_pv,
+	sum(clean_imp_uv)clean_imp_uv,
+	sum(clean_imp_pv)clean_imp_pv,
+	sum(clean_clk_uv)clean_clk_uv,
+	sum(clean_clk_pv)clean_clk_pv,
+	sum(dclean_imp_uv)dclean_imp_uv,
+	sum(dclean_imp_pv)dclean_imp_pv,
+	sum(dclean_clk_uv)dclean_clk_uv,
+	sum(dclean_clk_pv)dclean_clk_pv,
+	mic,daytime
+ from (
+	select to_char(daytime,'yyyy-mm-dd')daytime, mic, dirty_imp_uv, dirty_imp_pv, dirty_clk_uv, dirty_clk_pv, 
+       clean_imp_uv, clean_imp_pv, clean_clk_uv, clean_clk_pv, dclean_imp_uv, 
+       dclean_imp_pv, dclean_clk_uv, dclean_clk_pv
+       from tb_amp_basic_hour_monitor_date 
+   where 
+	( to_char(daytime,'yyyy-mm-dd') = #{date})
+    )a group by mic,daytime
+    ) frre  full join
+     tb_amp_sum_back_d back
+     on	frre.daytime = to_char(back.daytime,'yyyy-mm-dd') and frre.mic=back.mic ,
+		 tb_amp_basic_schedule_calendar_info cale 
+		where (cale.mic=frre.mic or cale.mic = back.mic)
+		and (to_char(cale.put_date,'yyyy-mm-dd')=frre.daytime or cale.put_date = back.daytime)
+		order by  frre.mic
+
+) fore,
+        tb_amp_basic_schedule_info sche
+		where fore.mic=ext.mic 
+			 and ext.mic=sche.mic 
+			 and act.activity_code = sche.activity_code 
+			 and  media.media_id = sche.media_id ::integer 
+			 <if test="customer_id!=null and customer_id!=''">  
+			 and act.customer_id in(${customer_id})
+			 </if>
+			  <if test="actName!=null and actName!=''">  
+		     and act.activity_name = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   	 and act.activity_code= #{actCode}
+		   </if>
+		     and fore.daytime =#{date}
+		 order by media.media_id,act.activity_code,  mic,fore.daytime
+
+)a
+</select>
+    <select id="sumDay" resultType="java.lang.Integer" parameterType="java.util.List">
+		select COUNT(*)from (
+			  select  act.activity_name,
+	        media.media_name,
+	        ext.point_location,--广告位
+	        ext.put_function,--投放形式
+	        sche.terminal_Type,--投放类型
+	        sche.group_id,
+	        ext.support_Exposure supportexposure,
+	        ext.support_Click supportclick,
+	        fore.mic,
+	        fore.put_date,
+	        fore.activity_code,
+	        case when sche.imp_data_caliber ='1' then fore.clean_imp_pv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_pv 
+            else fore.dirty_imp_pv 
+            end   pv ,
+            case when sche.imp_data_caliber ='1' then fore.clean_imp_uv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_uv 
+            else fore.dirty_imp_uv 
+            end   uv,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_pv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_pv 
+            else fore.dirty_clk_pv 
+            end   _pv ,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_uv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_uv 
+            else fore.dirty_clk_uv 
+            end   _uv,
+	       fore.a_vv, fore.a_uv,fore.a_pv,bounce_t,time_s,
+	         case when  sche.exposure_avg='' then '-1'
+	       	when sche.exposure_avg is null then '-1'
+		    else sche.exposure_avg
+	        end  exposure_avg,
+	       case when sche.click_avg='' then '-1' 
+	       when sche.click_avg is null then '-1'
+	       else sche.click_avg
+	        end click_avg,
+	       fore.clk,
+	       fore.put_value,
+		sche.unit,
+		sche.url_pc
+	        from   
+	        tb_amp_basic_activity_info act,
+		tb_amp_basic_media_info  media, 
+		tb_amp_basic_schedule_extend_info ext,
+	(
+	select  back.mic ,back. daytime put_date,case when frre.clean_imp_pv is null then 0 else clean_imp_pv end ,case when frre.dclean_imp_pv is null then 0 else dclean_imp_pv end ,
+	case when frre.dirty_imp_pv is null then 0 else dirty_imp_pv end,case when frre.clean_imp_uv is null then 0 else clean_imp_uv end,
+	case when frre.dclean_imp_uv is null then 0 else dclean_imp_uv end,case when frre.dirty_imp_uv is null then 0 else dirty_imp_uv end,
+	case when frre.clean_clk_pv is null then 0 else clean_clk_pv end,case when frre.dclean_clk_pv is null then 0 else dclean_clk_pv end ,case when frre.dirty_clk_pv is null then 0 else dirty_clk_pv end ,
+	case when  frre.clean_clk_uv is null then 0 else clean_clk_uv end ,
+	case when frre.dclean_clk_uv is null then 0 else dclean_clk_uv end ,
+	case when frre.dirty_clk_uv is null then 0 else dirty_clk_uv end,
+	 sche.activity_code , cale.put_value,case when  back.vv is null then -1
+                else back.vv end a_vv,
+                case when  back.uv is null then -1
+                else back.uv end a_uv,
+                case when back.pv is null then -1
+                else back.pv end a_pv,
+	        case when back.bounce_times is null then -1
+	        else back.bounce_times 
+	        end bounce_t,
+	        case when back.time_spent is null then -1
+	        else back.time_spent end time_s,
+	        case when back.clk is null then -1
+	        else back.clk end clk
+	        from  tb_amp_sum_fore_d frre 
+	        full join
+			tb_amp_sum_back_d back
+		on	(frre.put_date = back.daytime and frre.mic=back.mic)
+		full  join tb_amp_basic_schedule_info sche on back.mic =sche.mic ,
+		  tb_amp_basic_schedule_calendar_info cale 
+		where (cale.mic=frre.mic or cale.mic = back.mic)
+		and (cale.put_date=frre.put_date or cale.put_date = back.daytime)
+		<if test="actCode!=null and actCode!=''">  
+		   	 and sche.activity_code= #{actCode}
+		   </if>
+and back.daytime between  #{date} and #{dt1} 
+union 
+select  frre.mic ,frre.put_date,frre.clean_imp_pv ,frre.dclean_imp_pv,frre.dirty_imp_pv,frre.clean_imp_uv ,
+	frre.dclean_imp_uv,frre.dirty_imp_uv,frre.clean_clk_pv,frre.dclean_clk_pv,frre.dirty_clk_pv, frre.clean_clk_uv ,
+	frre.dclean_clk_uv,frre.dirty_clk_uv, frre.activity_code , cale.put_value,case when  back.vv is null then -1
+                else back.vv end a_vv,
+                case when  back.uv is null then -1
+                else back.uv end a_uv,
+                case when back.pv is null then -1
+                else back.pv end a_pv,
+	        case when back.bounce_times is null then -1
+	        else back.bounce_times 
+	        end bounce_t,
+	        case when back.time_spent is null then -1
+	        else back.time_spent end time_s,
+	        case when back.clk is null then -1
+	        else back.clk end clk
+	        from  tb_amp_sum_fore_d frre 
+	        full join
+			tb_amp_sum_back_d back
+		on	(frre.put_date = back.daytime and frre.mic=back.mic)
+		full  join tb_amp_basic_schedule_info sche on frre.mic =sche.mic ,
+		  tb_amp_basic_schedule_calendar_info cale 
+		where (cale.mic=frre.mic or cale.mic = back.mic)
+		and (cale.put_date=frre.put_date or cale.put_date = back.daytime)
+		<if test="actCode!=null and actCode!=''">  
+		   	 and sche.activity_code= #{actCode}
+		   </if>
+and frre.put_date between  #{date} and #{dt1} 
+		) fore ,
+		tb_amp_basic_schedule_info sche
+		where fore.mic=ext.mic 
+			 and ext.mic=sche.mic 
+			 and act.activity_code = sche.activity_code 
+			 and  media.media_id = sche.media_id ::integer 
+		    and act.customer_id in(${customer_id})
+			 <if test="actName!=null and actName!=''">  
+		     and act.activity_name = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   	 and act.activity_code= #{actCode}
+		   </if>
+		  and fore.put_date between  #{date} and #{dt1} 
+		 order by fore.put_date,media.media_id,fore.activity_code,  fore.mic
+
+			)a 
+    </select>
+    
+    <!-- 日报数据 -->
+    <select id="listInfo" resultType="com.udbac.entity.DataExport" parameterType="java.util.List">
+	    select  act.activity_name,
+	        media.media_name,
+	        ext.point_location,--广告位
+	        ext.put_function,--投放形式
+	        sche.terminal_Type,--投放类型
+	        sche.group_id,
+	        ext.support_Exposure supportexposure,
+	        ext.support_Click supportclick,
+	        fore.mic,
+	        fore.put_date,
+	        fore.activity_code,
+	        customer_name,
+	        case when sche.imp_data_caliber ='1' then fore.clean_imp_pv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_pv 
+            else fore.dirty_imp_pv 
+            end   pv ,
+            case when sche.imp_data_caliber ='1' then fore.clean_imp_uv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_uv 
+            else fore.dirty_imp_uv 
+            end   uv,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_pv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_pv 
+            else fore.dirty_clk_pv 
+            end   _pv ,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_uv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_uv 
+            else fore.dirty_clk_uv 
+            end   _uv,
+	       fore.a_vv, fore.a_uv,fore.a_pv,bounce_t,time_s,
+	         case when  sche.exposure_avg='' then '-1'
+	       	when sche.exposure_avg is null then '-1'
+		    else sche.exposure_avg
+	        end  exposure_avg,
+	       case when sche.click_avg='' then '-1' 
+	       when sche.click_avg is null then '-1'
+	       else sche.click_avg
+	        end click_avg,
+	       fore.clk,
+	       fore.put_value,
+		sche.unit,
+		sche.url_pc
+	        from   
+	        tb_amp_basic_activity_info act,
+		tb_amp_basic_media_info  media, 
+		tb_amp_basic_schedule_extend_info ext,
+	(
+	select  back.mic ,back. daytime put_date,case when frre.clean_imp_pv is null then 0 else clean_imp_pv end ,case when frre.dclean_imp_pv is null then 0 else dclean_imp_pv end ,
+	case when frre.dirty_imp_pv is null then 0 else dirty_imp_pv end,case when frre.clean_imp_uv is null then 0 else clean_imp_uv end,
+	case when frre.dclean_imp_uv is null then 0 else dclean_imp_uv end,case when frre.dirty_imp_uv is null then 0 else dirty_imp_uv end,
+	case when frre.clean_clk_pv is null then 0 else clean_clk_pv end,case when frre.dclean_clk_pv is null then 0 else dclean_clk_pv end ,case when frre.dirty_clk_pv is null then 0 else dirty_clk_pv end ,
+	case when  frre.clean_clk_uv is null then 0 else clean_clk_uv end ,
+	case when frre.dclean_clk_uv is null then 0 else dclean_clk_uv end ,
+	case when frre.dirty_clk_uv is null then 0 else dirty_clk_uv end,
+ sche.activity_code , cale.put_value,case when  back.vv is null then -1
+                else back.vv end a_vv,
+                case when  back.uv is null then -1
+                else back.uv end a_uv,
+                case when back.pv is null then -1
+                else back.pv end a_pv,
+	        case when back.bounce_times is null then -1
+	        else back.bounce_times 
+	        end bounce_t,
+	        case when back.time_spent is null then -1
+	        else back.time_spent end time_s,
+	        case when back.clk is null then -1
+	        else back.clk end clk
+	        from  tb_amp_sum_fore_d frre 
+	        full join
+			tb_amp_sum_back_d back
+		on	(frre.put_date = back.daytime and frre.mic=back.mic)
+		full  join tb_amp_basic_schedule_info sche on back.mic =sche.mic ,
+		  tb_amp_basic_schedule_calendar_info cale 
+		where (cale.mic=frre.mic or cale.mic = back.mic)
+		and (cale.put_date=frre.put_date or cale.put_date = back.daytime)
+		<if test="actCode!=null and actCode!=''">  
+		   	 and sche.activity_code= #{actCode}
+		   </if>
+and back.daytime between  #{date} and #{dt1} 
+union 
+select  frre.mic ,frre.put_date,frre.clean_imp_pv ,frre.dclean_imp_pv,frre.dirty_imp_pv,frre.clean_imp_uv ,
+	frre.dclean_imp_uv,frre.dirty_imp_uv,frre.clean_clk_pv,frre.dclean_clk_pv,frre.dirty_clk_pv, frre.clean_clk_uv ,
+	frre.dclean_clk_uv,frre.dirty_clk_uv, frre.activity_code , cale.put_value,case when  back.vv is null then -1
+                else back.vv end a_vv,
+                case when  back.uv is null then -1
+                else back.uv end a_uv,
+                case when back.pv is null then -1
+                else back.pv end a_pv,
+	        case when back.bounce_times is null then -1
+	        else back.bounce_times 
+	        end bounce_t,
+	        case when back.time_spent is null then -1
+	        else back.time_spent end time_s,
+	        case when back.clk is null then -1
+	        else back.clk end clk
+	        from  tb_amp_sum_fore_d frre 
+	        full join
+			tb_amp_sum_back_d back
+		on	(frre.put_date = back.daytime and frre.mic=back.mic)
+		full  join tb_amp_basic_schedule_info sche on frre.mic =sche.mic ,
+		  tb_amp_basic_schedule_calendar_info cale 
+		where (cale.mic=frre.mic or cale.mic = back.mic)
+		and (cale.put_date=frre.put_date or cale.put_date = back.daytime)
+		<if test="actCode!=null and actCode!=''">  
+		   	 and sche.activity_code= #{actCode}
+		   </if>
+and frre.put_date between  #{date} and #{dt1} 
+		) fore ,
+		tb_amp_basic_schedule_info sche,
+		tb_amp_basic_customer_info cus
+		where fore.mic=ext.mic 
+			 and ext.mic=sche.mic 
+			 and act.activity_code = sche.activity_code 
+			 and  media.media_id = sche.media_id ::integer 
+			 and act.customer_id :: integer=cus.customer_id
+		    and act.customer_id in(${customer_id})
+			 <if test="actName!=null and actName!=''">  
+		     and act.activity_name = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   	 and act.activity_code= #{actCode}
+		   </if>
+		  and fore.put_date between  #{date} and #{dt1} 
+		 order by fore.put_date,media.media_id,fore.activity_code,  fore.mic
+		     </select>
+ <select id="listInfos" resultType="com.udbac.entity.DataExport" parameterType="java.util.List">
+		select  act.activity_name,
+	        media.media_name,
+	        ext.point_location,--广告位
+	        ext.put_function,--投放形式
+	        sche.terminal_Type,--投放类型
+	        sche.group_id,
+	        ext.support_Exposure supportexposure,
+	        ext.support_Click supportclick,
+	        fore.mic,
+	        fore.daytime put_date,
+	        act.activity_code,
+	        customer_name,
+	        case when sche.imp_data_caliber ='1' then fore.clean_imp_pv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_pv 
+            else fore.dirty_imp_pv 
+            end   pv ,
+            case when sche.imp_data_caliber ='1' then fore.clean_imp_uv  
+            when sche.imp_data_caliber ='2' then fore.dclean_imp_uv 
+            else fore.dirty_imp_uv 
+            end   uv,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_pv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_pv 
+            else fore.dirty_clk_pv 
+            end   _pv ,
+            case when sche.clk_data_caliber ='1' then fore.clean_clk_uv  
+            when sche.clk_data_caliber ='2' then fore.dclean_clk_uv 
+            else fore.dirty_clk_uv 
+            end   _uv,
+	       fore.a_vv, fore.a_uv,fore.a_pv,bounce_t,time_s,
+	         case when  sche.exposure_avg='' then '-1'
+	       	when sche.exposure_avg is null then '-1'
+		    else sche.exposure_avg
+	        end  exposure_avg,
+	       case when sche.click_avg='' then '-1' 
+	       when sche.click_avg is null then '-1'
+	       else sche.click_avg
+	        end click_avg,
+	       fore.clk,
+	       fore.put_value,
+		sche.unit,
+		sche.url_pc
+	        from   
+	        tb_amp_basic_activity_info act,
+		tb_amp_basic_media_info  media, 
+		tb_amp_basic_schedule_extend_info ext,
+(
+select  frre.daytime, frre.mic, dirty_imp_uv, dirty_imp_pv, dirty_clk_uv, dirty_clk_pv, 
+       clean_imp_uv, clean_imp_pv, clean_clk_uv, clean_clk_pv, dclean_imp_uv, 
+       dclean_imp_pv, dclean_clk_uv, dclean_clk_pv ,cale.put_value,
+	case when  back.vv is null then -1
+                else back.vv end a_vv,
+                case when  back.uv is null then -1
+                else back.uv end a_uv,
+                case when back.pv is null then -1
+                else back.pv end a_pv,
+	        case when back.bounce_times is null then -1
+	        else back.bounce_times 
+	        end bounce_t,
+	        case when back.time_spent is null then -1
+	        else back.time_spent end time_s,
+	        case when back.clk is null then -1
+	        else back.clk end clk
+        from (
+	select 
+	sum(dirty_imp_uv)dirty_imp_uv, 
+	sum(dirty_imp_pv)dirty_imp_pv,
+	sum(dirty_clk_uv)dirty_clk_uv,
+	sum(dirty_clk_pv)dirty_clk_pv,
+	sum(clean_imp_uv)clean_imp_uv,
+	sum(clean_imp_pv)clean_imp_pv,
+	sum(clean_clk_uv)clean_clk_uv,
+	sum(clean_clk_pv)clean_clk_pv,
+	sum(dclean_imp_uv)dclean_imp_uv,
+	sum(dclean_imp_pv)dclean_imp_pv,
+	sum(dclean_clk_uv)dclean_clk_uv,
+	sum(dclean_clk_pv)dclean_clk_pv,
+	mic,daytime
+ from (
+	select to_char(daytime,'yyyy-mm-dd')daytime, mic, dirty_imp_uv, dirty_imp_pv, dirty_clk_uv, dirty_clk_pv, 
+       clean_imp_uv, clean_imp_pv, clean_clk_uv, clean_clk_pv, dclean_imp_uv, 
+       dclean_imp_pv, dclean_clk_uv, dclean_clk_pv
+       from tb_amp_basic_hour_monitor_date 
+   where 
+	( to_char(daytime,'yyyy-mm-dd') = #{date} )
+    )a group by mic,daytime
+    ) frre full join
+     tb_amp_sum_back_d back
+     on	frre.daytime = to_char(back.daytime,'yyyy-mm-dd') and frre.mic=back.mic ,
+		 tb_amp_basic_schedule_calendar_info cale 
+		where (cale.mic=frre.mic or cale.mic = back.mic)
+		and (to_char(cale.put_date,'yyyy-mm-dd')=frre.daytime or cale.put_date = back.daytime)
+		order by  frre.mic
+        ) fore,
+        tb_amp_basic_schedule_info sche,
+        tb_amp_basic_customer_info cus
+		where fore.mic=ext.mic 
+			 and ext.mic=sche.mic 
+			 and act.activity_code = sche.activity_code 
+			 and  media.media_id = sche.media_id ::integer 
+			 and act.customer_id :: integer=cus.customer_id
+			  <if test="customer_id!=null and customer_id!=''">  
+			 and act.customer_id in(${customer_id})
+			 </if>
+			 <if test="actName!=null and actName!=''">  
+		     and act.activity_name = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   	 and act.activity_code= #{actCode}
+		   </if>
+		     and fore.daytime =#{date}
+		    
+		 order by media.media_id,act.activity_code,  fore.mic,fore.daytime
+		 
+ 	</select>
+	    <!-- 当前客户的省级列表 -->
+	<select id="queryCustomer" parameterType="java.util.List"
+			resultType="com.udbac.entity.QueryCustomerInfo">
+			select c.customer_id,c.customer_name,
+            c.customer_code from tb_amp_basic_user_info u join 
+            tb_amp_basic_customer_info c on  c.CUSTOMER_id =u.PROVINCE_ID ::integer
+            where u.role_id='6' and u.PROVINCE_ID=#{province}
+	</select>
+    <select id="checkCode" resultType="java.lang.Integer" parameterType="java.lang.String">
+          SELECT COUNT(*) FROM(SELECT *
+              FROM tb_amp_basic_activity_info where activity_code=#{actCode}
+        )A
+    </select>
+   <select id="listInfoPZ" resultType="com.udbac.entity.DataExport" parameterType="java.util.List">
+     select mic ,terminal_type,put_function,case when a_vv = 0 then -1 else a_vv end a_vv,case when a_uv = 0 then -1 else a_uv end a_uv , pv, _pv,
+ case when a_pv = 0 then -1 else a_pv end a_pv ,case when bounce_t = 0 then -1 else bounce_t end bounce_t ,case when time_s = 0 then -1 else time_s end time_s,daytime   
+from (
+     select distinct sche.mic,terminal_type,put_function,sum(vv)a_vv,sum(uv)a_uv,case when dirty_imp_pv is null then 0 else dirty_imp_pv end  pv,case when dirty_clk_pv is null then 0 else dirty_clk_pv end _pv ,
+    sum(pv)a_pv,sum(BOUNCE_TIMES)bounce_t,avg(TIME_SPENT ) time_s ,max(DAYTIME)DAYTIME  
+            FROM (
+               SELECT  MIC,case when VV is null then 0 else VV END VV ,CASE WHEN UV IS NULL THEN 0 ELSE UV END UV,CLK,CASE WHEN PV IS NULL THEN 0 ELSE PV END PV,
+    case when BOUNCE_TIMES is null then 0 else BOUNCE_TIMES end BOUNCE_TIMES,CASE WHEN TIME_SPENT IS NULL THEN 0 ELSE TIME_SPENT END TIME_SPENT,DAYTIME from tb_amp_sum_back_d
+     where daytime between '2017-07-01'and  '2017-09-30'                                                                                                                                                                                                                                                                       
+            ) a
+            join tb_amp_basic_schedule_info sche on sche.mic=a.mic  full join tb_amp_basic_schedule_extend_info ext on a.mic=ext.mic
+           full join (select  b.mic,  sum(  case  when sche.imp_data_caliber ='1' then b.clean_imp_pv  when sche.imp_data_caliber ='2' then b.dclean_imp_pv 
+            else b.dirty_imp_pv 
+            end )  dirty_imp_pv ,
+           sum( case when sche.clk_data_caliber ='1' then b.clean_clk_pv  
+            when sche.clk_data_caliber ='2' then b.dclean_clk_pv 
+            else b.dirty_clk_pv 
+            end )  dirty_clk_pv
+            from tb_amp_basic_schedule_info sche join tb_amp_sum_fore_d b on sche.mic=b.mic  and put_date between '2017-07-01'and  '2017-09-30'
+            group by b.mic
+            )b on  sche.mic=b.mic
+            where  1=1
+					 AND				sche.mic in (
+
+'bbRxFTmFQKa6BCXeH3JN',
+'x5ShkyPw8suKQKxXAFhA',
+'9d2NrK7Durq45aywPuRE',
+'zyRYyHrrNTzxyOUGof5d',
+'hT5h9QbDM7mwiBaieV9i',
+'SOdo816fWyXvYLmMagnf',
+'HtVvNTehsJCepX2BEEsM',
+'A1vSubPT3aPEKHASFlXa',
+'37ss2Ho5xekuT3qPH1o8',
+'cGKZ7vxVPiCeOPhtfrzP',
+'eu9Iuf963L0c9hdyuojN',
+'oFq9zcrZeTRgaLv7GgTN',
+'68GX3YsrMTbvZuVOGIad',
+'FobzTYfEERteLZskBq4k',
+'LaXMuy6KLguGxRzydRYs'
+)
+          
+              	and sche.activity_code  like 'JT%' and sche.activity_code  not like 'JTYZ%' and sche.media_id in('18','196','197','199','213','195','223')
+              
+             group by sche.mic ,terminal_type,put_function ,dirty_imp_pv,dirty_clk_pv  
+         ) a   
+         UNION  
+     select  b.mic,terminal_type, put_function,case when  a_vv is null then -1 when a_vv =0 then -1 else a_vv end a_vv , case when a_uv is null then -1 when a_uv =0 then -1 else a_uv end a_uv ,
+     sum(  case when sche.imp_data_caliber ='1' then b.dclean_imp_pv  when sche.imp_data_caliber ='2' then b.dclean_imp_pv 
+            else b.dirty_imp_pv 
+            end )  pv ,
+           sum( case when sche.clk_data_caliber ='1' then b.clean_clk_pv  
+            when sche.clk_data_caliber ='2' then b.dclean_clk_pv 
+            else b.dirty_clk_pv 
+            end )  _pv, case when  a_pv is null then -1 when a_pv =0 then -1 else a_pv end a_pv,  case when bounce_t is null then -1 when bounce_t = 0 then -1  else bounce_t end bounce_t , 
+            case when time_s is null then -1 when time_s=0 then -1 else time_s end time_s,  daytime
+            from tb_amp_basic_schedule_info sche join tb_amp_sum_fore_d b on sche.mic=b.mic  join tb_amp_basic_schedule_extend_info ext on b.mic=ext.mic 
+            left join (
+                select distinct a.mic,sum(vv)a_vv,sum(uv)a_uv,
+             sum(pv)a_pv,sum(BOUNCE_TIMES)bounce_t,avg(TIME_SPENT ) time_s ,max(DAYTIME)DAYTIME  
+            FROM (
+               SELECT  MIC,case when VV is null then 0 else VV END VV ,CASE WHEN UV IS NULL THEN 0 ELSE UV END UV,CLK,CASE WHEN PV IS NULL THEN 0 ELSE PV END PV,
+    case when BOUNCE_TIMES is null then 0 else BOUNCE_TIMES end BOUNCE_TIMES,CASE WHEN TIME_SPENT IS NULL THEN 0 ELSE TIME_SPENT END TIME_SPENT,DAYTIME from tb_amp_sum_back_d
+     where daytime between '2017-07-01'and  '2017-09-30'  )a group by a.mic
+            )a on a.mic=b.mic
+            where put_date between '2017-07-01'and  '2017-09-30'
+           AND				b.mic in (
+
+'bbRxFTmFQKa6BCXeH3JN',
+'x5ShkyPw8suKQKxXAFhA',
+'9d2NrK7Durq45aywPuRE',
+'zyRYyHrrNTzxyOUGof5d',
+'hT5h9QbDM7mwiBaieV9i',
+'SOdo816fWyXvYLmMagnf',
+'HtVvNTehsJCepX2BEEsM',
+'A1vSubPT3aPEKHASFlXa',
+'37ss2Ho5xekuT3qPH1o8',
+'cGKZ7vxVPiCeOPhtfrzP',
+'eu9Iuf963L0c9hdyuojN',
+'oFq9zcrZeTRgaLv7GgTN',
+'68GX3YsrMTbvZuVOGIad',
+'FobzTYfEERteLZskBq4k',
+'LaXMuy6KLguGxRzydRYs'
+)
+            
+              	   and sche.activity_code  like 'JT%' and sche.activity_code  not like 'JTYZ%' and sche.media_id in('18','196','197','199','213','195','223')
+                                                                                                                                                                   
+            group by b.mic,terminal_type, put_function ,a_vv,a_uv,a_pv,bounce_t,time_s,daytime
+            
+            order by mic , daytime desc
+    </select> 
+    <select id="sumPZ" resultType="java.lang.Integer" parameterType="java.util.List">
+      select count(*)from (
+    select case when bb.mic is null then aa.mic else bb.mic end ,case when bb.put_date is null then aa. put_date else bb.put_date end ,
+case when pv is null then 0 else pv end,case when _pv is null then 0 else _pv end,case when bb.terminal_type is null then aa.terminal_type else bb.terminal_type end,
+case when bb.put_function is null then aa.put_function else bb.put_function end,case when A_VV is null then 0 else a_vv end,case when A_UV is null then 0 else a_uv end,
+case when CLK is null then 0 else clk end,case when A_PV is null then 0 else a_pv end ,case when BOUNCE_T is null then 0 else BOUNCE_T end , case when TIME_S is null then 0 else TIME_S end
+         from  (
+	  select  b.mic,  put_date,  case  when sche.imp_data_caliber ='1' then b.clean_imp_pv  when sche.imp_data_caliber ='2' then b.dclean_imp_pv 
+            else b.dirty_imp_pv
+            end   pv ,
+           case when sche.clk_data_caliber ='1' then b.clean_clk_pv  
+            when sche.clk_data_caliber ='2' then b.dclean_clk_pv 
+            else b.dirty_clk_pv 
+            end  _pv,terminal_type,put_function
+            from tb_amp_basic_schedule_info sche join tb_amp_sum_fore_d b on sche.mic=b.mic  and put_date between #{dt}and  #{dte}
+             <if test="actCode!=null and actCode!=''">  
+	     and  sche.activity_code = #{actCode}
+           </if> 
+            <choose>
+              <when test="flag ==1 ">
+                and sche.activity_code  like 'HRJT%',
+              </when>
+              <otherwise>
+              	   and sche.activity_code  like 'JT%' and sche.activity_code  not like 'JTYZ%' and sche.media_id in('18','196','197','199','213','195','223'),
+              </otherwise>
+           </choose>  
+	  tb_amp_basic_schedule_extend_info e where e.mic = sche.mic
+          )bb     full JOIN (
+	 select		a.MIC,case when VV is null then 0 else VV END A_VV ,CASE WHEN UV IS NULL THEN 0 ELSE UV END A_UV,case when CLK is null then 0 else clk end,CASE WHEN a.PV IS NULL THEN 0 ELSE a.PV END A_PV,
+	 case when BOUNCE_TIMES is null then 0 else BOUNCE_TIMES end BOUNCE_T,CASE WHEN TIME_SPENT IS NULL THEN 0 ELSE TIME_SPENT END TIME_S,a.DAYTIME put_date,	
+	 terminal_type,put_function FROM tb_amp_sum_back_d a
+            join tb_amp_basic_schedule_info sche on sche.mic=a.mic and daytime between #{dt}and  #{dte}
+           <if test="actCode!=null and actCode!=''">  
+	        and  sche.activity_code = #{actCode}
+           </if> 
+           <choose>
+              <when test="flag ==1 ">
+                and sche.activity_code  like 'HRJT%',
+              </when>
+              <otherwise>
+              	   and sche.activity_code  like 'JT%' and sche.activity_code  not like 'JTYZ%' and sche.media_id in('18','196','197','199','213','195','223'),
+              </otherwise>
+           </choose> 
+	   tb_amp_basic_schedule_extend_info e
+	  where e.mic = sche.mic
+				)aa
+	 on  aa.mic=bb.mic and aa.put_date = bb.put_date
+            order by aa.mic,bb.mic,bb.put_date,aa.put_date
+    
+  )b
+    </select>
+    <select id="selectProName" resultType="java.lang.String" parameterType="java.lang.String">
+    select activity_name from tb_amp_basic_activity_info  where activity_code = #{actCode}
+    </select>
+    <select id="minDay" resultType="java.lang.String" parameterType="java.lang.String">
+    select min(true_start) from tb_amp_sum_fore_accum  where activity_code = #{actCode}
+    </select>
+     <select id="maxDay" resultType="java.lang.String" parameterType="java.lang.String">
+    select max(true_end) from tb_amp_sum_fore_accum  where activity_code =#{actCode}
+    </select>
+    <select id="listPZDay" resultType="com.udbac.entity.DataExport" parameterType="java.util.List">
+    select case when bb.mic is null then aa.mic else bb.mic end ,case when bb.put_date is null then aa. put_date else bb.put_date end ,
+case when pv is null then 0 else pv end,case when _pv is null then 0 else _pv end,case when bb.terminal_type is null then aa.terminal_type else bb.terminal_type end,
+case when bb.put_function is null then aa.put_function else bb.put_function end,case when A_VV is null then 0 else a_vv end,case when A_UV is null then 0 else a_uv end,
+case when CLK is null then 0 else clk end,case when A_PV is null then 0 else a_pv end ,case when BOUNCE_T is null then 0 else BOUNCE_T end , case when TIME_S is null then 0 else TIME_S end
+         from  (
+	  select  b.mic,  put_date,  case  when sche.imp_data_caliber ='1' then b.clean_imp_pv  when sche.imp_data_caliber ='2' then b.dclean_imp_pv 
+            else b.dirty_imp_pv
+            end   pv ,
+           case when sche.clk_data_caliber ='1' then b.clean_clk_pv  
+            when sche.clk_data_caliber ='2' then b.dclean_clk_pv 
+            else b.dirty_clk_pv 
+            end  _pv,terminal_type,put_function
+            from tb_amp_basic_schedule_info sche join tb_amp_sum_fore_d b on sche.mic=b.mic  and put_date between #{dt}and  #{dte}
+             <if test="actCode!=null and actCode!=''">  
+	        and  sche.activity_code = #{actCode}
+           </if>  
+           <choose>
+              <when test="flag ==1 ">
+                and sche.activity_code  like 'HRJT%',
+              </when>
+              <otherwise>
+              	   and sche.activity_code  like 'JT%' and sche.activity_code  not like 'JTYZ%' and sche.media_id in('18','196','197','199','213','195','223'),
+              </otherwise>
+           </choose> 
+             tb_amp_basic_schedule_extend_info e where e.mic = sche.mic
+          )bb     full JOIN (
+	 select		a.MIC,case when VV is null then 0 else VV END A_VV ,CASE WHEN UV IS NULL THEN 0 ELSE UV END A_UV,case when CLK is null then 0 else clk end,CASE WHEN a.PV IS NULL THEN 0 ELSE a.PV END A_PV,
+	 case when BOUNCE_TIMES is null then 0 else BOUNCE_TIMES end BOUNCE_T,CASE WHEN TIME_SPENT IS NULL THEN 0 ELSE TIME_SPENT END TIME_S,a.DAYTIME put_date,	
+	 terminal_type,put_function FROM tb_amp_sum_back_d a
+            join tb_amp_basic_schedule_info sche on sche.mic=a.mic and daytime between #{dt}and  #{dte}
+           <if test="actCode!=null and actCode!=''">  
+	     and  sche.activity_code = #{actCode}
+           </if>  
+             <choose>
+              <when test="flag ==1 ">
+                and sche.activity_code  like 'HRJT%',
+              </when>
+              <otherwise>
+              	and sche.activity_code  like 'JT%' and sche.activity_code  not like 'JTYZ%' and sche.media_id in('18','196','197','199','213','195','223'),
+              </otherwise>
+           </choose> 
+	   tb_amp_basic_schedule_extend_info e
+	  where e.mic = sche.mic
+				)aa
+	 on  aa.mic=bb.mic and aa.put_date = bb.put_date
+            order by aa.mic,bb.mic,bb.put_date,aa.put_date
+         limit 10000 OFFSET #{export_times} 
+    </select>
+    <insert id="saveEndPoints">
+      INSERT INTO tb_amp_require(
+            mic, daytime, email)
+    VALUES (#{mic}, #{dt}, #{mailbox});
+    </insert>
+    <select id="checkMic" resultType="java.lang.Integer">
+         SELECT COUNT(*) FROM(SELECT *
+              FROM tb_amp_basic_schedule_info where mic =#{mic}
+        )A
+    </select>
+    <!-- 根据短代码设置活动排期点位表的曝光口径和点击口径 -->
+	<update id="updateDataCaliber">
+		<foreach collection="list" item="item" index="index" separator=";">
+			UPDATE tb_amp_basic_schedule_info 
+		    SET up_time = now()
+		    <if test="item.impDataCaliber!=null and item.impDataCaliber!=''">  
+	     		,imp_data_caliber = #{item.impDataCaliber}
+           </if>
+			<if test="item.clkDataCaliber!=null and item.clkDataCaliber!=''">  
+	     		,clk_data_caliber = #{item.clkDataCaliber}
+           </if>
+           <if test="item.updateUser!=null and item.updateUser!=''">  
+	     		,up_user = #{item.updateUser}
+           </if>
+           <if test="item.micStatMark!=null and item.micStatMark!=''">  
+	     		,mic_stat_mark = #{item.micStatMark}::integer
+           </if>
+		    WHERE mic = #{item.mic}
+		</foreach>
+	</update>
+</mapper>

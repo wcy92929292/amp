@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.udbac.dao.MonthReportDao">
+    
+    <select id="listMonth" resultMap="monthMap">
+		SELECT 
+				sche.customer_name,sche.customer_code,
+				sche.activity_code,sche.activity_name,sche.media_name,
+				point_location, put_function,key_name,
+				foreD.put_date, foreD.mic fore_mic,
+				backD.daytime,backD.mic back_mic,
+				foreD.dirty_imp_uv,foreD.dirty_imp_pv,foreD.dirty_clk_uv,foreD.dirty_clk_pv,
+				foreD.clean_imp_uv,foreD.clean_imp_pv,foreD.clean_clk_uv,foreD.clean_clk_pv,
+				foreD.dclean_imp_uv,foreD.dclean_imp_pv,foreD.dclean_clk_uv,foreD.dclean_clk_pv,
+				sum_dirty_imp_uv,sum_dirty_imp_pv,sum_dirty_clk_uv,sum_dirty_clk_pv,
+				sum_clean_imp_uv,sum_clean_imp_pv,sum_clean_clk_uv,sum_clean_clk_pv,
+				sum_dclean_imp_uv,sum_dclean_imp_pv,sum_dclean_clk_uv,sum_dclean_clk_pv,
+				visit, visitor, page_view, bounce_times,view_time,click,
+				imp_data_caliber,clk_data_caliber,support_click,support_exposure,group_id,url_pc,click_avg,exposure_avg,terminal_type
+		FROM
+		(	SELECT 
+				fored.mic,fored.put_date,
+				fored.dirty_imp_uv, fored.dirty_imp_pv, fored.dirty_clk_uv, fored.dirty_clk_pv,
+				fored.clean_imp_uv, fored.clean_imp_pv, fored.clean_clk_uv, fored.clean_clk_pv,
+				fored.dclean_imp_uv, fored.dclean_imp_pv, fored.dclean_clk_uv, fored.dclean_clk_pv,
+				sum_fored.dirty_imp_uv sum_dirty_imp_uv, sum_fored.dirty_imp_pv sum_dirty_imp_pv,
+				sum_fored.dirty_clk_uv sum_dirty_clk_uv, sum_fored.dirty_clk_pv sum_dirty_clk_pv,
+				sum_fored.clean_imp_uv sum_clean_imp_uv, sum_fored.clean_imp_pv sum_clean_imp_pv,
+				sum_fored.clean_clk_uv sum_clean_clk_uv, sum_fored.clean_clk_pv sum_clean_clk_pv,
+				sum_fored.dclean_imp_uv sum_dclean_imp_uv, sum_fored.dclean_imp_pv sum_dclean_imp_pv,
+				sum_fored.dclean_clk_uv sum_dclean_clk_uv, sum_fored.dclean_clk_pv sum_dclean_clk_pv
+			FROM
+					tb_amp_sum_fore_d fored,
+					tb_amp_sum_fore_m sum_fored,
+					tb_amp_basic_schedule_info sche,
+					tb_amp_basic_activity_info act,
+					tb_amp_basic_customer_info cus
+			where 
+				fored.put_date >= sum_fored.true_start
+			AND sum_fored.true_end >= fored.put_date
+			AND sche.mic = fored.mic
+			AND act.activity_code = sche.activity_code
+			AND act.customer_id::integer = cus.customer_id
+			AND cus.customer_code = #{customer}
+			AND sum_fored.mic = fored.mic
+			<![CDATA[AND start_date >= #{smonth} AND start_date <= #{emonth}]]>
+			AND 	(
+						fored.dirty_imp_uv != 0 OR fored.dirty_imp_pv != 0 OR fored.dirty_clk_uv != 0 OR fored.dirty_clk_pv != 0
+				OR 	fored.clean_imp_uv != 0 OR fored.clean_imp_pv != 0 OR fored.clean_clk_uv != 0 OR fored.clean_clk_pv != 0
+				OR 	fored.dclean_imp_uv != 0 OR fored.dclean_imp_pv != 0 OR fored.dclean_clk_uv != 0 OR fored.dclean_clk_pv != 0
+			)
+		) fored
+		
+		FULL JOIN
+
+		(	SELECT 
+				backd.mic,daytime,
+				vv visit,uv visitor,pv page_view,bounce_times,
+				time_spent view_time,clk click
+			FROM
+				tb_amp_sum_back_d backd,
+				tb_amp_basic_schedule_info sche,
+				tb_amp_basic_activity_info act,
+				tb_amp_basic_customer_info cus,
+				tb_amp_sum_fore_m sum_fored
+			where 
+					backd.daytime >= sum_fored.true_start
+			AND sum_fored.true_end >= backd.daytime
+			AND sum_fored.mic = backd.mic
+			AND sche.mic = backd.mic
+			AND act.activity_code = sche.activity_code
+			AND act.customer_id::integer = cus.customer_id
+			AND cus.customer_code = #{customer}
+			<![CDATA[AND daytime >= #{smonth} AND daytime <= #{emonth}]]>
+			<![CDATA[AND sche.media_id <> '18']]>
+			
+			UNION
+			
+			SELECT 
+				backd.mic,daytime,
+				vv visit,uv visitor,pv page_view,bounce_times,
+				time_spent view_time,clk click
+			FROM
+				tb_amp_sum_back_d backd,
+				tb_amp_basic_schedule_info sche,
+				tb_amp_basic_activity_info act,
+				tb_amp_basic_customer_info cus
+			where 
+				sche.mic = backd.mic
+			AND act.activity_code = sche.activity_code
+			AND act.customer_id::integer = cus.customer_id
+			AND cus.customer_code = #{customer}
+			AND sche.media_id = '18'
+			<![CDATA[AND daytime >= #{smonth} AND daytime <= #{emonth}]]>
+			
+		) backd
+		ON 
+			fored.mic = backd.mic AND fored.put_date = backd.daytime,
+			(
+				SELECT 
+					sche.mic,customer_name,customer_code,activity_name,act.activity_code,media_type,media_name,
+					put_function,point_location,click_avg,exposure_avg,imp_data_caliber,clk_data_caliber,url_pc,terminal_type,
+					support_click,support_exposure,key_name,group_id
+				FROM
+					tb_amp_basic_schedule_info sche,
+					tb_amp_basic_activity_info act,
+					tb_amp_basic_customer_info cus,
+					tb_amp_basic_media_info	media,
+					tb_amp_basic_schedule_extend_info extend
+				WHERE
+					act.activity_code = sche.activity_code
+				AND act.customer_id::integer = cus.customer_id
+				AND media.media_id = sche.media_id::integer
+				AND extend.mic = sche.mic
+				AND cus.customer_CODE = #{customer}
+				AND key_name is null
+				<if test="monthType == 1">
+					<![CDATA[AND (act.schedule_type <> 2 AND terminal_type not like 'SEM%' AND put_function not like '%关键词%' AND put_function not like '%关键字%' AND point_location not like '%关键字%' AND point_location not like '%关键词%')]]>
+				</if>
+				<if test="monthType == 2">
+					<![CDATA[AND (act.schedule_type = 2 OR terminal_type like 'SEM%' OR put_function like '%关键词%' OR put_function like '%关键字%' OR point_location like '%关键字%' OR point_location like '%关键词%')]]>
+				</if>
+			)sche
+		WHERE 
+			sche.mic = backd.mic OR sche.mic = fored.mic
+		order by 
+			<choose>
+			    <when test=" monthFile == 0">
+			    	media_name,put_function,put_date,daytime,point_location    
+			    </when>
+			    <otherwise>
+			   		 media_name,activity_name,sche.activity_code,group_id,fored.put_date,backd.daytime,foreD.mic,backD.mic   
+			    </otherwise>
+			</choose>
+    </select>
+    
+    <!-- 上海移动月报 -->
+    <select id="listShanghai" resultMap="shanghaiMonthMap">
+		SELECT 
+				DISTINCT
+				forem.mic fored_mic,fstartDate,fendDate,fdays,
+				dirty_imp_uv, dirty_imp_pv,dirty_clk_uv,dirty_clk_pv,
+				clean_imp_uv, clean_imp_pv,clean_clk_uv,clean_clk_pv,
+				dclean_imp_uv, dclean_imp_pv, dclean_clk_uv, dclean_clk_pv,
+				backd.mic backd_mic, startDate,endDate,bdays,
+				visit, visitor, page_view, bounce_times,view_time,click,
+				customer_name,customer_code,activity_name,media_type,media_name,
+				terminal_type,point_location,click_avg,exposure_avg,imp_data_caliber,clk_data_caliber,
+				support_click,support_exposure
+		FROM
+		(
+			SELECT 
+				forem.mic,true_start fstartDate,true_end fendDate, fdays,
+				dirty_imp_uv, dirty_imp_pv, dirty_clk_uv, dirty_clk_pv,
+				clean_imp_uv, clean_imp_pv, clean_clk_uv, clean_clk_pv,
+				dclean_imp_uv, dclean_imp_pv, dclean_clk_uv, dclean_clk_pv 
+			FROM
+				tb_amp_sum_fore_m forem,
+				(
+						SELECT fored.mic,count(fored.put_date) fdays
+						FROM 
+							tb_amp_sum_fore_d fored,
+							tb_amp_basic_schedule_info sche,
+							tb_amp_basic_activity_info act,
+							tb_amp_basic_customer_info cus
+						WHERE 
+							sche.mic = fored.mic
+						AND to_char(put_date,'yyyy-mm') = #{month}
+						AND act.activity_code = sche.activity_code
+						AND act.customer_id::integer = cus.customer_id
+						AND cus.customer_name = '上海移动'
+						GROUP BY fored.mic
+				)fored
+			where 
+					to_char(start_date,'yyyy-mm') = #{month}
+			AND fored.mic = forem.mic
+			AND (
+						dirty_imp_uv != 0 OR dirty_imp_pv != 0 OR dirty_clk_uv != 0 OR dirty_clk_pv != 0
+				OR 	clean_imp_uv != 0 OR clean_imp_pv != 0 OR clean_clk_uv != 0 OR clean_clk_pv != 0
+				OR 	dclean_imp_uv != 0 OR dclean_imp_pv != 0 OR dclean_clk_uv != 0 OR dclean_clk_pv != 0
+			)	
+		) forem
+		
+		FULL JOIN
+		
+		(
+			SELECT 
+				backd.mic,min(daytime) startDate,max(daytime) endDate,count(backd.mic) bdays,
+				sum(vv) visit,sum(uv) visitor,sum(pv) page_view,avg(bounce_times) bounce_times,
+				avg(time_spent * vv) view_time,sum(clk) click
+			FROM
+				tb_amp_sum_back_d backd,
+				tb_amp_basic_schedule_info sche,
+				tb_amp_basic_activity_info act,
+				tb_amp_basic_customer_info cus
+			where 
+				to_char(daytime,'yyyy-mm') = #{month}
+			AND sche.mic = backd.mic
+			AND act.activity_code = sche.activity_code
+			AND act.customer_id::integer = cus.customer_id
+			AND cus.customer_name = '上海移动'
+			GROUP BY
+				backd.mic
+		) backd
+		ON 
+			forem.mic = backd.mic,
+			(
+				SELECT 
+					sche.mic,customer_name,customer_code,activity_name,media_type,media_name,
+					terminal_type,point_location,click_avg,exposure_avg,imp_data_caliber,clk_data_caliber,
+					support_click,support_exposure
+				FROM
+					tb_amp_basic_schedule_info sche,
+					tb_amp_basic_activity_info act,
+					tb_amp_basic_customer_info cus,
+					tb_amp_basic_media_info	media,
+					tb_amp_basic_schedule_extend_info extend
+				WHERE
+					act.activity_code = sche.activity_code
+				AND act.customer_id::integer = cus.customer_id
+				AND media.media_id = sche.media_id::integer
+				AND extend.mic = sche.mic
+				AND cus.customer_name = '上海移动'
+			)sche
+		WHERE 
+			sche.mic = backd.mic OR sche.mic = forem.mic
+    </select>
+    
+    
+    <select id="listSumMic" resultMap="monthMap">
+ 		SELECT 
+				fored.start_date start_date, fored.end_date end_date,
+				backd.start_date bstart_date, backd.end_date bend_date,
+				sche.customer_name, sche.customer_code,
+				sche.activity_code, sche.activity_name, sche.media_name,
+				point_location, put_function,
+				foreD.mic fore_mic, backD.mic back_mic,
+				foreD.dirty_imp_uv, foreD.dirty_imp_pv, foreD.dirty_clk_uv, foreD.dirty_clk_pv,
+				foreD.clean_imp_uv, foreD.clean_imp_pv, foreD.clean_clk_uv, foreD.clean_clk_pv,
+				foreD.dclean_imp_uv, foreD.dclean_imp_pv, foreD.dclean_clk_uv, foreD.dclean_clk_pv,
+				visit, visitor, page_view, bounce_times, view_time, click,
+				imp_data_caliber,clk_data_caliber, support_click, support_exposure, sche.url_pc url,
+				exposure_avg,click_avg,unit,putDays,key_name
+		FROM
+		(
+				SELECT 
+					fored.mic,true_start start_date, true_end end_date,putDAYS,
+					dirty_imp_uv, dirty_imp_pv, dirty_clk_uv, dirty_clk_pv,
+					clean_imp_uv, clean_imp_pv, clean_clk_uv,  clean_clk_pv,
+					dclean_imp_uv,dclean_imp_pv, dclean_clk_uv, dclean_clk_pv
+				FROM
+					tb_amp_sum_fore_m fored,
+					(
+					SELECT calen.mic,count(put_date) putDays
+						FROM 
+							tb_amp_basic_schedule_calendar_info calen,
+							tb_amp_basic_schedule_info sche,
+							tb_amp_basic_activity_info act,
+							tb_amp_basic_customer_info cus
+						WHERE
+									sche.mic = calen.mic
+							AND act.activity_code = sche.activity_code
+							AND act.customer_id::integer = cus.customer_id
+							AND cus.customer_code = #{customer}
+							AND put_date >= #{smonth}
+							AND #{emonth} >= put_date
+						GROUP BY
+							calen.mic
+					)calen
+				where 
+					fored.start_date >= #{smonth}
+				AND #{emonth} >= fored.start_date
+				AND calen.MIC = fored.mic
+				AND 	(
+					dirty_imp_uv != 0 OR dirty_imp_pv != 0 OR dirty_clk_uv != 0 OR dirty_clk_pv != 0
+				OR 	clean_imp_uv != 0 OR clean_imp_pv != 0 OR clean_clk_uv != 0 OR clean_clk_pv != 0
+				OR 	dclean_imp_uv != 0 OR dclean_imp_pv != 0 OR dclean_clk_uv != 0 OR dclean_clk_pv != 0
+			)
+		) fored
+		
+		FULL JOIN
+		
+		(
+			SELECT 
+				backd.mic,min(daytime) start_date,max(daytime) end_date,
+				sum(vv) visit,sum(uv) visitor,sum(pv) page_view, sum(bounce_times) bounce_times,
+				avg(time_spent) view_time,sum(clk) click
+			FROM
+				tb_amp_sum_back_d backd,
+				tb_amp_basic_schedule_info sche,
+				tb_amp_basic_activity_info act,
+				tb_amp_basic_customer_info cus,
+				tb_amp_sum_fore_m forem
+			where 
+				<![CDATA[forem.true_start <= daytime AND daytime <= forem.true_end]]>
+				<![CDATA[AND start_date >= #{smonth} AND start_date <= #{emonth}]]>
+			AND sche.mic = backd.mic
+			AND act.activity_code = sche.activity_code
+			AND act.customer_id::integer = cus.customer_id
+			AND cus.customer_code = #{customer}
+			AND forem.mic = backd.mic
+			ANd forem.true_end >= backd.daytime
+			AND backd.daytime >= forem.true_start
+			<![CDATA[AND sche.media_id <> '18']]>
+			GROUP BY
+				backd.mic
+				
+			UNION
+	
+			SELECT 
+				backd.mic,min(daytime) start_date,max(daytime) end_date,
+				sum(vv) visit,sum(uv) visitor,sum(pv) page_view, sum(bounce_times) bounce_times,
+				avg(time_spent) view_time,sum(clk) click
+			FROM
+				tb_amp_sum_back_d backd,
+				tb_amp_basic_schedule_info sche,
+				tb_amp_basic_activity_info act,
+				tb_amp_basic_customer_info cus
+			where 
+				daytime >= #{smonth}
+			AND #{emonth} >= daytime
+			AND sche.mic = backd.mic
+			AND act.activity_code = sche.activity_code
+			AND act.customer_id::integer = cus.customer_id
+			AND cus.customer_code = #{customer}
+			AND sche.media_id = '18'
+			GROUP BY
+				backd.mic
+		) backd
+		ON 
+			fored.mic = backd.mic,
+			(
+				SELECT 
+					sche.mic,customer_name,customer_code,activity_name,act.activity_code,media_type,media_name,
+					put_function,point_location,imp_data_caliber,clk_data_caliber,exposure_avg,click_avg,
+					support_click,support_exposure,sche.url_pc,unit,key_name
+				FROM
+					tb_amp_basic_schedule_info sche,
+					tb_amp_basic_activity_info act,
+					tb_amp_basic_customer_info cus,
+					tb_amp_basic_media_info	media,
+					tb_amp_basic_schedule_extend_info extend
+				WHERE
+					act.activity_code = sche.activity_code
+				AND act.customer_id::integer = cus.customer_id
+				AND media.media_id = sche.media_id::integer
+				AND extend.mic = sche.mic
+				AND cus.customer_CODE =  #{customer}
+				<if test="monthType == 1">
+					<![CDATA[AND (act.schedule_type <> 2 AND terminal_type not like 'SEM%' AND put_function not like '%关键词%' AND put_function not like '%关键字%' AND point_location not like '%关键字%' AND point_location not like '%关键词%')]]>
+				</if>
+				<if test="monthType == 2">
+					<![CDATA[AND (act.schedule_type = 2 OR terminal_type like 'SEM%' OR put_function like '%关键词%' OR put_function like '%关键字%' OR point_location like '%关键字%' OR point_location like '%关键词%')]]>
+				</if>			
+			)sche
+		WHERE 
+			sche.mic = backd.mic OR sche.mic = fored.mic
+		order by 
+			customer_name,media_name,put_function,point_location
+    </select>
+    
+    <resultMap type="com.udbac.model.MonthReportModel" id="monthMap">
+        
+        <result column="customer_name" property="customerName"/>
+        <result column="customer_code" property="customerCode"/>
+        <result column="activity_code" property="activityCode"/>
+        <result column="activity_name" property="activityName"/>
+        <result column="media_name" property="mediaName"/>
+        <result column="point_location" property="pointLocation"/>
+        <result column="key_Name" property="pointLocation"/>
+        <result column="put_function" property="putFunction"/>
+        <result column="key_name" property="putFunction"/>
+        <result column="put_date" property="putDate"/>
+        <result column="daytime" property="putDate"/>
+        <result column="fore_mic" property="mic"/>
+        <result column="back_mic" property="mic"/>
+        <result column="imp_data_caliber" property="impDataCaliber"/>
+        <result column="clk_data_caliber" property="clkDataCaliber"/>
+        <result column="url_pc" property="url"/>
+        
+        <result column="dirty_imp_uv" property="dirtyImpUV"/>
+        <result column="dirty_imp_pv" property="dirtyImpPV"/>
+        <result column="dirty_clk_uv" property="dirtyClkUV"/>
+        <result column="dirty_clk_pv" property="dirtyClkPV"/>
+        <result column="clean_imp_uv" property="cleanImpUV"/>
+        <result column="clean_imp_pv" property="cleanImpPV"/>
+        <result column="clean_clk_uv" property="cleanClkUV"/>
+        <result column="clean_clk_pv" property="cleanClkPV"/>
+        <result column="dclean_imp_uv" property="dCleanImpUV"/>
+        <result column="dclean_imp_pv" property="dCleanImpPV"/>
+        <result column="dclean_clk_uv" property="dCleanClkUV"/>
+        <result column="dclean_clk_pv" property="dCleanClkPV"/>
+        
+        <result column="sum_dirty_imp_uv" property="sumDirtyImpUV"/>
+        <result column="sum_dirty_imp_pv" property="sumDirtyImpPV"/>
+        <result column="sum_dirty_clk_uv" property="sumDirtyClkUV"/>
+        <result column="sum_dirty_clk_pv" property="sumDirtyClkPV"/>
+        <result column="sum_clean_imp_uv" property="sumCleanImpUV"/>
+        <result column="sum_clean_imp_pv" property="sumCleanImpPV"/>
+        <result column="sum_clean_clk_uv" property="sumCleanClkUV"/>
+        <result column="sum_clean_clk_pv" property="sumCleanClkPV"/>
+        <result column="sum_dclean_imp_uv" property="sumDCleanImpUV"/>
+        <result column="sum_dclean_imp_pv" property="sumDCleanImpPV"/>
+        <result column="sum_dclean_clk_uv" property="sumDCleanClkUV"/>
+        <result column="sum_dclean_clk_pv" property="sumDCleanClkPV"/>
+     
+        <result column="visit" property="visit"/>
+        <result column="visitor" property="visitor"/>
+        <result column="page_view" property="pageView"/>
+        <result column="click" property="click" />
+        <result column="bounce_times" property="bounceTimes"/>
+        <result column="view_time" property="viewTime"/>
+        
+        <result column="sum_visit" property="sumVisit"/>
+        <result column="sum_visitor" property="sumVisitor"/>
+        <result column="sum_page_view" property="sumPageView"/>
+        <result column="sum_click" property="sumClick" />
+        <result column="sum_bounce_times" property="sumBounceTimes"/>
+        <result column="sum_view_time" property="sumViewTime"/>
+        
+        <result column="bounce_rate" property="bounceRate"/>
+        <result column="put_date" property="startDate"/>
+        <result column="put_date" property="endDate"/>
+        <result column="daytime" property="startDate"/>
+        <result column="daytime" property="endDate"/>
+        <result column="unit"  property="unit"/>
+        <result column="put_value"  property="putValue"/>
+        <result column="exposure_avg"  property="exposureAvg"/>
+        <result column="click_avg"  property="clickAvg"/>
+        <result column="url"  property="url"/>
+        <result column="terminal_type" property="terminalType"/>
+        
+        <result column="start_date"  property="startDate"/>
+        <result column="bstart_date"  property="startDate"/>
+        <result column="end_date"  property="endDate"/>
+        <result column="bend_date"  property="endDate"/>
+        <result column="support_click" property="supportClick"/>
+        <result column="support_exposure" property="supportExposure"/>
+        <result column="group_id" property="groupId"/>
+    </resultMap>
+    
+    
+    <resultMap type="com.udbac.model.MonthReportModel" id="shanghaiMonthMap">
+      
+		<result column="fored_mic" property="mic"/>
+        <result column="backd_mic" property="mic"/>
+        <result column="fstartDate" property="startDate"/>
+        <result column="fendDate" property="endDate"/>
+        <result column="startDate" property="startDate"/>
+        <result column="endDate" property="endDate"/>
+        
+        <result column="dirty_imp_uv" property="dirtyImpUV"/>
+        <result column="dirty_imp_pv" property="dirtyImpPV"/>
+        <result column="dirty_clk_uv" property="dirtyClkUV"/>
+        <result column="dirty_clk_pv" property="dirtyClkPV"/>
+        <result column="clean_imp_uv" property="cleanImpUV"/>
+        <result column="clean_imp_pv" property="cleanImpPV"/>
+        <result column="clean_clk_uv" property="cleanClkUV"/>
+        <result column="clean_clk_pv" property="cleanClkPV"/>
+        <result column="dclean_imp_uv" property="dCleanImpUV"/>
+        <result column="dclean_imp_pv" property="dCleanImpPV"/>
+        <result column="dclean_clk_uv" property="dCleanClkUV"/>
+        <result column="dclean_clk_pv" property="dCleanClkPV"/>
+        
+        <result column="sum_dirty_imp_uv" property="sumDirtyImpUV"/>
+        <result column="sum_dirty_imp_pv" property="sumDirtyImpPV"/>
+        <result column="sum_dirty_clk_uv" property="sumDirtyClkUV"/>
+        <result column="sum_dirty_clk_pv" property="sumDirtyClkPV"/>
+        <result column="sum_clean_imp_uv" property="sumCleanImpUV"/>
+        <result column="sum_clean_imp_pv" property="sumCleanImpPV"/>
+        <result column="sum_clean_clk_uv" property="sumCleanClkUV"/>
+        <result column="sum_clean_clk_pv" property="sumCleanClkPV"/>
+        <result column="sum_dclean_imp_uv" property="sumDCleanImpUV"/>
+        <result column="sum_dclean_imp_pv" property="sumDCleanImpPV"/>
+        <result column="sum_dclean_clk_uv" property="sumDCleanClkUV"/>
+        <result column="sum_dclean_clk_pv" property="sumDCleanClkPV"/>
+        
+        <result column="visit" property="visit"/>
+        <result column="visitor" property="visitor"/>
+        <result column="page_view" property="pageView"/>
+        <result column="click" property="click" />
+        <result column="bounce_times" property="bounceTimes"/>
+        <result column="view_time" property="viewTime"/>
+        
+        <result column="sum_visit" property="sumVisit"/>
+        <result column="sum_visitor" property="sumVisitor"/>
+        <result column="sum_page_view" property="sumPageView"/>
+        <result column="sum_click" property="sumClick" />
+        <result column="sum_bounce_times" property="sumBounceTimes"/>
+        <result column="sum_view_time" property="sumViewTime"/>
+        
+        <result column="customer_name" property="customerName"/>
+        <result column="customer_code" property="customerCode"/>
+        <result column="activity_name" property="activityName"/>
+        <result column="media_type" property="mediaType"/>
+        <result column="media_name" property="mediaName"/>
+        <result column="point_location" property="pointLocation"/>
+        <result column="terminal_type" property="terminalType"/>
+        <result column="click_avg" property="clickAvg"/>
+        <result column="exposure_avg" property="exposureAvg"/>
+        <result column="support_click" property="supportClick"/>
+        <result column="support_exposure" property="supportExposure"/>
+        <result column="imp_data_caliber" property="impDataCaliber"/>
+        <result column="clk_data_caliber" property="clkDataCaliber"/>
+        <result column="fdays" property="putDays"/>
+        <result column="bdays" property="putDays"/>
+    </resultMap>
+</mapper>

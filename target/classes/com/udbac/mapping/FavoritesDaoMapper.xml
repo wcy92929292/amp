@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.udbac.dao.FavoritesDao">
+
+	<resultMap type="com.udbac.entity.FavoritesInfo" id="favorites">
+		<result column="put_date" property="putDate" />
+		<result column="mic" property="mic" />
+		<result column="collect_user" property="userName" />
+	</resultMap>
+
+	<!-- 单个查询 -->
+	<select id="countFavorites" resultMap="favorites">
+		select * from
+		tb_amp_basic_favorites_info where mic = #{mic} and put_date =
+		#{date}::timestamp and collect_user = #{user}
+	</select>
+
+	<!-- 单个增加 -->
+	<insert id="addMyFavorites">
+		insert into tb_amp_basic_favorites_info
+		(mic,put_date,collect_user) values (#{mic},#{date}::timestamp,#{user})
+	</insert>
+
+	<!-- 单个删除 -->
+	<delete id="deleteFavorites">
+		delete from tb_amp_basic_favorites_info where mic =
+		#{mic} and put_date = #{date}::timestamp and collect_user = #{user}
+	</delete>
+
+	<!-- 批量保存 -->
+	<insert id="addMyManyFavorites">
+		insert into tb_amp_basic_favorites_info (mic,put_date,collect_user)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item},
+			#{date}::timestamp,
+			#{user}
+			)
+		</foreach>
+	</insert>
+
+	<!-- 批量删除 -->
+	<delete id="deleteManyFavorites">
+		delete from tb_amp_basic_favorites_info where
+		put_date =
+		#{date}::timestamp
+		and collect_user = #{user}
+		and mic in
+		<foreach collection="list" item="item" index="index" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- 批量查询 -->
+	<select id="info" resultMap="favorites">
+		select * from
+		tb_amp_basic_favorites_info where put_date =
+		#{date}::timestamp
+		and collect_user = #{user} 
+		and mic in
+		<foreach collection="list" item="item" index="index" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

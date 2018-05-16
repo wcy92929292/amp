@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>修改用户信息</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<link href="../../css/user.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<script src="../../js/user/userupdate.js"></script>
+<!-- echarts -->
+<script src="../../js/com/echarts-all.js"></script>
+<!-- 模板 -->
+<script type="text/javascript" src="../../js/com/jquery.tmpl.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<Link Rel="ICON NAME" href="../../images/logoIcon.ico">
+
+<script type="text/x-jquery-tmpl" id="template"></script>
+
+</head>
+<body>
+	<!-- 头部 -->
+	<div class="headers"></div>
+	<!-- 菜单导航 -->
+	<div id="template-nav"></div>
+	<!-- <div class="row" style="padding-top: 30px; margin-left: 5px;"></div> -->
+	<div class="contain">
+		<div class="zxy_contain1">
+			<div class="modleBk">
+				<h2 class="modleTitle">修改用户信息</h2>
+				<input type="hidden" id='user_id'/>
+				<input type="hidden" id='province'/>
+				<input type="hidden" id='role'/>
+				<input type="hidden" id='state'/>
+				<input type="hidden" id='username_id'/>
+			</div>
+			<form action="" method="post" class="form-horizontal formcs container" id="myform">
+				<div class="form-group">
+			    	<label class="col-sm-2 control-label label">
+			    		<span class="need">*&nbsp;</span>用&nbsp;户&nbsp;名&nbsp;:&nbsp;
+			    	</label>
+			    	
+			    	<div class="col-sm-10">
+			      		<input type="text" class="form-control" id="username" name="username" placeholder="">
+			     	 	<span style="color:#FF005C;font-size:0.7em" id="name_span"disabled="true "></span>
+			    	</div>
+			    	
+			    	<label class="col-sm-2 control-label label">
+			    		<span class="need">*&nbsp;</span>登录密码:
+			    	</label>
+			    	
+			    	<div class="col-sm-10">
+			      		<input type="password" class="form-control" id="password" name="password" placeholder="">
+			      		<span style="color:#FF005C;font-size:0.7em" id="pwd_span"></span>
+			    	</div>
+			  	</div>
+				
+				<div class="form-group">
+			    	<label class="col-sm-2 control-label label">
+			    		<span class="need">*&nbsp;</span>密码确认:
+			    	</label>
+			    	
+		    		<div class="col-sm-10">
+		      			<input type="password" id="confirmpwd" name="confirmpwd" class="form-control" placeholder="">
+		      			<span style="color:#FF005C;font-size:0.7em" id="pswd_span"></span>
+		    		</div>
+		    		
+		    		<label class="col-sm-2 control-label label">
+		    			<span class="need">*&nbsp;</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名:&nbsp;
+		    		</label>
+		    		
+		   		 	<div class="col-sm-10">
+		      			<input type="text" id="uname" name="uname" class="form-control" placeholder="">
+		      			<span style="color:#FF005C;font-size:0.7em" id="uname_span"></span>
+		    		</div>
+			  	</div>
+				
+				<div class="form-group">
+			    	<label class="col-sm-2 control-label label">
+			    		<span class="need">*&nbsp;</span>客&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;户:&nbsp;
+			    	</label>
+			    	
+			    	<div class="col-sm-10">
+			      		<select id="province_id" class="form-control" name="province"></select>
+			    	</div>
+			    	
+			    	<label class="col-sm-2 control-label label">
+			    		<span class="need">*&nbsp;</span>角&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;色:&nbsp;
+			    	</label>
+			    	
+			    	<div class="col-sm-10">
+			      	<select id="role_id" class="form-control" name="role" style="background: rgba(0,93,93,0.8);"></select>
+			    	</div>
+			  	</div>
+				
+				<div class="form-group">
+			    	<label class="col-sm-2 control-label label">
+			    		<span class="need">*&nbsp;</span>电&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;话:&nbsp;
+			    	</label>
+			    	
+			    	<div class="col-sm-10">
+			      		<input type="tel" id="tel" name="tel" class="form-control" placeholder="" pattern="[0-9]{11}">
+			      		<span style="color:#FF005C;font-size:0.7em" id="tel_span"></span>
+			    	</div>
+			    	
+			    	<label class="col-sm-2 control-label label">
+			    		<span class="need">*&nbsp;</span>邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱:&nbsp;
+			    	</label>
+			    	
+			    	<div class="col-sm-10">
+			      		<input type="email" id="email" name="email" class="form-control" placeholder="" style="width: 10em;">
+			    	</div>
+			    	<span style="color:#FF005C;font-size:0.7em" id="email_span"></span>
+			  	</div>
+				
+				<div class="form-group">
+			    	<label class="col-sm-2 control-label radio-inline label">
+			    		<span class="need">*&nbsp;</span>用户状态:
+			    	</label>
+			    	
+			    	<div class="col-sm-10 radio">
+					 	<input type="radio" id="user_state1" onclick="state('0')" name="user_state" placeholder="" value="1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<span>在职</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					 	<input type="radio" id="user_state2" onclick="state('1')"  name="user_state" placeholder="" value="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<span>离职</span>
+					</div>
+			  	</div>
+			</form>
+			<div id="button2" >
+				<input type="button" value="提交" class="button_style" id="submit" onclick='submit()'>
+				<input type="button" value="返回" id="back" class="button_style" onclick='back()' style="margin-left: 60px;">
+			</div>
+		</div>
+	</div>
+</body>
+</html>

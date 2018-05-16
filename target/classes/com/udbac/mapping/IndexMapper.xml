@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 首页SQL -->
+<mapper namespace="com.udbac.dao.IndexDao">
+<!-- 查询信息结果集 -->
+<resultMap type="com.udbac.entity.IndexBean" id="IndexResultMap">
+		<result property="mic" column="cmic" />
+		<result property="put_date" column="putdate" />
+		<result property="activity_code" column="activitycode" />
+		<result property="activity_name" column="activityname" />
+		<result property="customer_id" column="customerid" />
+		<result property="customer_name" column="customername" />
+		<result property="monitor_exposure_pv" column="exposurepv" />
+		<result property="monitor_exposure_uv" column="exposureuv" />
+		<result property="monitor_click_pv" column="clickpv" />
+		<result property="monitor_click_uv" column="clickuv" />
+		<result property="click_avg" column="clickavg" />
+		<result property="exposure_avg" column="exposureavg" />
+		<result property="unit" column="unit" />
+		<result property="support_exposure" column="supportexposure" />
+		<result property="support_click" column="supportclick" />
+		<result property="exception" column="exception" />
+	</resultMap>
+<select  id="QueryList" parameterType="map" resultType="com.udbac.entity.IndexBean" resultMap="IndexResultMap">
+<![CDATA[
+		SELECT  	
+			schedule.activity_code as activitycode,
+			activity.activity_name as activityname,
+			coalesce(activity.exception, 0) as exception,
+			customer.customer_name as customername,
+			coalesce(monitor.dirty_imp_pv, 0) as exposurepv,			
+			coalesce(monitor.dirty_imp_uv, 0) as exposureuv,		
+			coalesce(monitor.dirty_clk_pv, 0) as clickpv,		
+			coalesce(monitor.dirty_clk_uv, 0)  as clickuv,
+			coalesce(schedule.click_avg, '0') as clickavg,
+			case when schedule.unit in ('cpm', 'CPM')
+			 then (coalesce(calendar.put_value::bigint, 0)*1000)::character varying
+			else 	coalesce(schedule.exposure_avg, '0')  end as exposureavg,
+			extend.support_exposure as supportexposure,
+			extend.support_click as supportclick
+	FROM 	      tb_amp_basic_activity_info as activity
+		 left join tb_amp_basic_customer_info as customer on activity.customer_id::numeric = customer.customer_id,             
+		              tb_amp_basic_schedule_info as schedule
+         left join tb_amp_basic_schedule_extend_info as extend on schedule.mic = extend.mic,
+		              tb_amp_basic_schedule_calendar_info as calendar
+		 left join (select mic, #{sdate} ::timestamp without time zone put_date,
+					sum(DIRTY_IMP_PV) dirty_imp_pv,
+					sum(DIRTY_IMP_UV) dirty_imp_uv,
+					sum(DIRTY_IMP_PV) dirty_clk_pv,
+					sum(DIRTY_CLK_UV) dirty_clk_uv
+				FROM tb_amp_basic_hour_monitor_date
+				where DAYTIME >= #{sdate}::timestamp without time zone
+				AND DAYTIME <= concat(#{sdate} , ' 23:00:00')::timestamp without time zone
+				group by mic)   as monitor on calendar.mic = monitor.mic
+		       and monitor.put_date = calendar.put_date
+		 
+	where schedule.activity_code = activity.activity_code
+	and schedule.mic = calendar.mic
+	]]>
+	<if test="null != cust and '' != cust">
+			and customer.customer_name=#{cust}
+	</if>
+	<![CDATA[
+	and calendar.put_date = #{sdate} ::timestamp without time zone
+	order by activitycode 
+	]]>
+ </select>
+</mapper>

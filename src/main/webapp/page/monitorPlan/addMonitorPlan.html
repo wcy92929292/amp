@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+	<head lang="en">
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>监测活动添加</title>
+		<link href="../../css/com/bootstrap.css" rel="stylesheet">
+		<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+		<link href="../../css/com/ie.css" rel="stylesheet">
+		<link href="../../css/plan.css" rel="stylesheet">
+		<link href="../../css/style.css" rel="stylesheet">
+		<link href="../../css/Validform.css" rel="stylesheet">
+		<!-- 头部和底部css -->
+		<link href="../../css/headerorfooter.css" rel="stylesheet">
+	</head>
+
+	<body>
+		<!-- 头部 -->
+		<div class="headers"></div>
+		<div class="contain">
+			<div class="zxy_contain1">
+				<!-- 菜单导航 -->
+				<div id="template-nav"></div>
+				<div class="monitorPlan">
+					<form id="formId" class="planform" method="post" action="" name="myForm">
+						<div class="zxy_title_one">
+							<b class="m_s_title">添加活动方案</b>
+						</div>
+						<ul class="zxy_ul_two">
+							<li>
+								<h6>注：*&nbsp;&nbsp;为必选项</h6>
+							</li>
+							<li>
+								<input type="hidden" name="port_people" class="inputxt" id="port_people">
+							</li>
+
+							<li>
+								<label class="label" style="letter-spacing:6px;">预上线日:</label>
+								<input placeholder="开始时间:" class="day-time day-input" name='predict_start_date' type="text" id="sdate_id" onfocus="WdatePicker({skin:'twoer'})" />&nbsp;
+								<span class="need">*</span>
+								<span class="Validform_checktip"></span>
+							</li>
+
+							<li class="parent_idf">
+								<label class="label" style="letter-spacing:2.5px;">父活动编号:</label>
+								<input type="text" value="" name="parent_activity_code" class="inputxt" id="parent_activity_code" readonly>&nbsp;
+								<span class="need">*</span>
+								<span class="Validform_checktip"></span>
+							</li>
+
+							<li class="parent_idf">
+								<label class="label" style="letter-spacing:2.5px;">父活动名称:</label>
+								<input type="text" name="f_activity_name" class="inputxt" id="f_activity_name" readonly>&nbsp;
+								<span class="need">*</span>
+								<span class="Validform_checktip"></span>
+							</li>
+
+							<li>
+								<label class="label" style="letter-spacing:6px;">投放单位:</label>
+								<select cus="cus" id="customer_id" name="customer_id" datatype="*" nullmsg="请选择投放单位" readonly>
+									<option value="">--请选择--</option>
+								</select>&nbsp;
+								<span class="need">*</span>
+								<span class="Validform_checktip"></span>
+							</li>
+
+							<li>
+								<label class="label" style="letter-spacing:6px;">活动编号:</label>
+								<input id="s_code" name="s_code" readonly>&nbsp;
+								<input type="text" value="" name="activity_code" class="inputxt" datatype="ns" id="activity_code" style="width: 170px; height:26px;">&nbsp;
+								<span class="need">*</span>
+								<span class="Validform_checktip"></span>
+							</li>
+							<li>
+								<label class="label" style="letter-spacing:6px;">活动名称:</label>
+								<input type="text" value="" name="activity_name" class="inputxt" datatype="*" id="activity_name" style="width:20em;">&nbsp;
+								<!-- <!-- <input type="text" value="" name="activity_name" class="inputxt"  datatype="s1-50"   id="activity_name" style="width:20em;">&nbsp; -->
+								<span class="need">*</span>
+								<span class="Validform_checktip"></span>
+							</li>
+							<li>
+								<label class="label">监测中心人员:</label>&nbsp;
+								<select id="monitor_peopleID" name="monitor_people" datatype="*" nullmsg="请选择监测中心人员">
+									<option value="">--请选择--</option>
+								</select>&nbsp;
+								<span class="need">*</span>
+								<span class="Validform_checktip"></span>
+							</li>
+							<li>
+								<label class="label">前端支撑人员:</label>&nbsp;
+								<select id="font_support_peopleID" name="font_support_people" datatype="*" nullmsg="请选择前端支撑人员">
+									<option value="">--请选择--</option>
+								</select>&nbsp;
+								<span class="need">*</span>
+								<span class="Validform_checktip"></span>
+							</li>
+							<li>
+								<label class="label">后端支撑人员:</label>&nbsp;
+								<select id="after_support_peopleID" name="after_support_people" datatype="*" nullmsg="请选择后端支撑人员">
+									<option value="">--请选择--</option>
+								</select>&nbsp;
+								<span class="need">*</span>
+								<span class="Validform_checktip"></span>
+							</li>
+							<li>
+								<label class="label" style="letter-spacing:6px;">统计标记:</label>&nbsp;
+								<select id="stat_mark" name="stat_mark" datatype="*" nullmsg="请勾选">
+									<option value="">--请选择--</option>
+									<option value="0">N</option>
+									<option value="1">N+1</option>
+								</select>&nbsp;
+								<span class="need">*</span>
+								<span class="Validform_checktip"></span>
+							</li>
+							<li>
+								<label class="label" style="letter-spacing:20px;"> 备注</label>
+								<textarea rows="3" name="memo"></textarea>
+								<span class="Validform_checktip"></span>
+							</li>
+						</ul>
+					</form>
+				</div>
+				
+				<div class="addScheme">
+					<input type="checkbox" style="width: 5%;" >添加方案信息
+				</div>
+				
+				
+				<!-- 新增界面&删除界面 -->
+				<div class="addRmove-container" id="div1" style="display: none;">
+					<div class="container-children">
+						<div class="top clearfix">
+							<div class="title fl">
+								<span>页面名称</span>
+								<input type="text" placeholder="请填写页面名称" title="页面名称"/>
+								<span>页面序号</span>
+								<input type="text" placeholder="请填写页面序号" title="页面序号"/>
+							</div>
+							<div class="addRmove fr">
+								<input class="button_style add" type="button" value="新增页面" />
+								<input class="button_style bg remove" type="button" value="删除页面" />
+							</div>
+						</div>
+						
+						<div class="bottom clearfix">
+							<button type="button" class="button_style fr bg remove1" value="删除按钮">删除按钮</button>
+							<button type="button" class="button_style fr mg add1" value="新增按钮">新增按钮</button>
+							<div class="tabParent">
+								<table class="tab1">
+									<thead>
+										<tr>
+											<th>dcsid_s</th>
+											<th>按钮类型</th>
+											<th>按钮名称</th>
+											<th>按钮ID</th>
+											<th>页面URL</th>
+											<th>匹配规则</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><input type="text" /></td>
+											<td>
+												<select>
+													<option value="" disabled selected style='display:none;'>接口人填写</option>
+													<option value="PV">PV</option>
+													<option value="UV">UV</option>
+													<option value="VV">VV</option>
+												</select>
+											</td>
+											<td><input type="text" title="按钮名称"/></td>
+											<td><input type="text" title="按钮ID" /></td>
+											<td><input type="text" title="页面URL"/></td>
+											<td><input type="text" title="匹配规则"/></td>
+										</tr>
+									</tbody>
+								</table>
+								<table class="tab2">
+									<thead>
+										<tr>
+											<th>KEY</th>
+											<th>OPERATION</th>
+											<th>VALUE</th>
+											<th>操作</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="trlen2">
+											<td>
+												<select>
+													<option value="WT.EVENT">WT.EVENT</option>
+												</select>
+											</td>
+											<td><input type="text"/></td>
+											<td>
+												<select>
+													<option value="=">=</option>
+													<option value="~">~</option>
+												</select>
+											</td>
+											<td>
+												<button style="display: none;" type="button" class="button_style add2" value="新增规则">新增规则</button>
+												<button style="display: none;" type="button" class="button_style bg remove2" value="删除">删除</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- <ul id="zxy_ul_jiance_one">
+					<li><b>页面名称</b></li>
+					<li><b>页面URL</b></li>
+					<li><b>按钮名称</b></li>
+					<li><b>按钮ID</b></li>
+					<li><b>按钮事件</b></li>
+					<li><b>涉及指标</b></li>
+					<li><b>统计类别</b></li>
+					<li><b>操作</b></li>
+				</ul> -->
+				<table class="zxy_tab_two" id="table_id">
+					<tbody id="tbody_id" class="zxy_tab3"></tbody>
+					<tfoot>
+						<!-- <tr>
+							<td colspan="8" style="padding:5px 0 5px 5px;">
+								<input name="" type="button" id="add_line" value="新增" class="button_style" />
+								<input id='allSelectJson' value='' type='hidden' />
+							</td>
+						</tr> -->
+						<tr>
+							<td colspan="8" style="padding:5px 0 5px 5px; text-align:center;">
+								<input name="" type="button" id="comfirm_id" value="添加" class="button_style"/>
+								<input name="" type="button" id="cancal_id" value="关闭" onclick="$('#back')[0].click();" class="button_style" />
+								<a id="back" style="display: none;" href="/amp/page/monitorPlan/monitorPlan.html?back"></a>
+							</td>
+						</tr>
+					</tfoot>
+				</table> 
+			</div>
+		</div>
+	</body>
+	
+	<script src="../../js/com/jquery-1.9.1.js"></script>
+	<script src="../../js/com/bootstrap.min.js"></script>
+	<script src="../../js/com/jquery.cookie.js"></script>
+	<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+	<script src="../../js/udbac.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<!-- 按钮基本JS方法 -->
+	<script src="../../js/crudPlan.js"></script>
+	<!-- 表单验证 -->
+	<script src="../../js/com/Validform.js"></script>
+	<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+	<script src="../../js/layer/layer.js"></script>
+	<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+	<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+	<script type="text/html" id="template">
+			<tr>
+				<td data-content="pageName" scope="row"></td>
+				<td data-content="pageUrl"></td>
+				<td data-content="buttonName"></td>
+				<td data-content="buttonId"></td>
+				<td data-content="buttonEvent"></td>
+				<td data-content="targets"></td>
+				<td data-content="buttonType"></td>
+			</tr>
+		</script>
+	<script>
+		$(document).ready(function() {
+			checkActCode();
+			queryCustomer();
+			queryUser();
+
+			$("#port_people").val(getCookie("userID"));
+			$(".headers").loadTemplate("../../common/header.html", {});
+			
+			var date = new Date();
+			var sdate = cal_date_s(date, 1);
+			$("#sdate_id").val(sdate);
+			
+			/* $("#add_line").on("click", function() {
+				addLine();
+			}); */
+			
+			/* $("#delete_line").on("click", function() {
+				deleteLine(obj);
+			}); */
+			
+			$("#customer_id").on("change", function() {
+				$("#s_code").val($(this).children('option:selected').attr('code'));
+			});
+			
+			$("#comfirm_id").on("click", function() {
+				addMonitorPlan();
+			});
+		});
+	</script>
+</html>

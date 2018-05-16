@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>监测活动备注</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap.min.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<link href="../../css/plan.css" rel="stylesheet">
+<link href="../../css/Validform.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<script src="../../js/cookie.js"></script>
+<!-- 模块基本JS方法 -->
+<script src="../../js/crudPlan.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<!-- 表单验证 -->
+<script src="../../js/com/Validform.js"></script>
+<!-- 文件上传-->
+<script src="../../js/com/diyUpload.js"></script>
+<script src="../../js/com/webuploader.html5only.min.js"></script>
+<!-- <script src="../../js/com/jquery.uploadify.min.js"></script> -->
+<link href="../../css/diyUpload.css" rel="stylesheet" type="text/css" />
+<link href="../../css/webuploader.css" rel="stylesheet" type="text/css" />
+<script>
+	jQuery(document).ready(function() {
+
+		uploadImg();
+		var date = new Date();
+        var sdate= cal_date_s(date,5);
+        var edate= cal_date_e(date,1);
+
+		$("#sdate_id").val(sdate);
+		$("#edate_id").val(edate);
+
+		$("#addTaskUid").val(getCookie("userID"));//获取用户
+		var actCode = getUrlParam('actCode');//活动编号 ，只有添加子活动存在活动编号
+		queryTodoInfo();
+		if (actCode != null) {
+			$("#activityCode").val(actCode);
+		}
+		$(".headers").loadTemplate("../../common/header.html", {});
+
+		$("#query_id").on("click",function(){
+			queryTodoInfo();
+		});
+
+		
+		$("#comfirm_id").on("click", function() {
+			addTodoInfo();
+		});
+
+		$("#roleId").on("change", function() {
+			queryUserChange(this);
+		})
+	});
+</script>
+</head>
+<body>
+	<!-- 头部 -->
+	<div class="headers"></div>
+	<div class="contain">
+		<div class="zxy_contain1">
+			<!-- 菜单导航 -->
+			<div id="template-nav"></div>
+			<div class="row zxy_row_two">
+				<ul id="myTab" class="nav nav-tabs">
+					<li class="active">
+						<a href="#home" data-toggle="tab">活动状态列表</a>
+					</li>
+					<li>
+						<a href="#two" data-toggle="tab">新增活动备注</a>
+					</li>
+				</ul>
+				<div id="myTabContent" class="tab-content zxy_tab_con2">
+					<div class="tab-pane fade in active" id="home">
+						<div class="con-title">
+							<label class="label">开始时间：</label>
+							<input placeholder="开始时间:" class="day-time day-input" name='predict_start_date' type="text" id="sdate_id" onfocus="WdatePicker({skin:'twoer'})" />
+							
+							<label class="label">开始时间：</label>
+							<input placeholder="结束时间:" class="day-time day-input" name='predict_start_date' type="text" id="edate_id" onfocus="WdatePicker({skin:'twoer'})" />
+							
+							<label class="label">类型：</label>
+							<select id="type_id">
+								<option value="">下拉选择类型</option>
+								<option value="0">活动任务</option>
+								<option value="1">点位任务</option>
+								<option value="2">普通备注</option>
+								<option value="3">问题备注</option>
+							</select>
+							
+							<input type="button" value="查询" id="query_id" class="button_style"/>
+							<input name="" type="button" id="cancal_id" value="返回" onclick="$('#back')[0].click();" class="button_style">
+							<a id="back" style="display: none;" href="/amp/page/monitorPlan/monitorPlan.html?back"></a>
+						</div>
+						
+						<ul id="quoteId"></ul>
+					</div>
+					<!-- 新增活动备注start -->
+					<div class="tab-pane fade " id="two">
+						<form id="formId" name="myForm" class="planform">
+							<ul>
+								<li>
+									<h6>注：*&nbsp;&nbsp;为必选项</h6>
+								</li>
+								
+								<li>
+									<input type="hidden" name="addTaskUid" class="inputxt" id="addTaskUid">
+									<input type="hidden" name="activityCode" class="inputxt" id="activityCode">
+									<input type="hidden" name="ofState" value="1" class="inputxt" id="ofState">
+								</li>
+								<li>
+									&nbsp;&nbsp;&nbsp;
+									<span>是否发送邮件：</span>
+									<input type="checkbox" value="1" name="mailState" class="inputxt m-check" id="addTaskUid">&nbsp;
+									<strong>*&nbsp;</strong>
+								</li>
+								<li>
+									&nbsp;&nbsp;&nbsp;
+									<span>备&nbsp;&nbsp;注&nbsp;&nbsp;类&nbsp;&nbsp;&nbsp;型：</span>
+									
+									<input type="radio" value="2" name="todoType" checked="checked" class="m-check">
+									<span>普通备注</span>
+									
+									<input type="radio" value="3" name="todoType" class="m-check">
+									问题备注&nbsp;
+									<strong>*&nbsp;&nbsp;</strong>
+									
+									<span class="Validform_checktip"></span>
+								</li>
+								<li>
+									<span>&nbsp;&nbsp;&nbsp;&nbsp;选择人员角色：</span>
+									<select id="roleId" name="roleId" datatype="*" nullmsg="请选择人员角色">
+										<option value="">----请选择----</option>
+										<option value="3">接口人</option>
+										<option value="2">监测中心人员</option>
+										<option value="4">前端支撑人员</option>
+										<option value="1">后端支撑人员</option>
+									</select>
+									<span class="Validform_checktip"></span>
+								</li>
+								<li>
+									<span>&nbsp;&nbsp;&nbsp;&nbsp;选择执行人员：</span>
+									<select id="peopleImpId" name="receptionTaskUid" datatype="*" nullmsg="请选择执行人员">
+										<option value="">----请选择----</option>
+									</select>
+									<span class="Validform_checktip"></span>
+								</li>
+								<li style="margin-top: 20px;">
+									<div style="float:left; line-height:130px;letter-spacing:15.5px;">&nbsp;&nbsp;备注&nbsp;&nbsp;</div>
+									<textarea rows="3" name="todoContent" datatype="s500" style="float:left;"></textarea>
+									<span class="Validform_checktip"></span>
+									<div style="clear:both;"></div>
+								</li>
+								<li style="margin-top: 20px;">
+									<!-- <span style="line-height:160px;">&nbsp;&nbsp;&nbsp;&nbsp;选择上传图片：</span> -->
+									<div style="float:left; line-height:130px;letter-spacing:">&nbsp;&nbsp;&nbsp;&nbsp;选择上传图片：&nbsp;&nbsp;&nbsp;&nbsp;</div>
+									<div id="box">
+										<div id="test"></div>
+									</div>
+									<div style="clear:both;"></div>
+								</li>
+								<li>
+									<input name="" type="button" id="comfirm_id" value="添加" class="button_style">&nbsp;&nbsp;
+									<input name="" type="button" id="cancal_id" value="返回" onclick="$('#back')[0].click();" class="button_style">
+									<a id="back" style="display: none;" href="/amp/page/monitorPlan/monitorPlan.html?back"></a>
+								</li>
+							</ul>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div style="z-index: 19891015; background-color: #000; display: none; opacity: 0.3; filter: alpha(opacity = 30);" class="xubox_shade" id="mb" times="1"></div>
+</body>
+</html>

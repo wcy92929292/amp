@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.udbac.dao.MonitorPlanDao">
+	<sql id="tbAmpBasicActivityInfoColumns">
+		act.CREATE_DATE,
+		act.ACTIVITY_CODE,
+		ACTIVITY_NAME,
+		act.CUSTOMER_ID,
+		ACTIVITY_STATE,
+		GO_LIVE_TYPE,
+		PREDICT_START_DATE,
+		REALITY_START_DATE,
+		ACTIVITY_END_DATE,
+		PORT_PEOPLE,
+		MONITOR_PEOPLE,
+		FONT_SUPPORT_PEOPLE,
+		AFTER_SUPPORT_PEOPLE,
+		SCHEME_STATE,
+		UPDATE_USER,
+		UPDATE_DATE,
+		SCHEDULE_PATH,
+		MEMO,
+		PARENT_IDF,
+		PARENT_ACTIVITY_CODE
+	</sql>
+
+	<!-- 查找所有活动编号 -->
+	<select id="list" parameterType="java.util.Map" resultMap="tbAmpBasicActivityInfo">
+		SELECT
+		<include refid="tbAmpBasicActivityInfoColumns" />,
+		customer_name,customer_code,
+		port_people,u.real_name AS
+		port_people_name
+		FROM
+		tb_amp_basic_activity_info act
+		LEFT OUTER JOIN
+		Tb_Amp_Basic_Customer_Info cus
+		ON
+		cus.customer_id =
+		act.customer_id::integer
+		LEFT OUTER JOIN
+		tb_amp_basic_user_info u
+		ON
+		u.user_id = port_people::integer
+		WHERE
+		act.create_date >=#{startDate} 
+	<![CDATA[AND act.create_date < #{endDate}]]>
+		<if test="activityCode != null and activityCode != '' ">
+			AND activity_code like #{activityCode}
+		</if>
+		<if test="portUser != null and portUser != '' ">
+			AND u.real_name = #{portUser}
+		</if>
+
+		ORDER BY
+		act.create_date
+	</select>
+
+	<!-- 通过短代码查找活动信息 -->
+	<select id="findActByMics" resultMap="tbAmpBasicActivityInfo">
+		SELECT
+		<include refid="tbAmpBasicActivityInfoColumns" />
+		FROM
+		tb_amp_basic_activity_info act,
+		tb_amp_basic_schedule_info sche
+		WHERE sche.activity_code = act.activity_code
+		and sche.mic in (
+		<foreach collection="mics" index="i" item="mic" separator=",">
+			#{mic}
+		</foreach>
+		);
+	</select>
+
+
+	<!-- 插码的时候，更新监测方案信息 -->
+	<update id="updateMonitor" parameterType="com.udbac.entity.TbAmpBasicActivityInfo">
+		UPDATE
+		tb_amp_basic_activity_info
+		SET
+		REALITY_START_DATE = #{realityStartDate},
+		ACTIVITY_END_DATE = #{activityEndDate},
+		SCHEDULE_PATH = #{schedulePath},
+		SCHEDULE_TYPE = #{scheduleType}
+		WHERE
+		ACTIVITY_CODE = #{activityCode}
+	</update>
+
+	<!-- 没有监测方案插码，新增活动信息 -->
+	<insert id="insertActivity" parameterType="com.udbac.entity.TbAmpBasicActivityInfo">
+		INSERT INTO
+		tb_amp_basic_activity_info(
+		create_date,
+		activity_code,
+		activity_name,
+		customer_id,
+		activity_state,
+		REALITY_START_DATE,
+		predict_start_date,
+		ACTIVITY_END_DATE,
+		PORT_PEOPLE,
+		MONITOR_PEOPLE,
+		FONT_SUPPORT_PEOPLE,
+		AFTER_SUPPORT_PEOPLE,
+		SCHEME_STATE,
+		SCHEDULE_PATH,
+		PARENT_IDF,
+		go_live_type,
+		schedule_type
+		)
+		VALUES(
+		now(),
+		#{activityCode},
+		#{activityName},
+		#{customer.customerId},
+		3,
+		#{realityStartDate},
+		#{realityStartDate},
+		#{activityEndDate},
+		#{portPeople.userId},
+		#{monitorPeople.userId},
+		#{frontSupportPeople.userId},
+		#{afterSupportPeople.userId},
+		0,
+		#{schedulePath},
+		0,
+		0,
+		#{scheduleType}
+		);
+	</insert>
+
+	<!-- 更改监测活动状态 -->
+	<update id="updateState" parameterType="com.udbac.entity.TbAmpBasicActivityInfo">
+		UPDATE tb_amp_basic_activity_info
+		SET
+		activity_state = #{activityState}
+		<if test="goLiveType != null">
+			,go_live_type = #{goLiveType}
+		</if>
+		WHERE
+		activity_code = #{activityCode}
+	</update>
+
+	<!-- 根据活动编号，查找某个监测方案 -->
+	<select id="findByCode" resultMap="tbAmpBasicActivityInfo">
+		SELECT
+		<include refid="tbAmpBasicActivityInfoColumns" />
+		,
+		customer_name,
+		port_people,u.real_name AS port_people_name,
+		monitor_People,font_support_people,after_support_people
+		FROM
+		tb_amp_basic_activity_info act,
+		tb_amp_basic_user_info u,
+		Tb_Amp_Basic_Customer_Info cus
+		WHERE
+		u.user_id = port_people::integer
+		and cus.customer_id = act.customer_id::integer
+		and act.activity_code = #{actCode}
+	</select>
+
+	<resultMap type="com.udbac.entity.TbAmpBasicActivityInfo" id="tbAmpBasicActivityInfo">
+		<id column="activity_code" property="activityCode" />
+		<result column="create_date" property="createDate" />
+		<result column="activity_name" property="activityName" />
+		<result column="activity_state" property="activityState" />
+		<result column="go_live_type" property="goLiveType" />
+		<result column="predict_Start_Date" property="predictStartDate" />
+		<result column="reality_Start_Date" property="realityStartDate" />
+		<result column="activity_End_Date" property="activityEndDate" />
+		<result column="scheme_State" property="schemeState" />
+		<result column="update_Date" property="updateDate" />
+		<result column="schedule_Path" property="schedulePath" />
+		<result column="memo" property="memo" />
+		<result column="parent_Idf" property="parentIdf" />
+		<result column="parent_Activity_Code" property="parentActivityCode" />
+		<association column="customer_id" property="customer"
+			javaType="com.udbac.entity.TbAmpBasicCustomerInfo">
+			<result column="customer_Id" property="customerId" />
+			<result column="customer_code" property="customerCode" />
+			<result column="customer_Name" property="customerName" />
+		</association>
+		<association column="port_People" property="portPeople"
+			javaType="com.udbac.entity.TbAmpBasicUserInfo">
+			<result column="port_people" property="userId" />
+			<result column="port_people_name" property="realName" />
+		</association>
+		<association column="monitor_People" property="monitorPeople"
+			javaType="com.udbac.entity.TbAmpBasicUserInfo" select="findPerson" />
+		<association column="font_support_people" property="frontSupportPeople"
+			javaType="com.udbac.entity.TbAmpBasicUserInfo" select="findPerson" />
+		<association column="after_Support_People" property="afterSupportPeople"
+			javaType="com.udbac.entity.TbAmpBasicUserInfo" select="findPerson" />
+		<association column="update_User" property="updateUser"
+			javaType="com.udbac.entity.TbAmpBasicUserInfo" select="findPerson" />
+	</resultMap>
+
+	<select id="findPerson" resultType="com.udbac.entity.TbAmpBasicUserInfo">
+		select real_name realName,user_id userId
+		from tb_amp_basic_user_info
+		where user_id = #{user_id}::INTEGER
+	</select>
+
+	<select id="getActivityState" parameterType="java.util.List"
+		resultType="com.udbac.entity.AddMonitorPlanBean">
+		SELECT
+		activity_name,
+		activity_code,
+		customer_name,
+		customer_code,
+		activity_state
+		FROM
+		tb_amp_basic_activity_info act,
+		tb_amp_basic_customer_info cus
+		WHERE
+		act.customer_id :: INTEGER = cus.customer_id
+		AND
+		act.activity_code = #{actCode}
+	</select>
+
+	<select id="queryActAndCus" parameterType="java.util.List"
+		resultType="com.udbac.entity.QueryCustomerInfo">
+		SELECT
+		t1.customer_id,
+		t1.activity_name,
+		t1.activity_code,
+		t2.customer_id,
+		t2.customer_name,
+		t2.customer_code
+		FROM
+		tb_amp_basic_activity_info AS t1,
+		tb_amp_basic_customer_info AS t2
+		WHERE
+		t1.customer_id :: INTEGER = t2.customer_id
+		AND t1.activity_code = #{actCode}
+	</select>
+
+	<select id="queryActNameAndCus" parameterType="java.util.List"
+		resultType="com.udbac.entity.QueryCustomerInfo">
+		SELECT
+		activity_name,
+		activity_code,
+		customer_name,
+		customer_code,
+		parent_idf
+		FROM
+		tb_amp_basic_activity_info act,
+		tb_amp_basic_customer_info cus
+		WHERE
+		act.customer_id :: INTEGER = cus.customer_id
+		AND act.activity_code = #{actCode}
+		AND
+		act.parent_idf :: INTEGER = 0
+	</select>
+
+	<select id="querymonitor" parameterType="java.util.List"
+		resultType="com.udbac.entity.QueryCustomerInfo">
+		SELECT
+		t1.monitor_people,
+		t1.font_support_people,
+		t1.after_support_people,
+		t2.user_id,
+		t2.real_name
+		FROM
+		tb_amp_basic_activity_info AS t1,
+		tb_amp_basic_user_info AS t2
+		WHERE
+		t1.activity_code = #{actCode}
+		AND t1.monitor_people :: INTEGER = t2.user_id
+	</select>
+
+	<select id="queryFontSupport" parameterType="java.util.List"
+		resultType="com.udbac.entity.QueryCustomerInfo">
+		SELECT
+		t1.monitor_people,
+		t1.font_support_people,
+		t1.after_support_people,
+		t2.user_id,
+		t2.real_name
+		FROM
+		tb_amp_basic_activity_info AS t1,
+		tb_amp_basic_user_info AS t2
+		WHERE
+		t1.activity_code = #{actCode}
+		AND t1.font_support_people :: INTEGER = t2.user_id
+	</select>
+
+	<select id="queryAfterSupport" parameterType="java.util.List"
+		resultType="com.udbac.entity.QueryCustomerInfo">
+		SELECT
+		t1.monitor_people,
+		t1.font_support_people,
+		t1.after_support_people,
+		t2.user_id,
+		t2.real_name
+		FROM
+		tb_amp_basic_activity_info AS t1,
+		tb_amp_basic_user_info AS t2
+		WHERE
+		t1.activity_code = #{actCode}
+		AND t1.after_support_people :: INTEGER = t2.user_id
+	</select>
+
+	<insert id="addActivityinfo" parameterType="com.udbac.entity.AddMonitorPlanBean">
+		insert into
+		tb_amp_basic_activity_info(
+		create_date,
+		activity_code,
+		activity_name,
+		predict_start_date,
+		customer_id,
+		activity_state,
+		go_live_type,
+		port_people,
+		monitor_people,
+		font_support_people,
+		after_support_people,
+		scheme_state,
+		parent_idf,
+		parent_activity_code,
+		memo,
+		stat_mark
+		)values(
+		to_char(now(),'YYYY-mm-DD HH24:mi:SS')::timestamp,
+		#{activity_code},
+		#{activity_name},
+		#{predict_start_date}::date,
+		#{customer_id},
+		0,
+		2,
+		#{port_people},
+		#{monitor_people},
+		#{font_support_people},
+		#{after_support_people},
+		1,
+		#{parent_idf},
+		#{parent_activity_code},
+		#{memo},
+		#{stat_mark})
+
+	</insert>
+	<!-- 添加 监测方案 by linying -->
+	<insert id="addMonitorSchemeInfo" parameterType="Object">
+		<![CDATA[
+			insert into tb_amp_basic_monitor_scheme_info_tmp(
+				create_date,
+				activity_code,
+				page_name,
+				page_id,
+				dcsid_s,
+				button_type,
+				button_name,
+				button_id,
+				url_match,
+				page_url,
+				target_key,
+				target_value,
+				target_operator,
+	    		update_user,
+				update_date
+			) values ]]>
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(to_char(now(),'YYYY-mm-DD HH24:mi:SS')::timestamp,
+			#{acid},
+			#{item.page_name},
+			#{item.page_id}::integer,
+			#{item.dcsid_s},
+			#{item.btn_type},
+			#{item.btn_name},
+			#{item.btn_id},
+			#{item.match_url},
+			#{item.page_url},
+			#{item.key},
+			#{item.value},
+			#{item.op},
+			#{userID},
+			to_char(now(),'YYYY-mm-DD HH24:mi:SS')::timestamp
+			)
+		</foreach>
+	</insert>
+	<!-- <insert id="addMonitorSchemeInfo" parameterType="Object" > <![CDATA[ 
+		insert into tb_amp_basic_monitor_scheme_info( create_date, activity_code, 
+		page_name, button_name, button_event, involve_index, button_type, update_user, 
+		update_date ) values ]]> <foreach collection="list" item="item" index="index" 
+		separator=","> (to_char(now(),'YYYY-mm-DD HH24:mi:SS')::timestamp, #{acid}, 
+		#{item.page_name}, #{item.button_name}, #{item.button_event}, #{item.involve_index}, 
+		#{item.button_type}, #{userID}, to_char(now(),'YYYY-mm-DD HH24:mi:SS')::timestamp 
+		) </foreach> </insert> -->
+
+	<!-- 列出修改活动方案页面的信息 -->
+	<select id="queryAll" parameterType="java.util.List"
+		resultType="com.udbac.entity.QueryActivityInfo">
+		SELECT
+		*
+		FROM
+		tb_amp_basic_activity_info t1,
+		tb_amp_basic_monitor_scheme_info t2
+		WHERE
+		t1.activity_code =
+		t2.activity_code
+		AND
+		t1.activity_code = #{actCode}
+	</select>
+
+	<!-- 客户列表 -HYZ -->
+	<select id="queryCustomer" parameterType="java.util.List"
+		resultType="com.udbac.entity.QueryCustomerInfo">
+		SELECT
+		customer_id,customer_name,customer_code
+		FROM
+		tb_amp_basic_customer_info
+		ORDER BY
+		customer_code
+
+	</select>
+
+	<!-- 又使用了 -->
+	<!-- <update id="updateMonitorInfo" parameterType="Object">
+		<foreach collection="list" item="item" index="index"
+			separator=";">
+			UPDATE tb_amp_basic_monitor_scheme_info
+			SET
+			page_name = #{item.page_name},
+			button_name = #{item.button_name},
+			button_event = #{item.button_event},
+			involve_index = #{item.involve_index},
+			button_type = #{item.button_type},
+			update_user = #{userID},
+			update_date = to_char(now(),'YYYY-mm-DD
+			HH24:mi:SS')::timestamp
+			WHERE
+			scheme_id = #{item.scheme_id}
+		</foreach>
+	</update> -->
+	
+	<update id="updateMonitorInfo" parameterType="Object">
+		<foreach collection="list" item="item" index="index"
+			separator=";">
+			UPDATE tb_amp_basic_monitor_scheme_info_tmp
+			SET
+			page_name = #{item.page_name},
+			page_id = #{item.page_id},
+			dcsid_s = #{item.dcsid_s},
+			button_type = #{item.btn_type},
+			button_name = #{item.btn_name},
+			button_id = #{item.btn_id},
+			url_match = #{item.match_url},
+			page_url = #{item.page_url},
+			target_key = #{item.key},
+			target_value = #{item.value},
+			target_operator = #{item.op},
+			update_user = #{userID},
+			update_date = to_char(now(),'YYYY-mm-DD
+			HH24:mi:SS')::timestamp
+			WHERE
+			scheme_id = #{item.scheme_id}
+		</foreach>
+	</update>
+	
+	<!-- 查询一条信息 -->
+	<select id="getOrignInfo" resultType="com.udbac.entity.AddMonitorSchemeInfo">
+		select * from tb_amp_basic_monitor_scheme_info_tmp where scheme_id = #{schemeId} and activity_code = #{actCode}
+	</select>
+	
+	
+
+	<delete id="delMonitorInfo">
+		delete from tb_amp_basic_monitor_scheme_info_tmp where scheme_id in (
+		<foreach collection="list" item="item" index="i" separator=",">
+			#{item}
+		</foreach>
+		)
+	</delete>
+
+	<update id="updateActMonitorInfo" parameterType="com.udbac.entity.AddMonitorPlanBean">
+		UPDATE tb_amp_basic_activity_info
+		SET
+		predict_start_date = to_date(#{bean.predict_start_date},'YYYY-MM-DD'),
+		activity_name = #{bean.activity_name},
+		<!-- activity_code = #{bean.activity_code}, -->
+		customer_id = #{bean.customer_id},
+		monitor_people = #{bean.monitor_people},
+		font_support_people = #{bean.font_support_people},
+		after_support_people = #{bean.after_support_people},
+		memo = #{bean.memo},
+		activity_state=0,
+		stat_mark = #{bean.stat_mark}
+		WHERE
+		activity_code = #{activity_code}
+	</update>
+
+	<delete id="delActivity" parameterType="com.udbac.entity.AddMonitorSchemeInfo">
+		delete from tb_amp_basic_monitor_scheme_info where activity_code =
+		#{actCode}
+	</delete>
+
+	<!-- 查询活动编号是否存在 by linying -->
+	<select id="queryMonitorCode" parameterType="String" resultType="Integer">
+		select count(activity_code) from tb_amp_basic_activity_info where
+		activity_code=#{acode}
+
+	</select>
+	<!-- 添加活动备注 by linying -->
+	<insert id="addTodoTask" parameterType="com.udbac.entity.TodoInfoBean">
+		INSERT INTO tb_amp_basic_role_todo_info(
+		activity_code, todo_content, todo_type, todo_state, add_task_uid,
+		reception_task_uid, create_date, img_path, state_update,
+		of_state,of_task_type)
+		VALUES (#{activityCode}, #{todoContent}, #{todoType}::integer,
+		#{todoState}::integer,
+		#{addTaskUid}, #{receptionTaskUid}, to_char(now(),'YYYY-mm-DD
+		HH24:mi:SS')::timestamp,
+		#{imgPath},to_char(now(),'YYYY-mm-DD HH24:mi:SS')::timestamp,#{ofState},#{ofState})
+	</insert>
+	<!-- 查询活动Todo by linying -->
+	<select id="queryTodoInfo" parameterType="Map"
+		resultType="com.udbac.entity.TodoInfoBean">
+		select tb_todo.create_date as createDate,
+		activity_code as activityCode,
+		todo_code as todoCode,
+		todo_content as todoContent,
+		tb_todo.reception_task_uid as receptionTaskUid,
+		tb_user.real_name as realName,
+		case todo_type
+		when '0' then '活动任务'
+		when '1' then '点位任务'
+		when '2' then '普通备注'
+		when '3' then '问题备注'
+		else '其他' end as todoType,
+		case todo_state
+		when '0' then '已完成'
+		when '1' then '待完成'
+		when '2' then '— —' end as todoState
+		from tb_amp_basic_role_todo_info
+		tb_todo
+		left join tb_amp_basic_user_info tb_user
+		on tb_todo.reception_task_uid::integer=tb_user.user_id
+		where
+		tb_todo.activity_code=#{actCode}
+		<if test="sdate != '' || edate !='' ">
+		<![CDATA[ 
+		and to_char(tb_todo.create_date,'YYYY-MM-DD') >=#{sdate} 
+		and to_char(tb_todo.create_date,'YYYY-MM-DD') <=#{edate}
+		]]>
+
+			<if test="_type != ''">
+				<if test="_type != '2'">
+					and tb_todo.todo_type=#{_type}::integer
+				</if>
+				<if test="_type == '2'">
+					and tb_todo.todo_type!=#{_type}::integer
+				</if>
+			</if>
+		</if>
+		<if test="userId != ''">
+			and tb_todo.reception_task_uid=#{userId}
+		</if>
+		order by tb_todo.todo_code desc
+	</select>
+	<!-- 更新活动问题数 -->
+	<update id="updateActivityException" parameterType="String">
+		update tb_amp_basic_activity_info tb_act
+		set exception=(select exception+1 from tb_amp_basic_activity_info where
+		activity_code=#{actCode})
+		where activity_code=#{actCode}
+	</update>
+	<!-- 查询固定模板任务 by linying -->
+	<select id="queryTaskList" parameterType="com.udbac.entity.TodoInfoBean"
+		resultType="com.udbac.entity.TodoInfoBean">
+		select tb_act.activity_code as activityCode,
+		tb_act.activity_state as ofState,
+		tb_task.*
+		from (select task_name as todoContent,
+		tb_task.role_id as roleId,
+		tb_user.user_id as receptionTaskUid,
+		of_task_type as todoType,
+		'1' as todoState,
+		'systemId' as addTaskUid
+		from tb_amp_basic_task_list_info as tb_task
+		join tb_amp_basic_user_info as tb_user
+		on tb_task.role_id=tb_user.role_id
+		and last_state_id=#{nowState} and next_state_id=#{nextState}
+		and of_task_type=#{ofTaskType}::integer) as tb_task
+		join tb_amp_basic_activity_info as tb_act
+		on port_people::integer=receptionTaskUid::integer
+		or monitor_people::integer=receptionTaskUid::integer
+		or font_support_people::integer=receptionTaskUid::integer
+		or after_support_people::integer=receptionTaskUid::integer
+		where activity_code=#{activityCode}
+
+
+
+	</select>
+	<!-- 根据用户编号查询有关用户的活动 -->
+	<select id="queryActivityByUser" parameterType="String"
+		resultType="com.udbac.entity.TbAmpBasicActivityInfo">
+		select activity_code as activityCode ,activity_name as activityName from
+		tb_amp_basic_activity_info
+		where port_people = #{userId} or monitor_people =#{userId} or
+		font_support_people=#{userId} or after_support_people=#{userId}
+		and activity_state !=7
+	</select>
+	<!-- 根据活动编号查询监测方案信息 by lp -->
+	<select id="queryMonitorByActivityCode" parameterType="String"
+		resultType="com.udbac.entity.AddMonitorSchemeInfo">
+		SELECT create_date,
+		scheme_id,
+		activity_code,
+		page_name,
+		button_name,
+		CASE WHEN button_type::INTEGER=11 THEN '终端'
+		WHEN button_type::INTEGER=12 THEN '业务'
+		WHEN button_type::INTEGER=13 THEN '充值'
+		WHEN button_type::INTEGER=14 THEN '推广'
+		WHEN button_type::INTEGER=15 THEN '配件'
+		WHEN button_type::INTEGER=16 THEN '终端和配件'
+		WHEN button_type::INTEGER=21 THEN '买手机'
+		WHEN button_type::INTEGER=22 THEN '办业务'
+		WHEN button_type::INTEGER=23 THEN '办套餐'
+		WHEN button_type::INTEGER=24 THEN '挑配件' END button_type,
+
+		button_event,
+		involve_index
+		FROM tb_amp_basic_monitor_scheme_info
+		WHERE activity_code=#{activity_code}
+	</select>
+	<!-- 更新监测活动页面URL和按钮id by lp -->
+	<update id="updateMonitorPageUrlAndButtonId" parameterType="map">
+		update tb_amp_basic_monitor_scheme_info_tmp set 
+		dcsid_s = #{dcsid_s},
+		button_id=#{btn_id},
+		url_match=#{match_url},
+		page_url=#{page_url},
+		target_key=#{key},
+		target_value=#{value},
+		target_operator=#{op},
+		check_user=#{userId},
+		check_date=#{date}::timestamp
+		where scheme_id = #{scheme_id}::integer
+	</update>
+	<!-- 更新活动状态 by lp -->
+	<update id="updateActState" parameterType="map">
+		update
+		tb_amp_basic_activity_info set activity_state= #{actState}::integer
+		where activity_code = #{actCode}
+	</update>
+</mapper>

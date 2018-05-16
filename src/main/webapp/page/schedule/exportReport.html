@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>报告导出</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<link href="../../css/jquery.autocomplete.css" rel="stylesheet">
+ 
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.min.js"></script>
+<script src="../../js/com/jquery.autocomplete.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<script src="../../js/export.js"></script>
+<script src="../../js/crudPlan.js"></script>
+<script src="../../js/provinceSheet.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/afterdata.js"></script>
+
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<style >
+.bclickButtons{
+	background: rgba(0,93,93,0.8);
+    color: #fff;
+    cursor: pointer;
+    height: 25px;
+    line-height: 25px;
+    width: 45px;
+    text-align: center;
+    border:1px solid rgba(0,93,93,0.8);
+}
+.bclickButtons:hover{
+	border:1px solid #fff;
+}
+</style>
+<script>
+jQuery(document).ready(function() {
+	 $(".headers").loadTemplate("../../common/header.html", {});	
+});
+</script>
+
+</head>
+  <body>
+	<!-- 头部 -->
+	<div class="headers"></div>
+
+	<div class="contain">
+		<div class="zxy_contain1">
+			<!-- 菜单导航 -->
+			<div id="template-nav"></div>
+			<div class="zxy_daochu">
+				
+				
+				
+				<h4>导出日报数据：<span class='clickShowBtn bclickButtons'>展开</span></h4>
+				<div id="day_msg" style="color:red;"></div>
+				<form name="form" id="dayId" action="" method="post" style='display:none;'>
+				<br />
+					<span>时&nbsp;间&nbsp;筛&nbsp;选：&nbsp;
+						<input type="radio" name="sysTime" checked="checked" value="0" id="zero"><span class="checks">历史日期</span>&nbsp;
+						<input type="radio" name="sysTime" value="1" id="zero" ><span class="checks">当天日报</span>&nbsp;
+						<input type="radio" name="sysTime" value="2" id="zero"><span class="checks">按小时筛选</span>&nbsp;
+					</span><br><br> 
+					<div id="riqi" style="display:block">
+						<span class="calendar">选&nbsp;择&nbsp;日&nbsp;期：&nbsp;
+							<input placeholder="开始日期:" id="beginDate" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker()">
+						</span>&nbsp;&nbsp;&nbsp;
+						<span class="calendar">
+						    <input placeholder="结束日期:" id="endDate" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker()">
+						</span>
+					</div>
+					<div id="shijian" style="display:none">
+						<span class="calendar">选&nbsp;择&nbsp;时&nbsp;间：&nbsp;
+							<input placeholder="开始时间:" id="beginShijian" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'})">
+						</span>&nbsp;&nbsp;&nbsp;
+						<span class="calendar">
+						    <input placeholder="结束时间:" id="endShijian" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'})">
+						</span>
+					</div><br>
+					<span>投&nbsp;放&nbsp;单&nbsp;位：&nbsp;
+						<select style='display:none' cus="cus" id="customer_id" name="customer_ids" datatype="*" nullmsg="请选择投放单位" readonly>
+							<option value="">--请选择--</option>
+						</select> 
+						<input id='customer_id_input' type="text" placeholder="点击选择投放单位" >
+					</span><br><br>
+						
+				    <span>活&nbsp;动&nbsp;名&nbsp;称：&nbsp;
+				    	<input type="text" placeholder="非必填" class="zxy_name"  id="actNameDay">
+				   	</span><br><br>
+				   	
+					<span>活&nbsp;动&nbsp;编&nbsp;号：&nbsp;
+						<input type="text" placeholder="非必填" class="zxy_name" id="actCodeDay">
+				   </span><br><br>
+				    <div id="micDay" style="display:none">
+				        <span>营&nbsp;&nbsp;&nbsp;销&nbsp;&nbsp;&nbsp;码：&nbsp;&nbsp;
+					    	<input type="text" placeholder="非必填" class="zxy_name"  id="mics">
+					   	</span><br><br>
+				    </div>
+				    <span>异常数据(指定范围外)标红：<!-- 暂时隐藏误删 -->
+						<input name="isRed" type="checkbox" id="isRed" value="1" style="width:13px;margin:0;" />
+					</span><br><br>
+				    <div id="redIf" style="display:none">
+					    <input name="jumpIf" type="checkbox" id="jumpIf" value="1" style="width:13px;margin:0;" />
+					    <span>跳出率界值：
+					    	<input type="text" placeholder="非必填" class="range_name" id="jumpRang" disabled="disabled">%
+					    </span><br><br>
+					    <input name="ctrIf" type="checkbox" id="ctrIf" value="1" style="width:13px;margin:0;" />
+					    <span>c&nbsp;&nbsp;t&nbsp;&nbsp;r&nbsp;&nbsp;界&nbsp;值：
+					    	<input type="text" class="range_name" placeholder="非必填"  id="ctrRangL" disabled="disabled">%-<input type="text" class="range_name" placeholder="非必填"  id="ctrRangM" disabled="disabled">%
+					    </span><br><br>
+					    <input name="bgIf" type="checkbox" id="bgIf" value="1" style="width:13px;margin:0;" />
+					    <span>曝光完成率界值：
+							<input type="text" placeholder="非必填" class="range_name" id="bgwcRangL" disabled="disabled">%-<input type="text" class="range_name" placeholder="非必填"  id="bgwcRangM" disabled="disabled">%
+						</span><br><br>
+						<input name="djIf" type="checkbox" id="djIf" value="1" style="width:13px;margin:0;" />
+						<span>点击完成率界值：
+						<input type="text" placeholder="非必填" class="range_name" id="djwcRangL" disabled="disabled">%-<input type="text" class="range_name" placeholder="非必填"  id="djwcRangM" disabled="disabled">%
+					</span><br><br>
+					</div>
+				  
+					<a class="btn_day">
+						<span id="exportDay">
+							<input type="button" value="导出" class="long_button_style">
+						</span>
+					</a> 
+				</form>
+				<hr />
+				
+				<h4>导出周报数据：<span class='clickShowBtn1 bclickButtons'  >展开</span></h4>
+				<span class="week_msg" style="display:none;color:#0f0;">msg显示：</span>
+					
+				<form id="weekId" name="form" action="" method="post" style='display:none;'>
+					<br />
+					<span class="calendar_week">截止日期：
+						<input placeholder="开始日期:" class="" type="text" id="d122" onfocus="WdatePicker({kin:'twoer',isShowWeek:true})">
+					</span><br><br>
+					
+					<span>投放单位：
+						<select id="customer_id_week" name="customer_id">
+							<option value="0">--请选择--</option>
+						</select>
+					</span><br><br>
+					
+					<span>活动编号：</span>
+					<input type="text" placeholder="非必填" id="week_actCode" class="zxy_name"><br><br>
+					
+					<span>过滤百度：
+						<input type="radio" name="baidurRemove" value="0" id="zero"><span class="checks">是</span>&nbsp;
+						<input type="radio" name="baidurRemove" checked="checked"  value="1" id="zero" ><span class="checks">否</span>&nbsp;
+					</span><br><br>
+				    <span>异常数据(指定范围外)标红：
+						<input type="checkbox" class="week_isRed" value="1" style="width:13px;margin:0;" />
+					</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>
+					
+					<div id="weekRed" style="display:none">
+						<input  type="checkbox" id="w_jumpIf" value="1" style="width:13px;margin:0;"/>
+					    <span >跳出率界值：
+					    	<input type="text" placeholder="非必填" class="range_name" id="w_jumpRang" disabled="disabled">%
+					    </span><br><br>
+					    <input type="checkbox" id="w_ctrIf" value="1" style="width:13px;margin:0;"/>
+					    <span>c&nbsp;&nbsp;t&nbsp;&nbsp;r&nbsp;&nbsp;界&nbsp;值：
+					    	<input type="text" class="range_name" placeholder="非必填" id="w_ctrRangL" disabled="disabled">%-<input type="text" class="range_name" placeholder="非必填"  id="w_ctrRangM" disabled="disabled">%
+					    </span><br><br>
+					    <input type="checkbox" id="w_bgIf" value="1" style="width:13px;margin:0;"/>
+					    <span>曝光完成率界值：
+							<input type="text" placeholder="非必填" class="range_name" id="w_bgwcRangL" disabled="disabled">%-<input type="text" class="range_name" placeholder="非必填"  id="w_bgwcRangM" disabled="disabled">%
+						</span><br><br>
+						<input type="checkbox" id="w_djIf" value="1" style="width:13px;margin:0;"/>
+						<span>点击完成率界值：
+							<input type="text" placeholder="非必填" class="range_name" id="w_djwcRangL" disabled="disabled">%-<input type="text" class="range_name" placeholder="非必填"  id="w_djwcRangM" disabled="disabled">%
+						</span><br><br>
+					</div>
+					<a class="btn_week">
+						<span>
+							<input type="button" value="导出" class="long_button_style">
+						</span>
+					</a> 
+				</form>
+				<hr/>	
+				
+				<h4>自然月数据：<span class='clickShowBtn2 bclickButtons'>展开</span></h4>
+				<div style='display:none;' id='input_wrapper'>
+				<br />
+					<div id="month_mes" style="color:red;"></div>
+					<!-- <form action="/amp/report/month.do" method="post" id="month"> -->
+					<span>选择日期：</span>
+					<input placeholder="自然月所在日期:" class="text-input text-input-1 day-time" name="month_date" id="month_date" onfocus="WdatePicker({skin:'twoer'})"><br><br>
+					<span>投放单位：</span>
+					<select id="month_customer" name="month_customer">
+						<option value="-1">--请选择--</option>
+					</select><br><br>
+					<span>数据类型：</span>
+					<select id="month_type" name="month_type">
+						<option value="0" selected="selected">普通类型</option>
+						<option value="1">不包含关键字</option>
+						<option value="2">只有关键字</option>
+					</select><br><br>
+					<span>维度类型：</span>
+					<select id="month_file" name="month_file">
+						<option value="0" selected="selected">月报维度</option>
+						<option value="1">日报维度</option>
+					</select><br><br>
+					<div id="month_day" style="display: none;">
+						<span>汇总数据：</span>
+						<select id="month_summary_data" name="month_summary_data">
+							<option value="0" selected="selected">累加汇总</option>
+							<option value="1">频控汇总</option>
+						</select><br><br>
+					</div>
+						<span class="zxy_sp_one" style="padding-left: 80px;">
+							<input type="button" value="导出" id="month_report" class="long_button_style">
+						</span>
+			    </div>
+			    <hr />
+			   	<h4>累计投放数据：<span class='clickShowBtn3 bclickButtons'   >展开</span></h4>
+	          	<div id="jilei_msg" style="color:red;"></div>
+			    <form id="leijifrom" action="" method="post" style='display:none;'>
+				    <br />
+				    <!-- <div name="jieanzhi" style="float: right; padding-right:250px;padding-top: 5px;">
+				    <span >标红范围：</span><br><br>
+					  
+					</div> -->
+		     		<span>模板筛选：<input type="radio" style="width: 20px; height: 20px;color: #efefef;" name="moban" checked="checked" value="0">
+		     			<span class="checks">按周模板</span>
+		     		</span>
+			       	<input type="radio" style="width: 20px; height: 20px;color: #efefef;" name="moban" value="1" id="one">
+			       	<span class="checks">按月模板</span>
+				    <input type="radio" style="width: 20px; height: 20px;color: #efefef;" name="moban" value="2" id="one">
+				    <span class="checks">全模板</span><br><br>  
+			    	<span>截止日期：</span>
+					<input placeholder="" class="zxy_name" name="month_date" id="jilei_date" onfocus="WdatePicker({skin:'twoer'})"><br><br>
+					<span>投放单位：
+						<select cus="cus" id="leijiCus" class="zxy_name" name="customer_ids" datatype="*"readonly>
+							<option value="">--请选择--</option>
+						</select>
+					</span><br><br>
+					<span>活动编号：</span>
+				    <input type="text" id="leijiCode"class="zxy_name" placeholder="非必填"><br><br>
+				    <div style="display:none;" id='acts'>
+					 	<span>是否频控：<!-- 暂时隐藏误删 -->
+							<input name="isRegion" type="checkbox" id="isRegion" value="1" style="width:13px;margin:0;" />
+						</span><br><br>
+					</div>
+					<div  style="display:block;" id='act'>
+				     	<span>异常数据(指定范围外)标红：<!-- 暂时隐藏误删 -->
+							<input name="isRedLeiji" type="checkbox" id="leijiRed" value="1" style="width:13px;margin:0;" />
+						</span>	
+					</div><br>
+					<div id="redLeiji" style="display:none">
+				    	<input name="jumpIfLeiji" type="checkbox" id="jumpIfLeiji" value="1" style="width:13px;margin:0;" />
+				    	<span>跳出率界值：
+					    	<input type="text" placeholder="非必填" class="range_name" id="jumpLJ" disabled="disabled">%
+					    </span><br><br>
+				    	<input name="ctrIfLeiji" type="checkbox" id="ctrIfLeiji" value="1" style="width:13px;margin:0;" />
+					    <span>c&nbsp;&nbsp;t&nbsp;&nbsp;r&nbsp;&nbsp;界&nbsp;值：
+					    	<input type="text" class="range_name" placeholder="非必填"  id="ctrLJ1" disabled="disabled">%-<input type="text" class="range_name" placeholder="非必填"  id="ctrLJ2" disabled="disabled">%
+					    </span><br><br>
+				    	<input name="bgIfLeiji" type="checkbox" id="bgIfLeiji" value="1" style="width:13px;margin:0;" />
+					    <span>曝光完成率界值：
+							<input type="text" placeholder="非必填" class="range_name" id="wcLJ1" disabled="disabled">%-<input type="text" class="range_name" placeholder="非必填"  id="wcLJ2" disabled="disabled">%
+						</span><br><br>
+						<input name="djIfLeiji" type="checkbox" id="djIfLeiji" value="1" style="width:13px;margin:0;" />
+						<span>点击完成率界值：
+							<input type="text" placeholder="非必填" class="range_name" id="djwcLJ1" disabled="disabled">%-<input type="text" class="range_name" placeholder="非必填"  id="djwcLJ2" disabled="disabled">%
+						</span><br><br>
+					</div>
+					<!--  <span>合并点位：</span>
+					<select id="leiji_location" name="leiji_location">
+						<option value="0" selected="selected">否</option>
+						<option value="1">是</option>
+					</select>
+					<br><br> -->
+					<span class="zxy_sp_one" style="padding-left: 80px;">
+						<input type="button" value="导出" id="leijiD" class="long_button_style">
+					</span>
+					
+			    </form>
+					
+				<hr id="dayEndHidden"/>  
+				<h4>集团结案数据报表：<span class='clickShowBtn4 bclickButtons'  >展开</span></h4>
+				<form name="form" id="dayEnd" action="/amp/endExport/exportEnd.do" method="post" style='display:none;'>
+				    <!-- <div style="padding-top: 40px;"></div> -->
+				    <h4 style='display:none;' >集团结案数据报表：</h4>
+				    <span class="clo_msg" style="display:none;color:red;">msg显示：</span><br><br>
+				    <span>活动名称：</span>
+				    <input type="text" id="actNameCLO"class="zxy_name" name="actName"><br><br>
+				    <span>活动编号：</span>
+				    <input type="text"  id="actCodeCLO"class="zxy_name" name="actCode"><br><br>
+					<span class="zxy_sp_one">
+						<input type="button" value="导出" id="endFileSelect" class="long_button_style">
+					</span>
+				</form>
+				<hr />
+				<div>
+				<h4>结案数据报表（地域or频次）：<span class='clickShowBtn5 bclickButtons'  >展开</span></h4>
+					<div id="pinci" style='display:none;'>
+						<!-- <div style="padding-top: 40px;"></div> -->
+						<span class="week_span" style="display: none; color: red">显示区域</span><br>
+						<h4 style='display:none;'>结案数据报表（地域or频次）：</h4>
+						<span class="region_msg" style="display:none;color:#0f0;">msg显示：</span><br>
+							<span>模板筛选：
+							<input type="radio" style="width: 20px; height: 20px;color: #efefef;" name="city" checked="checked" value="0">
+		     			<span class="checks">按省模板</span>
+		     			<input type="radio" style="width: 20px; height: 20px;color: #efefef;" name="city" value="1" id="one">
+			       	<span class="checks">按地市模板</span>
+		     		</span><br><br> 
+						<span>累计筛选：
+							<input type="radio" name="data" checked="checked" value="0" id="zero">
+							<span class="checks">未累计</span>
+							<input type="radio" name="data" value="1" id="one"><span class="checks">累计</span>
+						</span><br><br> 
+						<span class="calendar_region" style="display:block;" id='xzrq'>
+							<span>选择日期：
+								<input placeholder="开始日期:" class="" type="text" id="date_region" onfocus="WdatePicker({skin:'twoer'})">
+								<!-- <input style="display:none;" placeholder="结束日期:" class="" type="text" id="date_end" onfocus="WdatePicker({skin:'twoer'})"> -->
+							</span><br><br>
+						</span>
+						<span style="display:block;" id='zhouqi'>周&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;期：
+							<select id="frequency_id_region" name="frequency_id">
+								<option value="0">--请选择--</option>
+								<option value="1">自然周</option>
+								<option value="2">自然月</option>
+							</select>
+							<br><br>
+						</span> 
+						<span class="calendar_region" style="display:none;" id='jzrq'>截止日期：
+							<input placeholder="截止日期:" class="zxy_name" type="text" id="eDate" onfocus="WdatePicker({skin:'twoer'})"><br><br>
+						</span>
+						<span>投放单位：
+							<select cus="cus" id="customer_id1" class="zxy_name" name="customer_ids" datatype="*"readonly>
+								<option value="">--请选择--</option>
+							</select>
+							<br><br>
+						</span>
+					  	<span id="prov" style="display:block;">投放省份：
+							<select id="customer_id_region" name="customer_id_regoin">
+								 <option value="0">--请选择--</option>
+							</select>
+							<br><br>
+						</span>
+						<span style="display:none;" id='city'>
+						   <span >投放地市：
+						   	<select id="prov_prov">
+						   	<option value="0">--请选择--</option>
+							</select>
+							<select id="prov_city">
+							<option value="0">--请选择--</option>
+							</select>
+						   </span>
+						   <br><br>
+						</span>
+						<span>活动编号：</span>
+						<input type="text" placeholder="非必填" id="actCode_region"  class="zxy_name"><br><br>
+						<a class="regoin_id">
+							<span style="margin-left: 82px;" >
+								<input style="width: 6em;" type="button" value="导出" class="long_button_style">
+							</span>
+						</a> 
+					</div>
+					<hr/>  
+					<h4>集团品专数据报表：<span class='clickShowBtn6 bclickButtons'>展开</span></h4>
+					<form name="form" id="PZId"  method="post" style='display:none;'>
+				    <!-- <div style="padding-top: 40px;"></div> -->
+				    <h4 style='display:none;' >集团品专数据报表：</h4><br><br>
+				    <div id="pz_msg" style="color:red;"></div>
+					<span class="calendar">选择时间：
+						<input placeholder="开始时间:" id="beginPZ" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker()">
+					</span>&nbsp;&nbsp;&nbsp;
+					<span class="calendar">
+					    <input placeholder="结束时间:" id="endPZ" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker()">
+					</span><br><br>
+					<span>活动编号：</span>
+				    <input type="text" placeholder="非必填" class="zxy_name" id="PZCode"><br><br>
+					<span class="zxy_sp_one" style="margin-left: 82px;">
+						<input type="button" value="导出" id="PZFileSelect" class="long_button_style" style="width: 6em;">
+					</span>
+					</form>
+					<hr/>
+					
+					
+					<h4>导出后端数据：<span class='clickShowBtn7 bclickButtons' >展开</span></h4>
+					<div id="hd_mes_weapper" style='display:none;'>
+					<br />
+						<div id="hd_mes" style="color:red;"></div>
+						<span>选择日期：</span>
+						<input id="startDate" placeholder="请选择开始时间" class="text-input text-input-1 day-time" type="text" name="" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">&nbsp;&nbsp;&nbsp;
+						<input id="endDate1" placeholder="请选择结束时间" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})"><br><br>
+						<textarea id="backendDataTextareaId" rows="3" cols="5" name="mic" style="min-width:350px; max-width:350px; min-height: 200px; max-height: 200px; background-color: rgba(0,93,93,0.8); border: 1px solid rgba(127,255,255,0.75); color: #efefef; box-shadow: 0px 0px 10px rgba(0,255,255,0.75); -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75); -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);" placeholder="请输入输入短代码,一行一个"></textarea><br><br>
+						
+						<span class="zxy_sp_one" style="padding-left: 80px;">
+							<input type="button" value="导出" id="sub" class="long_button_style" style="width: 6em;" onclick="send()">
+						</span>
+					</div>
+					<hr />
+					<h4>分端数据报表：<span class='clickShowBtn8 bclickButtons' >展开</span></h4>
+					<form name="form" id="cityId"  method="post" style='display:none;' >
+				    <!-- <div style="padding-top: 40px;"></div> -->
+				    <h4 style='display:none;'>分端数据报表：</h4><br><br>
+				    <div id="city_msg" style="color:red;"></div>
+					<span class="calendar">提取日期：&nbsp;
+						<input placeholder="提取日期:" id="tqrq" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker()">
+					</span>&nbsp;&nbsp;&nbsp;
+					</br></br>
+					<span>营&nbsp;销&nbsp;码&nbsp;：&nbsp;
+					 <input type="text" class="zxy_name" id="yxdm">
+					</span>
+					<br><br>
+					<span class="zxy_sp_one" style="margin-left: 82px;">
+						<input type="button" value="提交需求" id="cityFileSelect" class="long_button_style" style="width: 6em;">
+					</span>
+					</form>
+					<hr/>
+					
+					
+					<h4>口径设置：<span class='clickShowBtn0 bclickButtons'>展开</span></h4>
+				<div id="dataCaliberMessage" style="color:red;"></div>
+				<form name="form" id="dayId0" action="" method="post" style='display:none;'><br />
+					<div id="" style="color:red;"></div>
+					<textarea id="dataCaliberTextareaId" rows="3" cols="5" name="" style="min-width:350px; max-width:350px; min-height: 200px; max-height: 200px; background-color: rgba(0,93,93,0.8); border: 1px solid rgba(127,255,255,0.75); color: #efefef; box-shadow: 0px 0px 10px rgba(0,255,255,0.75); -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75); -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);" placeholder="请输入输入短代码,一行一个"></textarea><br><br>
+					<span>
+						<input name="" type="checkbox" id="impDataCaliberCheckbox" value="" style="width:13px;margin:0;" />曝光口径：
+						<select id="impDataCaliberSelect" name="" class="day-time" disabled="disabled">
+							<option value="">--请选择--</option>
+							<option value="0">标准口径</option>
+							<option value="1">去重口径</option>
+							<option value="2">冷却口径</option>
+						</select>&emsp;
+						
+						<input name="" type="checkbox" id="clkDataCaliberCheckbox" value="" style="width:13px;margin:0;" />点击口径：
+						<select id="clkDataCaliberSelect" name="" class="day-time" disabled="disabled">
+							<option value="">--请选择--</option>
+							<option value="0">标准口径</option>
+							<option value="1">去重口径</option>
+							<option value="2">冷却口径</option>
+						</select>&emsp;
+						
+						<input name="" type="checkbox" id="micStatMarkCheckbox" value="" style="width:13px;margin:0;" />N口径：
+						<select id="micStatMarkSelect" name="" class="day-time" disabled="disabled">
+							<option value="">--请选择--</option>
+							<option value="0">N</option>
+							<option value="1">N+1</option>
+						</select>
+					</span><br />
+					<span class="zxy_sp_one" style="padding-left: 80px;">
+						<input type="button" value="提交" id="dataCaliberSubmit" class="long_button_style" style="width: 6em;">&emsp;&emsp;
+						<input type="button" value="取消" id="cancelId" class="button_style_moniSel" style="width: 6em;">
+					</span>
+				</form>
+				<hr />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div style="z-index: 19891015; background-color: #000; display: none; opacity: 0.3; filter: alpha(opacity = 30);" class="xubox_shade" id="mb" times="1"></div>
+	<div id = 'customer_id_idWrapper' style=' height: 30%; width: 40%;left: 30%; top: 30%;text-align: center;display:none; z-index:999999; background:rgb(139, 177, 243); position: absolute;width:40% ;height:30%'>
+		<ul class = 'customer_id_idWrapper_ul' >
+		</ul>
+		<ul class='customer_id_idWrapper_ul2'>
+			<li><button class='yBtn' style='margin: 5px 6px;background: #004d5f; color: #fff;width: 4rem;border-radius: 5px;border: none; backgeround: red; padding: 4px; '>确定</button>
+			<button class='nBtn' style='margin: 5px 6px;background: #004d5f; color: #fff;width: 4rem;border-radius: 5px;border: none; backgeround: red; padding: 4px; '>取消</button></li>
+		</ul>
+	</div>
+    <div id="updown" style="top:50%; display: block;"><span class="up"></span><span class="down"></span></div> 
+</body>
+<script src="../../js/afterdata.js"></script>
+<script>
+	 (function(a,b,c,d,e){
+		//a被点击对象，b被显示对象，c确定，d取消,e：li列表
+		$(a).css({
+			"width": "15em",
+		    "height": "26px",
+		    "padding": "0 0 0 10px",
+		    "border-radius": "5px",
+		    "outline": "none",
+		    "color": "#efefef",
+		    "background-color": "rgba(0,93,93,0.8)",
+		    "background-image": "none"
+		})
+		$(a).on('click',function(){
+			$(b).css('display','block');
+		});
+		$(c).on('click',function(){
+			var $inputListS = $(e + " input");
+			//console.log($inputListS);
+			var userSelectT='';
+			$inputListS.each(function(){
+				//console.log($(this).prop('checked'));
+				var $this =  $(this);
+				if($this.prop('checked')){
+					userSelectT += $this.prev('label').text()+'、';
+				}
+			});
+			$(a).val(userSelectT);
+			$(b).css('display','none');
+		});
+		$(d).on('click',function(){
+			$(b).css('display','none');
+		});
+	})("#customer_id_input","#customer_id_idWrapper",".yBtn",".nBtn",".customer_id_idWrapper_ul"); 
+	 
+	 
+	//////////////////////////////////////////////////////////
+	$('.bclickButtons').css('float','right').parent('h4').css('overflow','hidden');
+	$('.clickShowBtn0').on('click',function(){
+		that = this;
+		showDown (that,$('#dayId0'));
+	});
+	$('.clickShowBtn').on('click',function(){
+		that = this;
+		showDown (that,$('#dayId'));
+	});
+	$('.clickShowBtn1').on('click',function(){
+		that = this;
+		showDown (that,$('#weekId'));
+	});
+	$('.clickShowBtn2').on('click',function(){
+		that = this;
+		showDown (that,$('#input_wrapper'));
+	});
+	$('.clickShowBtn3').on('click',function(){
+		that = this;
+		showDown (that,$('#leijifrom'));
+	});
+	$('.clickShowBtn4').on('click',function(){
+		that = this;
+		showDown (that,$('#dayEnd'));
+	});
+	$('.clickShowBtn5').on('click',function(){
+		that = this;
+		showDown (that,$('#pinci'));
+	});
+	$('.clickShowBtn6').on('click',function(){
+		that = this;
+		showDown (that,$('#PZId'));
+	});
+	$('.clickShowBtn7').on('click',function(){
+		that = this;
+		showDown (that,$('#hd_mes_weapper'));
+	});
+	$('.clickShowBtn8').on('click',function(){
+		that = this;
+		showDown (that,$('#cityId'));
+	});
+	
+	function showDown (that,showThat){
+		 if($(that).text() == '展开'){
+			 $(that).text('折叠');
+		 }else{
+			 $(that).text('展开');
+		 }
+		 
+		 if(showThat.css('display') == 'none'){
+			 showThat.show('1');
+		 }else{
+			 showThat.hide('1');
+		 }
+	}
+	
+	
+		$("#updown").css("top", window.screen.availHeight / 2 - 100 + "px");
+
+		$('#updown .up').click(function() {
+		$('.zxy_contain1').animate({
+			scrollTop : '0px'
+		}, 500);
+		});
+		$('#updown .down').click(function() {
+			var thisHeight = $('.zxy_daochu').height();
+		$('.zxy_contain1').animate({
+			scrollTop : thisHeight
+		}, 500);
+		});
+//////////////////////////////////////////////////////////	 
+</script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

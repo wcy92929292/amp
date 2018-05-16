@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.udbac.dao.AfterDataDao">
+	<resultMap type="com.udbac.entity.AfterData" id="resultAfter">
+		<result column="daytime" property="startDate" />
+		<result column="daytime" property="endDate" />
+		<result column="daytime" property="daytime" />
+		<result column="vv" property="visit" />
+		<result column="mic" property="mic" />
+		<result column="uv" property="visitor" />
+		<result column="clk" property="click" />
+		<result column="pv" property="pageview" />
+		<result column="bounce_times" property="bounceTimes" />
+		<result column="time_spent" property="timeSpent" />
+	</resultMap>
+
+	<select id="list" resultMap="resultAfter">
+		select daytime,mic,vv,uv,pv,clk,bounce_times,time_spent from tb_amp_sum_back_d
+		where daytime between #{startDate}::timestamp and #{endDate}
+		and mic in
+		<foreach collection="mic" item="item" index="index" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+
+	</select>
+
+</mapper>

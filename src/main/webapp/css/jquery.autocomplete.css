@@ -1,0 +1,48 @@
+.ac_results {
+	padding: 0px;
+	border: 1px solid WindowFrame;
+	background-color: rgba(0,93,93,0.8);
+	color: #efefef;
+	overflow: hidden;
+}
+
+.ac_results ul {
+	width: 100%;
+	/* list-style-position: outside; */
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	body{ background:url(图片链接地址) }
+}
+
+.ac_results iframe {
+	display:none;/*sorry for IE5*/
+	display/**/:block;/*sorry for IE5*/
+	position:absolute;
+	top:0;
+	left:0;
+	z-index:0;
+    filter:mask(); 
+	width:3000px;
+	height:3000px;
+}
+
+.ac_results li {
+	margin: 0px;
+	padding: 2px 5px;
+	cursor: pointer;
+	display: block;
+	width: 100%;
+	font: menu;
+	font-size: 12px;
+	overflow: hidden;
+}
+
+.ac_loading {
+	ackground : rgba(0,93,93,0.8);
+}
+
+.ac_over {
+	background-color: rgba(0,93,93,0.8);
+	color: HighlightText;
+}

@@ -1,0 +1,102 @@
+<div class="zxy_left_menu">
+
+	<!-- 用户-->
+	<div class="zxy_information">
+		<a href="/amp/page/user/editUser.html">
+			<img alt="用户头像" src="/amp/images/main/logoIcon.png" title="用户头像">
+		</a>
+		<div class="zxy_border"></div>
+	</div>
+
+	<!--用户信息-->
+	<div class="zxy_user">
+		<a href="/amp/page/user/addUser.html" title="注册"></a>
+		<a href="/amp/page/user/editUser.html" title="编辑用户"></a>
+		<a href="/amp/page/user/queryUser.html" title="角色查看"></a>
+	</div>
+
+	<!-- 系统时间 -->
+	<div class="zxy_time">
+		<b>当前时间：</b><br />
+		<span id='datetimes'></span>
+		<div class="zxy_border" style="margin-left:2em;"></div>
+	</div>
+	<img src="/amp/images/main/menu.png" id="zxy_clickMenu" alt="折叠菜单" title="点击折叠菜单">
+	<!-- 用户菜单 -->
+	<ul id="menu" class="menuclk">
+		<li style="visibility: hidden;">
+			<div class="zxy_bg2">
+				<a href="/amp/page/user/mytodo.html">TODO</a>
+			</div>
+			<span>TODO</span>
+		</li>
+		<li>
+			<div class="zxy_bg2">
+				<a href="/amp/page/schedule/mutiScheduleUpload.html">排期插码</a>
+			</div>
+			<span>排期插码</span>
+		</li>
+		<li>
+			<div class="zxy_bg2">
+				<a href="/amp/page/schedule/exportReport.html">报告导出</a>
+			</div>
+			<span>报告导出</span>
+		</li>
+		<li>
+			<div class="zxy_bg2">
+				<a href="/amp/page/afterData/ButtonPop.html">导入后端数据</a>
+			</div>
+			<span>导入后端数据</span>
+		</li>
+	</ul>
+	<div class="usetExit">
+		<script src="/amp/js/user/usertime.js"></script>
+		<span>欢迎你：</span>
+		<a href="/amp/page/user/editUser.html" id="currentUser"></a><br />
+		<a href="/amp/page/login/login.html" onclick="loginOut()" id="exit">退出登录</a>
+	</div>
+</div>
+
+<script type="text/javascript" src="/amp/js/cookie.js"></script>
+<script type="text/javascript">
+	//客户，隐藏排期按钮
+	var role = getCookie("roleName");
+	if(role.indexOf("客户") >= 0) {
+		$("#menu li").eq(1).remove();
+	}
+</script>
+
+<script>
+	/*折叠左侧导航栏JS部分*/
+	var timer = null;
+
+	function startMove(iTarget, speed, paddingValue) {
+		var oClickMenu = document.getElementById("zxy_clickMenu");
+		var oLeftMenu = oClickMenu.parentNode;
+		var oContain = oClickMenu.parentNode.parentNode.parentNode.parentNode;
+
+		clearInterval(timer);
+		timer = setInterval(function() {
+			if(oLeftMenu.offsetLeft == iTarget) {
+				clearInterval(timer);
+			} else {
+				oLeftMenu.style.left = oLeftMenu.offsetLeft + speed + "px";
+				oContain.style.paddingLeft = paddingValue;
+			}
+		}, 30);
+
+	};
+
+	var oClickMenu = document.getElementById("zxy_clickMenu");
+	var num = 0; //自定义值
+
+	oClickMenu.onclick = function() {
+		if(num == 0) {
+			num = 1;
+			startMove(-180, -12, "5px");
+		} else if(num == 1) {
+			num = 0;
+			startMove(0, 12, "200px");
+		}
+	};
+</script>

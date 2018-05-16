@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge，chrome=1">
+<title>全国活动概览</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<!-- echarts -->
+<script src="../../js/com/echarts-all.js"></script>
+<!-- 模板 -->
+<script type="text/javascript" src="../../js/com/jquery.tmpl.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+
+<script type="text/html" id="template">
+<div class="div_css popup mouse_hover" id="popup" onclick="to_popup(this)">
+	<ul id="s">
+		<li id="c" scope="row">${customer}</li>
+		<li>PV：${pv}</li>
+		<li>活动数：${acnum}</li>
+		<li>问题数：${pnum}</li>
+	</ul>
+</div>
+</script>
+<body>
+<!-- 头部 -->
+<div class="headers"></div>
+<div class="contain">
+	<div class="zxy_contain1" style="overflow-x: hidden;">
+		<!-- 菜单导航 -->
+		<div id="template-nav"></div>
+		<div id="popups">
+			<div class="div_left_content" id="div_left">
+				<div class="div_left_content1" style="visibility: hidden;">
+					<span>总投放单位：</span>
+					<span id="countCust">0</span>
+					<span>总活动数：</span>
+					<span id="actnum">0</span>
+					<span>总PV数：</span>
+					<span id="pv">0</span>
+					<span id="sp1">总问题数：</span>
+					<span id="pronum">0</span>
+				</div>
+			</div>
+			<div id="dss">
+				<div id="error" style="visibility: hidden;">
+					<span>未查询到相关数据</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 延时加载遮罩层 -->
+<div class="zxy_mask">
+		<div class="rect1"></div>
+		<div class="rect2"></div>
+		<div class="rect3"></div>
+		<div class="rect4"></div>
+		<div class="rect5"></div><br>
+		<span>小小U，正在为您努力加载数据，请您稍等片刻^_^</span>
+	</div>
+</body>
+<script src="../../js/index.js"></script>
+<!--定时器延迟加载  -->
+<script type="text/javascript" src="../../js/time.js"></script>
+<script type="text/javascript">
+	//客户，投放单位总数
+	var role = getCookie("roleName");
+	if(role.indexOf("客户") >= 0){
+		$("#div_left span:lt(2)").remove();
+	}
+</script>
+</html>

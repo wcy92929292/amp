@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>实时数据</title>
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<script type="text/javascript" src="../../js/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="../../js/highcharts/highcharts-more.js"></script>
+<script type="text/javascript" src="../../js/realDatahighchart.js"></script>
+<!-- <script src="../../js/jquery.svg.min.js"></script> -->
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+
+<!-- 头部 -->
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		$(".headers").loadTemplate("../../common/header.html", {});
+	});
+</script>
+<style type="text/css">
+
+#right,#left{
+
+	float:left;
+	width:100%;
+	height:80%;
+ 	margin-top: 5px; 
+
+}
+#historyData,#hourData{
+	width:80%;
+	height:100%;
+	float:left;
+	
+/*  	opacity: 0.7;  */
+	margin-left:5px;
+	 -webkit-box-shadow:0 0 10px 5px #0CC;  
+  -moz-box-shadow:0 0 10px 5px #0CC;  
+  -o-box-shadow:0 0 10px 5px #0CC;  
+  -ms-box-shadow:0 0 10px 5px #0CC;  
+  box-shadow:0 0 10px 5px #0CC;
+}
+#left ul,#right ul{
+ 	float:right; 
+	width:100%;
+}
+#historyState{
+	float:right;
+	height: 100%;
+	width:18%;  
+}
+
+#right ul{
+	height: 403px;
+}
+#hourState{
+	float:right;
+	height: 430px;
+	width:18%;
+
+}
+#left ul li,#right ul li{
+	color: #ddd;
+	line-height: 25px; 
+	background:#fff;
+	border:1px dotted #079BFD;  
+	padding: 0px 10px 1.5px;
+}
+#hourState ul li,#historyState ul li{
+	background-color: #000b4b ;
+	cursor: pointer;
+}
+#hourState ul li:hover,#historyState ul li:hover{
+	background-color: #002369;
+}
+.clear{
+	clear:both;
+}
+.clo{
+	float:right;
+	width:40px;
+	height:40px;
+	line-height: 50px;
+	z-index:1;
+}
+.clo:hover{
+
+    cursor: pointer;
+}
+
+.nav{
+	margin-bottom: 0 ;
+}
+#historyDataList,#hourDataList{
+	float:left;
+	width:100%;
+	margin-top:1%;
+	text-align: center;
+}
+
+#historyDataList ul,#hourDataList ul{
+	float: left; 
+	width:10.65%;
+	margin:0.21%;
+	height:auto;
+	 
+}
+#historyDataList ul:hover,#hourDataList ul:hover{
+	background:red;
+	cursor: pointer;
+}
+#historyDataList ul li{
+   background-color:#000b4b;
+}
+#hourDataList ul li{
+	margin-top:auto;
+	height:auto;
+	font-size: 16px;
+	line-height: 20px;
+	background-color:#000b4b;
+	padding: 1px 10px 1px 10px;
+	border:1px dotted #079BFD;	    
+}
+</style>
+</head>
+<body>
+	<div class="headers"></div>
+	<div class="contain">
+		<div class="zxy_contain1">
+			<!-- 菜单导航 -->
+			<div id="template-nav" ></div>
+			
+			<div id="main">
+				<ul id="myTab" class="nav nav-tabs">
+						<li class="active">
+							<a href="#home" data-toggle="tab" id="date1">当天实数据</a>
+						</li>
+						<li>
+							<a href="#two" data-toggle="tab" id="date2">历史七天数据</a>
+						</li>
+				</ul>
+
+				<div class="clo">
+					<img src="../../images/close.png"/>
+					</div>	
+				<div class="clear"></div>
+				<div id="left">
+					<!-- 折线图 -->
+					<div id="historyData"></div>
+					<div id="historyState">
+						<!-- 状态 -->
+						<ul>
+							<li value="1">上线无数</li>
+							<li value="2">取消上线</li>
+							<li value="3">正常上线</li>
+							<li value="4">推迟上线</li>
+							<li value="5">曝光无数</li>
+							<li value="6">点击无数</li>
+							<li value="7">点击比曝光大</li>
+							<li value="8">曝光预估不符</li>
+							<li value="9" >点击预估不符</li>
+							<li value="10" >不监测点击,但有数</li>
+							<li value="11" >不监测曝光,但有数</li>
+							<li value="12">与环比差异过大</li>
+							<li value="13">与同比差异过大</li>
+							<li value="14">经验值差异过大</li>
+						</ul>
+					</div>
+					<div class="clear"></div>
+					<div id="historyDataList">
+						<ul>
+							<li>日期：</li>
+							<li>PV:</li>
+							<li>PC:</li>
+						</ul>
+						<ul>
+							<li>#</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>#</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>#</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>#</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>#</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>#</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>#</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+					</div>
+				</div><!-- end <div id="left"> -->
+				<div class="clear"></div>
+				<div id="right">
+					<div id="hourData"></div>
+					<div id="hourState">
+						<!-- 状态 -->
+						<ul>
+							<li ><b>营销码：</b></li>
+							<li>&nbsp;</li>
+							<li ><b>投放位置：</b></li>
+							<li></li>
+							<li ><b>第时监测：</b></li>
+							<li>PV：</li>
+							<li>PC：</li>
+							<li ><b>当天总监测：</b></li>
+							<li >PV：</li>
+							<li >PC：</li>
+						</ul>
+					</div>
+					<div class="clear"></div>
+					<div id="hourDataList">
+						<ul class="stitle">
+							<li>H：</li>
+							<li>PV：</li>
+							<li>PC：</li>
+						</ul>
+						<ul>
+							<li>00:00~01:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>01:00~02:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>02:00~03:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>03:00~04:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>04:00~05:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>05:00~06:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>06:00~07:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>07:00~08:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<div class="clear"></div>
+						<ul class="stitle">
+							<li>H：</li>
+							<li>PV：</li>
+							<li>PC：</li>
+						</ul>
+						<ul>
+							<li>08:00~09:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>09:00~10:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>10:00~11:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>11:00~12:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>12:00~13:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>13:00~14:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>14:00~15:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>15:00~16:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<div class="clear"></div>
+						<ul class="stitle">
+							<li>H：</li>
+							<li>PV：</li>
+							<li>PC：</li>
+						</ul>
+						<ul>
+							<li>16:00~17:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>17:00~18:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>18:00~19:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>19:00~20:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>20:00~21:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>21:00~22:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>22:00~23:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+						<ul>
+							<li>23:00~00:00</li>
+							<li>&nbsp;</li>
+							<li>&nbsp;</li>
+						</ul>
+					</div>
+				</div> <!-- end <div id="right"> -->
+			</div> <!-- end <div id="main"> -->
+		</div>
+	</div>
+</body>
+</html>

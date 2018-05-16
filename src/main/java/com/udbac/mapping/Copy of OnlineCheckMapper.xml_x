@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.udbac.dao.OnlineCheckDao">
+
+
+	<!-- <cache readOnly="true" type="org.mybatis.caches.ehcache.LoggingEhcache">
+		<property name="timeToIdleSeconds" value="1800" />
+		<property name="timeToLiveSeconds" value="1800" />
+		<property name="maxEntriesLocalHeap" value="1000" />
+		<property name="maxEntriesLocalDisk" value="10000000" />
+		<property name="memoryStoreEvictionPolicy" value="LRU" />
+	</cache> -->
+
+	<!-- 上线第一天的详细信息 -->
+	<select id="queryInfo" parameterType="java.util.List"
+		resultType="com.udbac.entity.OnlineCheckInfo">
+	select ect.point_location,
+       ect.put_function,
+       ect.support_exposure,
+       ect.support_click,
+       act.activity_name,
+       act.activity_code,
+       cus.customer_name,
+       cus.customer_code,
+       media.media_name,
+       fav.collect_user,
+       calendar.mic,
+       calendar.online_state,
+       calendar.put_date,
+       calendar.put_value,
+       calendar.exposure_file,
+       calendar.click_file,
+       calendar.after_file,
+       calendar.now_state_id,
+       moni.click,
+       moni.pv,
+       sche.click_avg,
+       sche.exposure_avg,
+       ect.support_click,
+       ect.support_exposure,
+       sche.unit,
+       calendar.put_value
+from tb_amp_basic_schedule_info as sche
+left join tb_amp_basic_media_info media on media.media_id = sche.media_id::integer
+left join tb_amp_basic_schedule_extend_info ect on ect.mic = sche.mic,
+		  tb_amp_basic_activity_info as act
+left join tb_amp_basic_customer_info as cus on cus.customer_id = act.customer_id::integer,
+          tb_amp_basic_schedule_calendar_info as calendar
+left join tb_amp_basic_favorites_info fav
+  			on fav.mic = calendar.mic
+			and fav.put_date = calendar.put_date
+left join tb_amp_basic_user_info	as users on fav.collect_user = users.user_name
+left join
+  ( select mic,
+           to_char(daytime, 'yyyy-mm-dd') as moni_day,
+           sum(clean_clk_pv) as click,
+           sum(clean_imp_pv) as pv
+   from tb_amp_basic_hour_monitor_date
+   where to_char(daytime, 'yyyy-mm-dd') = to_char(now(), 'yyyy-mm-dd')
+   group by mic,
+            to_char(daytime, 'yyyy-mm-dd')) as moni on moni.mic = calendar.mic
+and moni.moni_day = to_char(calendar.put_date, 'yyyy-mm-dd'),
+
+  (select mic,
+          min(put_date) as min_date
+   from tb_amp_basic_schedule_calendar_info
+   group by mic) as min_put_date
+   where calendar.mic = sche.mic
+   and act.activity_code = sche.activity_code
+   and min_put_date.mic = calendar.mic
+   and min_put_date.min_date = calendar.put_date
+   and to_char(min_put_date.min_date, 'yyyy-mm-dd') = to_char(now(), 'yyyy-mm-dd')
+		<if test="state!=null and state!='' ">
+			AND CALENDAR.ONLINE_STATE like #{state}
+		</if>
+		<if test="mic!=null and mic!='' ">
+			AND CALENDAR.MIC like concat('%',#{mic},'%')
+		</if>
+		<if test="cusName!=null and cusName!='' ">
+			AND CUS.CUSTOMER_NAME = #{cusName}
+		</if>
+		<![CDATA[AND  (MEDIA_NAME <>  '百度' or ECT.POINT_LOCATION =  '百度睿投' )]]>
+		<if test="userName!=null and userName!='' ">
+		and fav.collect_user = #{userName}
+		</if>
+		<!-- ORDER BY CALENDAR.MIC -->
+		UNION
+		select ect.point_location,
+       ect.put_function,
+       ect.support_exposure,
+       ect.support_click,
+       act.activity_name,
+       act.activity_code,
+       cus.customer_name,
+       cus.customer_code,
+       media.media_name,
+       fav.collect_user,
+       calendar.mic,
+       calendar.online_state,
+       calendar.put_date,
+       calendar.put_value,
+       calendar.exposure_file,
+       calendar.click_file,
+       calendar.after_file,
+       calendar.now_state_id,
+       moni.click,
+       moni.pv,
+       sche.click_avg,
+       sche.exposure_avg,
+       ect.support_click,
+       ect.support_exposure,
+       sche.unit,
+       calendar.put_value
+from
+  (select mic,
+          to_char(daytime, 'yyyy-mm-dd') as moni_day,
+          sum(clean_clk_pv) as click,
+          sum(clean_imp_pv) as pv
+   from tb_amp_basic_hour_monitor_date
+   where to_char(daytime, 'yyyy-mm-dd') = to_char(now(), 'yyyy-mm-dd')
+   group by mic,
+            to_char(daytime, 'yyyy-mm-dd')) as moni -- 小时表数据
+
+left join tb_amp_basic_schedule_info as sche on moni.mic = sche.mic
+left join tb_amp_basic_activity_info as act on act.activity_code = sche.activity_code
+left join tb_amp_basic_schedule_extend_info ect on ect.mic = sche.mic
+left join tb_amp_basic_schedule_calendar_info as calendar on sche.mic = calendar.mic
+left join tb_amp_basic_favorites_info fav
+  			on fav.mic = calendar.mic
+			and fav.put_date = calendar.put_date
+left join tb_amp_basic_user_info	as users on fav.collect_user = users.user_name
+left join tb_amp_basic_media_info media on media.media_id = sche.media_id::integer
+left join tb_amp_basic_customer_info as cus on cus.customer_id = act.customer_id::integer,
+  (select mic,
+          min(put_date) as min_date
+   from tb_amp_basic_schedule_calendar_info
+   group by mic) as min_put_date
+   where calendar.mic = sche.mic
+   and moni.moni_day = to_char(calendar.put_date, 'yyyy-mm-dd')
+   and act.activity_code = sche.activity_code
+   and min_put_date.mic = calendar.mic
+   and min_put_date.min_date = calendar.put_date
+   and to_char(min_put_date.min_date, 'yyyy-mm-dd') = to_char(now(), 'yyyy-mm-dd')
+		<if test="state!=null and state!='' ">
+			AND CALENDAR.ONLINE_STATE like #{state}
+		</if>
+		<if test="mic!=null and mic!='' ">
+			AND CALENDAR.MIC like concat('%',#{mic},'%')
+		</if>
+		<if test="cusName!=null and cusName!='' ">
+			AND CUS.CUSTOMER_NAME = #{cusName}
+		</if>
+		  <![CDATA[AND  (MEDIA_NAME <>  '百度' or ECT.POINT_LOCATION =  '百度睿投' )]]>
+		  <if test="userName!=null and userName!='' ">
+		and fav.collect_user = #{userName}
+		</if>
+		ORDER BY 5
+	</select>
+
+	<!-- 保存曝光核查的图片 -->
+	<insert id="saveExposurePath" parameterType="com.udbac.entity.OnlineCheckInfo">
+		update
+		tb_amp_basic_schedule_calendar_info set exposure_file =
+		#{exposureFile} where mic = #{mic}
+	</insert>
+
+	<!-- 保存点击核查的图片 -->
+	<insert id="saveClickPath" parameterType="com.udbac.entity.OnlineCheckInfo">
+		update
+		tb_amp_basic_schedule_calendar_info set click_file = #{click_file}
+		where mic = #{mic}
+	</insert>
+
+	<!-- 保存后端核查的图片 -->
+	<insert id="saveAfterPath" parameterType="com.udbac.entity.OnlineCheckInfo">
+		update
+		tb_amp_basic_schedule_calendar_info set after_file = #{after_file}
+		where mic = #{mic}
+	</insert>
+
+	<!-- 改变上线第一天的上线状态 -->
+	<update id="changeState" parameterType="com.udbac.entity.OnlineCheckInfo">
+		UPDATE
+		tb_amp_basic_schedule_calendar_info
+		SET online_state = #{state}
+		where
+		mic = #{mic}
+		and put_date =#{date}
+	</update>
+
+	<!-- 改变上线第一天的点位状态 -->
+	<update id="setMicState" parameterType="com.udbac.entity.OnlineCheckInfo">
+		UPDATE
+		TB_AMP_BASIC_SCHEDULE_CALENDAR_INFO
+		SET NOW_STATE_ID = #{mic_state}
+		WHERE MIC = #{mic}
+	</update>
+
+
+	<!-- 查询某个点位的上一个点位状态 点位改变的时候 上一个的点位的当前状态发生改变 -->
+	<select id="queryLastState" parameterType="com.udbac.entity.OnlineCheckInfo"
+		resultType="String">
+		select now_state_id from
+		tb_amp_basic_schedule_calendar_info where mic = #{mic}
+	</select>
+</mapper>

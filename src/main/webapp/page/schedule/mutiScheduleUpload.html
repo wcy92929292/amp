@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>排期入库</title>
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<link href="../../css/com/bootstrap.css" rel="stylesheet"/>
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet"/>
+<link href="../../css/com/ie.css" rel="stylesheet"/>
+<link href="../../css/style.css" rel="stylesheet"/>
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet"/>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/muiSchedule.js"></script>
+<script src="../../js/provinceSheet.js"></script>
+
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/ 
+"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<link href="../../css/jquery.autocomplete.css" rel="stylesheet">
+<!-- 文件上传-->
+<script src="../../js/com/diyUpload.js"></script>
+<script src="../../js/com/webuploader.html5only.min.js"></script>
+<link href="../../css/diyUpload.css" rel="stylesheet" type="text/css" />
+<link href="../../css/webuploader.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+
+		var i =1;
+
+		jQuery(document).ready(function() {
+			 $(".headers").loadTemplate("../../common/header.html", {});
+		});
+		
+		var fun = null;
+		var frequency;
+		
+		//规定频控方法
+		function changeControl(currentNum){
+			frequency = currentNum.value;
+			fun = $(currentNum).parents("tr").find("select").eq(2).find("option");
+			
+			for(i=0;i<fun.length;i++){
+				fun.eq(i).text(fun.eq(i).text().replace(/[n\d]+/,frequency));
+			}
+		}//end changeControl()
+		
+		//选择排期文件之后回显文件名称
+		function selectChangeSchedule(fileName){
+			$("#scheduleFileText").val(fileName);
+		}//end selectChangeSchedule();
+		
+		//选择强制插码文件之后回显文件名称
+		function selectChangeUpdate(fileName){
+			$("#updateFileText").val(fileName);
+		}//end selectChangeSchedule();
+		
+		//错误信息回显
+		var mesArr = null;
+		function error(message){
+			$("#message").html("");
+			message = message.replace(/\[/g,"");
+			message = message.replace(/\+/g,"");
+			message = message.replace(/\]/g,"");
+			mesArr = message.split("\n,")
+			for(i = 0;i<mesArr.length;i++){
+				$("#message").append(mesArr[i]);
+				$("#message").append("</BR>");
+			}
+			
+			$("#scheduleFrame").attr("src","schedule.html?"+new Date());
+		}
+		
+		$(function(){
+			
+			//规定频控次数
+ 			var num = $(".frequency");
+			var tr=null;
+			for(i=1;i<=21;i++){
+				num.append($("<option value="+i+">"+i+"</option>"));
+			}
+			
+			//增加一行频控属性
+			$("#addTr").click(function(){
+				if(tr == null){
+					tr = $(".tab").eq(0).html();
+				}
+				$(".tab").eq(0).append(tr);
+			});
+			
+			//选择排期文件
+			$("#scheduleFileSelect").click(function(){
+				scheduleFrame.selectFile();
+			});
+			
+			//强制插码选择文件
+			$("#updateFileSelect").click(function(){
+				scheduleFrame.selectUpdateFile();
+			});
+			
+			//普通排期插码
+			$("#genSchedule").click(function(){
+				/* setpPointLine(); */
+				$("#message").html("");
+				scheduleFrame.submitForm(0,$("#after").val(),$("#before").val(),$("#center").val(),$("#isAddPoint")[0].checked ? "1" : "");
+			});
+			
+			//集团排期插码
+			$("#JTSchedule").click(function(){
+				/* setpPointLine(); */
+				$("#message").html("");
+				scheduleFrame.submitForm(1,$("#after").val(),$("#before").val(),$("#center").val(),$("#isAddPoint")[0].checked ? "1" : "");
+			});
+			
+			//百度关键词插码
+			$("#keySchedule").click(function(){
+				/* setpPointLine(); */
+				$("#message").html("");
+				scheduleFrame.submitForm(2,$("#after").val(),$("#before").val(),$("#center").val(),$("#isAddPoint")[0].checked ? "1" : "");
+			});
+			
+			//后端补排期
+			$("#afterSchedule").click(function(){
+				scheduleFrame.submitForm(3,$("#after").val(),$("#before").val(),$("#center").val());			
+			});
+			
+			//根据活动编号导出排期
+			var actCode;
+			var scheduleForm;
+			var scheFrame;
+			var actCodeDiv = $("<div style='display:none'>");
+			$("body").append(actCodeDiv);
+			$("#actCodeBut").click(function(){
+				
+				actCode = $("#actCode").val().replace(" ","");
+				scheFrame = $("<iframe name='downFrame'>");
+				
+				if(actCode  == ""){
+					$("#message").html("请填写活动编号");
+					return false;
+				}
+				
+				actCodeDiv.html(scheFrame);
+				$(downFrame.document.body).html("<form action='/amp/schedule/downSchedule.do' method='post' name='downForm' id='downForm'>" +
+						"<input value='"+actCode+"' name='actCode'/></form>");
+				$(downFrame.document.body).append("<script>downFrame.downForm.submit();");
+				
+			});//end 根据活动编号导出排期
+			
+			//延长排期  addScheduleDate
+			var  addDateFile = null;
+			$("#addDateBut").click(function(){
+				
+				addDateFile = $("<input type='file' name='scheduleFile'>");
+				addDateFile[0].click();
+				addDateFile.change(function(){
+					$("#addDateText").val(addDateFile.val());
+				});
+			});//end 
+			
+			var updateForecastFile = null;
+			$("#updateForecastBut").click(function(){
+				updateForecastFile = $("<input type='file' name='scheduleFile'>");
+				updateForecastFile[0].click();
+				updateForecastFile.change(function(){
+					$("#updateForecastText").val(updateForecastFile.val());
+				});
+			});
+			
+			
+			/**
+			更改排期预估
+			**/
+			function addScheDate(type){
+				
+				if(addDateFile == null || addDateFile.val() == "" || addDateFile.val().lastIndexOf(".xlsx") < 0){ 
+					$("message").html("请正确选择延长排期文件!");
+					return false;
+				}
+				
+				scheFrame = $("<iframe name='addScheduleFrame'>");
+				
+				actCodeDiv.html(scheFrame);
+				$(addScheduleFrame.document.body).html(
+						"<form action='/amp/schedule/addScheduleDate.do' method='post' name='addDateForm' id='addDateForm' enctype='multipart/form-data'>" +
+						"<input value='"+type+"' name='scheduleType'/></form>");
+				$(addScheduleFrame.document.addDateForm).append(addDateFile);
+				$(addScheduleFrame.document.body).append("<script>addScheduleFrame.addDateForm.submit();");
+			}//end addScheduleDate
+			
+			//异步提交表单
+			function submitForm(action,method,params){
+				var _bodyFrame = $("body #submitFrameDiv");
+				
+				if(_bodyFrame.length == 0){
+					var _hideDiv = $("<div id='submitFrameDiv' style='display:none'>");
+					var _formFrame = $("<iframe name='formFrame'>");
+					$("body").append(_hideDiv);
+					_hideDiv.append(_formFrame);
+				}
+				var _newForm = $("<form name='iframeForm' id='iframeForm'>");
+				
+				_newForm.attr("action",action);
+				_newForm.attr("method",method);
+				_newForm.attr("enctype","multipart/form-data");
+				for(var i=0;i<params.length;i++){
+					_newForm.append(params[i]);
+				}
+				
+				$(formFrame.document.body).html("");
+				$(formFrame.document.body).append(_newForm);
+				
+				//最后提交
+				$(formFrame.document.body).append("<script>formFrame.iframeForm.submit();");
+			}//end submitForm
+
+			/**
+				更改排期预估
+			**/
+			function updateScheduleForecast(type){
+				
+				if(updateForecastFile == null || updateForecastFile.val() == '' 
+					|| updateForecastFile.val().indexOf(".xlsx") < 0){
+					setMes("请选择排期预估文件");
+					return;
+				}
+			
+				var action = "/amp/schedule/setScheduleNewForecast.do";
+				var method = "post";
+				var params = [];
+				params[0] = updateForecastFile;
+				params[1] = "<input name='scheduleType' value='" + type + "'>";
+				submitForm(action,method,params);
+			}
+			
+			
+			$("#updateScheForecast").click(function(){
+				updateScheduleForecast(0);
+			});
+			
+			$("#updateJTForecast").click(function(){
+				updateScheduleForecast(1);
+			});
+			
+			$("#addScheDate").click(function(){
+				addScheDate(0);
+			});
+			
+			$("#addJTDate").click(function(){
+				addScheDate(1);
+			});
+			
+			//后端人员列表
+			var afterId = ["1","9","10","11"];
+			for(i=0;i<afterId.length;i++){
+				$.post("/amp/user/queryUserById.do",{roleId:afterId[i]},function(data){
+					if(data == '401'){
+						location = "/amp/page/login/login.html";
+					}
+					for(i=0;i<data.length;i++){
+						$("#after").append("<option value="+ data[i].user_id +">"+ data[i].real_name +"</option>");
+					}
+				});
+			}
+			
+			//前端人员列表
+				$.post("/amp/user/queryUserById.do",{roleId:"4"},function(data){
+					if(data == '401'){
+						location = "/amp/page/login/login.html";
+					}
+					for(i=0;i<data.length;i++){
+						$("#before").append("<option value="+ data[i].user_id +">"+ data[i].real_name +"</option>");
+					}
+				});
+			
+			//监测中心人员列表
+			var centerId = ["2","8","10","11"];
+			for(i=0;i<centerId.length;i++){
+				$.post("/amp/user/queryUserById.do",{roleId:centerId[i]},function(data){
+					if(data == '401'){
+						location = "/amp/page/login/login.html";
+					}
+					for(i=0;i<data.length;i++){
+						$("#center").append("<option value="+ data[i].user_id +">"+ data[i].real_name +"</option>");
+					}
+				});
+			}
+		});//end $(function(){})
+		
+		/* var pointLineSELECT;
+		var pointLine = "";
+		
+		function setpPointLine(){
+			$(".tab tr").each(function(){
+				pointLine += $(this).find("input").val().replace(/^\D$/,"");
+				
+				if(/^\D+$/.test(pointLine) && "" != pointLine){
+					$("#message").text("频控排期点位所在行必须填写数字！");
+					return false;
+				} 
+				pointLineSELECT = $(this).find("select");
+				
+				for(i=0;i<pointLineSELECT.length;i++){
+					pointLine += ",";
+					pointLine += pointLineSELECT[i].value;
+				}
+				
+				scheduleFrame.addPointLine(pointLine);
+				pointLine = "";
+			});
+		}//end setpPointLine() */
+		
+</script>
+</head>
+<body>
+	<!-- 头部 -->
+	<div class="headers"></div>
+	
+	<div class="contain">
+		<div class="zxy_contain1">
+			<!-- 菜单导航 -->
+			<div id="template-nav"></div>
+			<div class="panel-body" id="message" style="padding:0;"></div>
+				 <!-- 频控属性输入勿删 -->
+				<!--<b style="display:inline-block;padding:15px 0; font-size:1.2em;">排期点位去重规则:</b>
+				<div class="table-responsive" id="div_table">
+					<table class="table table-striped table-hover" id="table_id">
+						<thead id="thead_1">
+							<tr>
+								<th>频控排期点位所在行</th>
+								<th>是否需频控</th>
+								<th>频控次数</th>
+								<th>频控方法规则</th>
+								<th>频控周期</th>
+							</tr>
+						</thead>
+						<tbody class="tab">
+							<tr>
+								<td>
+									<input type="text" class="form-control" placeholder="">
+								</td>
+								<td>
+									<select class="select">
+										<option>-----请选择需求-----</option>
+										<option value='1'>是</option>
+										<option value='0'>否</option>
+									</select>
+								</td>
+								<td>
+									<select class="select frequency" onchange="changeControl(this);" >
+										<option>-----请选择次数-----</option>
+									</select>
+								<td>
+									<select class="select">
+										<option>-----请选择规则-----</option>
+										<option value="0">前n次有效</option>
+										<option value="1">n次以上滤除</option>
+									</select>
+								</td>
+								<td>
+									<select class="select">
+										<option>-----请选择周期-----</option>
+										<option value="0">全周期</option>
+										<option value="1">自然周</option>
+										<option value="2">投放周</option>
+									</select>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					</div>
+					<div style="text-align:center;">
+					   <button id="addTr" class="btn btn-info btn-lg">增加频控项目</button>
+					</div> -->
+				<hr/>
+					<div class="paddingDiv"></div>
+				<!-- <b class="zxy_title_style">媒体名称映射:</b> -->
+				<div class="table-responsive" id="addMedia" style="display:none">
+					<table class="table table-striped table-hover thead_zxy">
+					<thead>
+							<tr>
+							<td class="thead_zxy thead_zxy_td">
+								<b>新增媒体:</b>
+							</td>
+							<td class="thead_zxy_td_r" style="text-align: left;">
+								<input type="text" id="mediaName" class="newMedia" placeholder="请输入标准媒体名称">
+								<select id="mediaType">
+									<option value='0'>--请选择新媒体类型--</option>
+								</select>
+								<input type="button" value="新增" class="long_button_style" id="addMedias"/>
+							</td>
+						</tr>
+						</thead>
+					</table>
+				</div>
+				
+				
+				<div class="paddingDiv"></div>
+				<!-- <b class="zxy_title_style">媒体名称映射:</b> -->
+				<div class="table-responsive">
+					<table class="table table-striped table-hover thead_zxy">
+					<thead>
+							<tr>
+							<td class="thead_zxy thead_zxy_td">
+								<b>媒体名称泛化:</b>
+							</td>
+							<td class="thead_zxy_td_r" style="text-align: left;">
+								<input id="newMediaName" class="newMedia"  placeholder="请输入排期中媒体名称"/>
+								<input type="text" id="mediaInput" class="newMedia" placeholder="请输入标准媒体名称、关键字">
+								<!-- <select id="mediaType" style="display: none">
+									<option value='0'>--请选择新媒体类型--</option>
+								</select> -->
+								<input type="button" id="mapMedia" value="泛化" class="long_button_style" />
+								<span class="paddingDiv"></span>
+								
+							</td>
+						</tr>
+						</thead>
+						<tbody id="zxy_paiqi_tbody">
+							<tr>							
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<div class="paddingDiv"></div>
+				<b class="zxy_title_style">项目指定人员:</b>
+				<div class="table-responsive">
+					<table class="table table-striped table-hover thead_zxy">
+						<thead>
+							<tr>
+								<th>后端人员：</th>
+								<th>前端人员：</th>
+								<th>监测中心人员：</th>
+							</tr>
+						</thead>
+						<tbody id="zxy_paiqi_tbody">
+							<tr>
+								<td>
+									<select id="after">
+										<option value="-1">-----请选择-----</option>
+									</select>
+								</td>
+								<td>
+									<select id="before">
+										<option value="-1">-----请选择-----</option>
+									</select>
+								</td>
+								<td>
+									<select id="center">
+										<option value="-1">-----请选择-----</option>
+									</select>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<hr />
+				<div class="paddingDiv"></div>
+				<b class="zxy_title_style">项目需求指令:</b>
+				<div class="table-responsive" style="height:;">
+					<table class="table zxy_table5">
+						<tr class="thead_zxy_tr">
+							<td class="thead_zxy thead_zxy_td">
+								<b>强制插码确认:</b>
+							</td>
+							<td class="thead_zxy_td_r">
+								<input type="text" placeholder="确认截屏" class="text-input text-input-1" name="upfile" id="updateFileText"  disabled="disabled"> 
+								<input type="button" value="选择"id="updateFileSelect" class="long_button_style">
+								<span style="color:#fff;">强制插码会把之前的排期替换，重新加码。如果不需要，请将这置空!</span>
+								<span class="paddingDiv"></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="thead_zxy thead_zxy_td">
+								<b>导出排期文件:</b>
+							</td>
+							<td class="thead_zxy_td_r">
+								<input placeholder="活动编号" class="text-input text-input-1" type="text" id="actCode">
+								<input type="button" id="actCodeBut" value="导出" class="long_button_style" />	
+								<span class="paddingDiv"></span>
+							</td>
+						</tr>
+						<!-- <tr style="display:none;">
+							<td class="thead_zxy thead_zxy_td">
+								<b>媒体名称映射:</b>
+							</td>
+							<td class="thead_zxy_td_r">
+								<input id="newMediaName" /> ——>
+								<select id="meidaSelect" style="display:none;">
+									<option value='-1'>--请选择--</option>
+								</select>
+			
+								<input type="text" list="media" id="mediaInput" placeholder="--请选择--">
+								<datalist id="media"></datalist>
+			
+								<input type="button" id="mapMedia" value="映射" class="long_button_style" />
+								<span class="paddingDiv"></span>
+							</td>
+						</tr> -->
+						<tr>
+							<td class="thead_zxy thead_zxy_td">
+								<b>更改排期日期:</b>
+							</td>
+							<td class="thead_zxy_td_r">
+								<input placeholder="更改日期排期文件" class="text-input text-input-1" type="text" disabled="disabled" id="addDateText">
+								<input type="button" id="addDateBut" value="选择" class="long_button_style" />
+								<input type="button" id="addScheDate" value="普通排期" class="long_button_style" />
+								<input type="button" id="addJTDate" value="集团排期" class="long_button_style" />
+								<span class="paddingDiv"></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="thead_zxy thead_zxy_td">
+								<b>更改排期预估:</b>
+							</td>
+							<td class="thead_zxy_td_r">
+								<input placeholder="更改预估排期文件" class="text-input text-input-1" type="text" disabled="disabled" id="updateForecastText">
+								<input type="button" id="updateForecastBut" value="选择" class="long_button_style" />
+								<input type="button" id="updateScheForecast" value="普通排期" class="long_button_style" />
+								<input type="button" id="updateJTForecast" value="集团排期" class="long_button_style" />
+								<span class="paddingDiv"></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="thead_zxy thead_zxy_td">
+								<b>排期插码文件:</b>
+							</td>
+							<td class="thead_zxy_td_r">
+								<input placeholder="排期文件" class="text-input text-input-1" type="text" name="upfile" id="scheduleFileText" disabled="disabled">
+								<input type="button" value="选择" id="scheduleFileSelect" class="long_button_style">
+								<input name="schedule" type="button" id="genSchedule" value="普通排期插码" class="long_button_style" />
+								<input name="schedule" type="button" id="JTSchedule" value="集团排期插码" class="long_button_style" />
+								<input name="schedule" type="button" id="keySchedule" value="百度关键词插码" class="long_button_style" />
+								<b class="b_zxy">是否增加点位：</b>
+								<input name="schedule" type="checkbox" id="isAddPoint" value="1" class="" />
+								<!--<input name="schedule" type="button" id="afterSchedule" value="后端补排期" class="long_button_style" style="display:none;"/>-->
+								<span class="paddingDiv"></span>
+							</td>
+						</tr>
+					</table>
+				</div>
+			<div id="scheduleDiv" style="display:none;">
+				<iframe name="scheduleFrame" src="schedule.html" id="scheduleFrame"></iframe>
+			</div>
+		</div>
+	</div>
+	<script src="../../js/com/jquery.autocomplete.js"></script>
+</body>
+</html>

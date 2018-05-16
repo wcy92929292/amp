@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+	<head lang="en">
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
+		<meta http-equiv="X-UA-Compatible" content="IE=9" />
+		
+		<title>欢迎登录</title>
+		<link href="../../css/com/bootstrap.min.css" rel="stylesheet">
+		<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+		<script src="../../js/com/jquery-1.9.1.js"></script>
+		<script src="../../js/com/bootstrap.min.js"></script>
+		<!-- layer图层加载样式 -->
+		<script src="../../js/layer/layer.js"></script>
+		<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+		<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+		<!-- 登录JS -->
+		<script src="../../js/cookie.js"></script>
+		<script src="../../js/login.js"></script>
+		<link href="../../css/login.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript">
+		  $(function () {
+		    // Invoke the plugin
+		   	//$('input, textarea').placeholder();
+		  });
+		</script>
+	</head>
+
+	<body>
+		<div class="zxy_content">
+			<a href="http://www.udbac.com"><img src="../../images/message/udbac_logo1.png" class="logo"/></a>
+			<div class="content">
+				<h2 class="text-center">博新创亿广告平台监测系统</h2>
+				<div class=" content1">
+					<div class="content2">
+						<div class="content3">
+							<form class="form-horizontal" action="" method="post" id="loginForm" role="form">
+								<div class="control-group">
+									<label class="control-label">用户名:</label>
+									<div class="controls">
+										<input placeholder="请输入用户名" class="text-input text-input-1 " type="text" id="username" >
+									</div>
+								</div>
+								<div class="control-group">
+									<label class="control-label">密&nbsp;码:</label>
+									<div class="controls">
+										<input placeholder="请输入您的密码" class="text-input text-input-1" type="password" id="password" >
+									</div>
+								</div>
+								<div class="control-group">
+									<label class="control-label">验证码:</label>
+									<div class="controls">
+										<input placeholder="请输入验证码" class="text-input text-input-1" type="text" id="check_code">
+										<a id="zxy_a" href="javascript:;"
+										onclick="document.getElementById('icodeli2').src = '../../amp/login/checkcode.do?'+(new Date()).getTime()"><img
+										src="../../amp/login/checkcode.do"  class="code-img" id="icodeli2">
+										</a>
+									</div>
+								</div>
+								<div class="controls">
+									<input name="" type="button" id="comfirm_id" value="登录" class="btn btn-primary btn-small button_style" />
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<span>建议使用IE9及以上版本浏览器或Chrome内核浏览器访问本系统</span>
+		</div>
+		<div class="zxy_content1"></div>
+	</body>
+
+</html>

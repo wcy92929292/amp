@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!--此代码段时为了兼容浏览器以IE最高版本的文档模式渲染-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>注册用户</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<link href="../../css/user.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<script src="../../js/user/useradd.js"></script>
+<!-- echarts -->
+<script src="../../js/com/echarts-all.js"></script>
+<!-- 模板 -->
+<script type="text/javascript" src="../../js/com/jquery.tmpl.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<Link Rel="ICON NAME" href="../../images/logoIcon.ico">
+</head>
+<body>
+	<!-- 头部 -->
+	<div class="headers"></div>
+	<!-- 菜单导航 -->
+	<div id="template-nav"></div>
+	<div class="contain">
+		<div class="zxy_contain1">
+			<div class="modleBk container-fulid">
+				<h2 class="modleTitle">注册用户</h2>
+			</div>
+			<div class="information marTop60px">
+				<form action="" method="post" class='form-horizontal formcs container' id='myform'>
+					<div class="form-group">
+				      	<label class="col-sm-2 control-label label"><span class="need">*&nbsp;</span>用&nbsp;户&nbsp;名&nbsp;:&nbsp;</label>
+				    	<div class="col-sm-10">
+				      		<input type="text" class="form-control" id="username" name="username" placeholder="输入用户名">
+				      		<span style="color:#FF005C;font-size:0.7em" id="name_span"></span>
+				    	</div>
+				    	
+				    	<label class="col-sm-2 control-label label"><span class="need">*&nbsp;</span>登录密码:</label>
+				    	<div class="col-sm-10">
+				      		<input type="password" class="form-control" id="password" name="password" placeholder="输入登录密码">
+				      		<span style="color:#FF005C;font-size:0.7em" id="pwd_span"></span>
+				    	</div>
+				  	</div>
+				  	
+				  	<div class="form-group">
+				    	<label class="col-sm-2 control-label label"><span class="need">*&nbsp;</span>密码确认:</label>
+				    	<div class="col-sm-10">
+				      		<input type="password" id="confirmpwd" name="confirmpwd" class="form-control" placeholder="再次输入密码">
+				      		<span style="color:#FF005C;font-size:0.7em" id="pswd_span"></span>
+				    	</div>
+				    	
+				    	<label class="col-sm-2 control-label label"><span class="need">*&nbsp;</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名:&nbsp;</label>
+				    	<div class="col-sm-10">
+				      		<input type="text" id="uname" name="uname" class="form-control" placeholder="输入姓名">
+				      		<span style="color:#FF005C;font-size:0.7em" id="uname_span"></span>
+				    	</div>
+				  	</div>
+				  	
+				  	<div class="form-group">
+				    	<label class="col-sm-2 control-label label"><span class="need">*&nbsp;</span>客&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;户:&nbsp;</label>
+				    	<div class="col-sm-10">
+				      		<select id="province_id" class="form-control" name="province">
+				      			<option value="" selected="selected">--请选择--</option>
+				      		</select>
+				      		<span style="color:#FF005C;font-size:0.7em" id="province_span"></span>
+				    	</div>
+				    	
+				    	<label class="col-sm-2 control-label label"><span class="need">*&nbsp;</span>角&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;色:&nbsp;</label>
+				    	<div class="col-sm-10">
+				      		<select id="role_id" class="form-control" name="role" style="background-color: rgba(0,93,93,0.8)">
+				      	 		<option value="">--请选择--</option>
+				      		</select>
+				      		<span style="color:#FF005C;font-size:0.7em" id="role_span"></span>
+				    	</div>
+				  	</div>
+				  	
+				  	<div class="form-group">
+				    	<label class="col-sm-2 control-label label"><span class="need">*&nbsp;</span>电&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;话:&nbsp;</label>
+				    	<div class="col-sm-10">
+				      		<input type="tel" id="tel" name="tel" class="form-control" placeholder="输入电话" pattern="[0-9]{11}">
+				      		<span style="color:#FF005C;font-size:0.7em" id="tel_span"></span>
+				    	</div>
+				    	
+				    	<label class="col-sm-2 control-label label"><span class="need">*&nbsp;</span>邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱:&nbsp;</label>
+				    	<div class="col-sm-10">
+				      		<input type="email" id="email" name="email" class="form-control" placeholder="输入邮件">
+				      		<span style="color:#FF005C;font-size:0.7em" id="email_span"></span>
+				    	</div>
+				  	</div>
+				</form>
+				<div id="button2" >
+					<input type="button" value="注册" class="btn btn-info btn-sm" id="submit" onclick='submitForm()'>
+					<input type="button" value="取消" class="btn btn-info btn-sm" id="reset"  onclick='resetForm()'>
+				</div>	
+			</div>
+		</div>
+	</div>
+</body>
+</html>

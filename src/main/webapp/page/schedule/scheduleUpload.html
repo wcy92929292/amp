@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>排期入库</title>
+    <link href="../../css/com/bootstrap.css" rel="stylesheet">
+    <link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+    <link href="../../css/com/ie.css" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <!-- 头部和底部css -->
+    <link href="../../css/headerorfooter.css" rel="stylesheet">
+    <script src="../../js/com/jquery-1.9.1.js"></script>
+    <script src="../../js/com/bootstrap.min.js"></script>
+    <script src="../../js/cookie.js"></script>
+    <script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+    <script src="../../js/udbac.js"></script>
+    <!-- echarts -->
+    <script src="../../js/com/echarts-all.js"></script>
+    <!-- 日期选择控件 -->
+    <script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+    <!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+    
+	
+    <script>
+	
+    function getFile(obj,inputName){
+		var file_name = $(obj).val();
+		$("input[name='"+inputName+"']").val(file_name);
+	}
+		function init(){
+			$("#mb").css("display", "block");
+			// 加载等待效果
+			 layer.load(2);
+			
+           	//关闭等待效果
+			layer.closeAll();
+			//timeOutLayer();
+		}
+
+		jQuery(document).ready(function() {
+		  	init();
+		  });
+    </script>
+</head>
+<body>
+		
+		<div class="row"
+			style="padding-top: 30px; margin-left: 0; margin-right: 0;">
+			<div style="width: 450px;margin:0 auto;">
+				<div class="filebox">
+				     <input type="text" name="copyFile"  class="textbox" />
+				     <input name="" type="button" id="comfirm_id" value="选择文件" class="button_style"/>
+				     <input type="file" class="uploadFile" name="upload"
+				     onchange="getFile(this,'copyFile')" />
+				</div>
+			</div>
+		</div>
+    
+        <hr>
+        <div style="width:540px;margin:auto;">
+        	<input name="" type="button" id="comfirm_id" value="导入省排期" class="long_button_style"/>
+						&nbsp;&nbsp;
+			<input name="" type="button" id="cancal_id" value="导入集团排期" class="long_button_style"/>
+				&nbsp;&nbsp;
+			<input name="" type="button" id="cancal_id" value="导入百度关键词" class="long_button_style"/>
+		</div>
+	
+	
+	<div style="z-index: 19891015; background-color: #000; display: none; opacity: 0.3; filter: alpha(opacity = 30);"
+		class="xubox_shade" id="mb" times="1"></div>
+	<!-- 底部 
+	<div class="footers"></div>-->
+</body>
+</html>

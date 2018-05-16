@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>投放单位活动展示</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<!-- echarts -->
+<script src="../../js/com/echarts-all.js"></script>
+<!-- 模板 -->
+<script type="text/javascript" src="../../js/com/jquery.tmpl.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../../js/index_popups.js"></script>
+<script type="text/html" id="template">
+ 	<tr>
+		<td data-content="customerName"></td>
+		<td data-content="activityName" style=""></td>
+		<td data-content="pv"></td>
+		<td data-content="pnum"></td>				         	
+	</tr>
+</script>
+
+</head>
+</head>
+<body>
+	<!-- 头部 -->
+	<div class="headers"></div>
+	<div class="contain">
+		<div class="zxy_contain1" style="overflow-x: hidden;">
+			<!-- 菜单导航 -->
+			<div id="template-nav"></div>
+			<div class="div_all">
+				<ul id="zxy_ul_gailan">
+					<li><b>投放单位</b></li>
+					<li><b>活动名称</b></li>
+					<li><b>目前PV</b></li>
+					<li><b>问题数</b></li>
+				</ul>
+				
+				<table id="table_id" class="zxy_index">
+					<tbody id="tbody_id" class="zxy_tab1"></tbody>
+				</table>
+				
+				<div style="text-align:center; padding-top:10px;">
+					<input name="" type="button" id="cancal_id" value="返回" class="button_style" />
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

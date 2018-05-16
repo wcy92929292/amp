@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>监测活动展示</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<!-- echarts -->
+<script src="../../js/com/echarts-all.js"></script>
+<!-- 模板 -->
+<script type="text/javascript" src="../../js/com/jquery.tmpl.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript"
+	src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<script src="../../js/data.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<script src="../../js/monitorPlan.js"></script>
+
+<script type="text/html" id="template">
+ 	<tr>
+		<td scope="row">${createDate}</td>
+		<td >${code}</td>
+      	<td isParent="${parentIdf}" class='mouse_hover' style="color:red; width:333px;">${actName}</td>
+        <td cusCode="${customerCode}">${province}</td>
+		<td >${preOnlineDate}</td>
+		<td actOnlineDate='${actOnlineDate}'>${actOnlineDate}</td>
+		<td onlineType='${onlineType}'>${onlineType}</td>
+		<td actStateCode='${actStateCode}'>${actStat}</td>
+		<td >
+			{{if actStat=='待审核'}}--{{/if}}
+			{{if actStat=='具备上线条件'}}
+				<input style="margin-left:-55px;width:25px;margin:auto;" type="radio" onchange="comfirmOnline(this);"  value="0" />正常上线 
+			{{/if}}
+			{{if actStat=='不具备上线条件'}}
+				<input style="margin-left:-55px;width:25px;margin:auto;" type="radio" onchange="comfirmOnline(this)" value="1"/>强制上线
+			{{/if}}
+			{{if actStat=='活动排期'}}
+				<input style="margin-left:-55px;width:25px;margin:auto;" type="radio" onchange="comfirmOnline(this);" value="2"/>确认排期
+			{{/if}}
+			{{if actStat=='确认排期'}}
+				<input style="margin-left:-55px;width:25px;margin:auto;" type="radio" onchange="comfirmOnline(this);" value="3"/>通知上线
+			{{/if}}
+			{{if actStat=='通知上线'}}
+				<input style="margin-left:-55px;width:25px;margin:auto;" type="radio" onchange="comfirmOnline(this);" value="4"/>已上线
+			{{/if}}
+			{{if actStat=='已上线'}}
+					<input style="margin-left:-55px;width:25px;margin:auto;" type="radio" onchange="comfirmOnline(this);" value="6"/>准备结案基础数据
+			{{/if}}
+			{{if actStat=='准备结案基础数据'}}
+					<input style="margin-left:-55px;width:25px;margin:auto;" type="radio" onchange="comfirmOnline(this);" value="4"/>已上线
+					<input style="margin-left:-55px;width:25px;margin:auto;" type="radio" onchange="comfirmOnline(this);" value="5"/>已结束
+			{{/if}}
+			{{if actStat=='已结束'}}--{{/if}}
+		</td>
+		<td data-content="">${auditStaff}</td>
+		<td style="width:340px;">
+			<input name="" type="button" value="添加子方案" onclick="addSubAct(this);" class="button_style quote_id" style="width:90px;"/>
+			<input name="" type="button" onclick="modifyAct(this);" value="修改" class="button_style modify_id"/>
+			<input name="" type="button" value="审核" onclick="audit(this);" class="button_style audit_id"/>
+			<input name="" type="button" onclick="actDetail(this);" value="活动详细信息" class="button_style detail_id" style="width:90px;"/>
+		</td>
+	</tr>
+</script>
+<!-- 上面的script代码的第三个td
+监测方案页面的红色活动名称暂时不需要跳转功能先做隐藏处理勿删此段代码 
+<td isParent="${parentIdf}" onclick='quote(this)' class='mouse_hover' style="color:red; cursor:pointer; width:333px	;">${actName}</td>
+这是39行完整代码段必要时直接复制替换39行即可
+原文如下：
+<td isParent="${parentIdf}" class='mouse_hover' style="color:red; width:333px;">${actName}</td>
+-->
+</head>
+
+<body>
+	<!-- 头部 -->
+	<div class="headers"></div>
+
+	<div class="contain">
+		<div class="zxy_contain1" style="overflow:hidden;">
+			<!-- 菜单导航 -->
+			<div id="template-nav"></div>
+			<div class="row zxy_row_one">
+				<div id="message"></div>
+				<div class="m_s_title">监测活动一览
+					<span style="display: none;"></span>
+				</div><br><br><br>
+				<span class="zxy_sp_jiance">
+					<span>&nbsp;&nbsp;开始时间：
+						<input placeholder="开始时间:" class="text-input text-input-1" type="text" id="sdate_id" onfocus="WdatePicker({skin:'twoer'})"/>&nbsp;
+					</span>
+					
+					<span>结束时间：
+						<input placeholder="结束时间:" class="text-input text-input-1" type="text" id="edate_id" onfocus="WdatePicker({skin:'twoer'})"/>&nbsp;
+					</span>
+					
+					<span>接口人：
+						<input placeholder="" class="text-input text-input-1" type="text" id="portUser"/>&nbsp;
+					</span>
+
+					<span>活动编号：
+						<input placeholder="" class="text-input text-input-1" type="text" id="pageName"/>&nbsp;
+					</span>
+					
+					<!-- <span>接口人：
+						<input placeholder="" class="text-input text-input-1" type="text" id="pageName"/>&nbsp;&nbsp;&nbsp;
+					</span> -->
+					
+					<!-- <span >活动状态：
+						<select id="activity_state">
+							<option value="-1">全部</option>
+							<script type="text/javascript" >
+								for(i=0;i<actStateArr.length;i++){
+									document.write("<option value='"+ i +"'>"+actStateArr[i]+"</option>");
+								}
+							</script>
+						</select>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</span> -->
+					
+					<input name="" type="button" id="query_id" value="查询" class="button_style_moniSel" /> &nbsp;
+					<input name="" type="button" id="add_id" value="添加" class="button_style_moniAdd" />
+				</span>
+				<div class="col-sm-8" align="right">
+					<div class="row"></div>
+				</div>
+			</div>
+			
+			<div id="zxy_yilan_content">
+				<!-- 强制上线 -->
+				<div style="display: none;" id="stateForm">
+					<iframe name='updateStateFrame' src='/amp/page/monitorPlan/updateStateForm.html'></iframe>
+				</div>
+				<div class="table-responsive" id="div_table" style="height:96%;">
+					<table class="table table-striped table-hover zxy_table_one" id="table_id">
+						<thead id='thead_1' class="zxy_thead_one">
+							<tr>
+								<th>添加日期</th>
+								<th>活动编号</th>
+								<th style="width:333px;">活动名称</th>
+								<th>投放单位</th>
+								<th>预上线日期</th>
+								<th>活动上线日期</th>
+								<th>上线类型</th>
+								<th>活动状态</th>
+								<th>更改活动状态</th>
+								<th>接口人</th>
+								<th style="width: 340px;">操作</th>
+							</tr>
+						</thead>
+						<tbody id="tbody_id" class="zxy_tbody1 zxy_tab2"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div style="z-index: 19891015; background-color: #000; display: none; opacity: 0.3; filter: alpha(opacity = 30);" class="xubox_shade" id="mb" times="1"></div>
+</body>
+<!-- 固定表头的JS文件 -->
+<script>
+$(function()
+	{
+		$("#zxy_yilan_content").off("scroll").on("scroll",function()//解除绑定滚动事件
+		{
+			var height = $(this).scrollTop() + "px";//定义ul的定位后的top值等于滚动条滚动的高度
+			$("#thead_1").css("top",height);
+		});
+	});
+</script>
+</html>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.udbac.dao.AutoScheduleDao">
+
+	<!-- 排期信息对应 -->
+	<resultMap id="scheduleMap" type="com.udbac.entity.AutoScheduleInfo">
+		<!-- 媒体 -->
+		<result column="media_name" property="mediaName" />
+		<!-- 活动 -->
+		<result column="activity_name" property="activityName" />
+		<result column="activity_code" property="activityCode" />
+		<result column="reality_start_date" property="realityStartDate" />
+		<result column="activity_end_date" property="activityEndDate" />
+		<result column="customer_code" property="customerCode" />
+		<!-- 排期信息 -->
+		<result column="mic" property="mic" />
+		<result column="ACTIVITY_CODE" property="activityCode" />
+		<result column="URL_PC" property="urlPc" />
+		<result column="TERMINAL_TYPE" property="terminalType" />
+		<result column="UNIT" property="unit" />
+		<result column="CLICK_AVG" property="clickAvg" />
+		<result column="EXPOSURE_AVG" property="exposureAvg" />
+		<!-- 排期扩展信息 -->
+		<result column="POINT_LOCATION" property="pointLocation" />
+		<result column="PUT_FUNCTION" property="putFunction" />
+		<result column="MATERIAL_REQUIRE" property="materialRequire" />
+		
+		<result column="SUPPORT_EXPOSURE" property="supportExposure" />
+		<result column="SUPPORT_CLICK" property="supportClick" />
+		<result column="AREA" property="area" />
+		<!-- 日历信息 -->
+		<collection property="calendarInfo" ofType="com.udbac.entity.AutoSchedulCalendarInfo">
+			<result column="mic" property="mic" />
+			<result column="put_Date" property="putDate" />
+			<result column="put_Value" property="putValue" />
+		</collection>
+	</resultMap>
+
+	<!-- 通过创建时间查找相应的排期信息 -->
+	<select id="listAll" resultMap="scheduleMap">
+		select
+			act.activity_name,act.reality_start_date,act.activity_end_date,create_time,sche.mic,sche.activity_code,
+			cus.customer_code,media.media_name,url_pc,terminal_type,unit,click_avg,
+			exposure_avg,point_location,put_function,material_require,resource_position,
+			support_exposure,support_exposure,support_click,area,put_date,put_value
+		from 
+			tb_amp_basic_schedule_extend_info ext,
+			tb_amp_basic_activity_info act,
+			tb_amp_basic_customer_info cus,
+			tb_amp_basic_media_info media,
+			tb_amp_basic_schedule_info sche
+		left join tb_amp_basic_schedule_calendar_info cale 
+		on   cale.mic = sche.mic
+		where 
+		    act.activity_code = sche.activity_code
+		and media.media_id = sche.media_id::integer
+		and act.customer_id::integer = cus.customer_id
+		and ext.mic = sche.mic
+		and (
+				(create_time between #{sdate} and #{edate}) 
+				or 
+				(url_update_time between #{sdate} and #{edate})
+		) order by activity_code, mic
+		
+		
+	</select>
+
+</mapper>

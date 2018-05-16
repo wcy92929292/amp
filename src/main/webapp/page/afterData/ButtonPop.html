@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+	<head lang="en">
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>监测数据导入</title>
+		<link href="../../css/com/bootstrap.css" rel="stylesheet">
+		<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+		<link href="../../css/com/ie.css" rel="stylesheet">
+		<link href="../../css/style.css" rel="stylesheet">
+		<link href="../../css/jquery.autocomplete.css" rel="stylesheet">
+
+		<!-- 头部和底部css -->
+		<link href="../../css/headerorfooter.css" rel="stylesheet">
+		<script src="../../js/com/jquery-1.9.1.min.js"></script>
+		<script src="../../js/com/jquery.autocomplete.js"></script>
+		<script src="../../js/com/bootstrap.min.js"></script>
+		<script src="../../js/com/jquery.cookie.js"></script>
+		<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+		<script src="../../js/udbac.js"></script>
+		<script src="../../js/export.js"></script>
+		<script src="../../js/crudPlan.js"></script>
+		<script src="../../js/provinceSheet.js"></script>
+		<script src="../../js/cookie.js"></script>
+
+		<!-- 日期选择控件 -->
+		<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+		<!-- layer图层加载样式 -->
+		<script src="../../js/layer/layer.js"></script>
+		<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+		<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+		<script>
+			jQuery(document).ready(function() {
+				$(".headers").loadTemplate("../../common/header.html", {});
+			});
+		</script>
+
+		<script src="../../js/afterdata.js"></script>
+	</head>
+
+	<body>
+		<!-- 头部 -->
+		<div class="headers"></div>
+
+		<div class="contain">
+			<div class="zxy_contain1">
+				<!-- 菜单导航 -->
+				<div id="template-nav"></div>
+				<div class="zxy_daochu" style="text-align: center;">
+					<button class="pop-button">导入监测数据(最新)</button>&emsp;&emsp;
+					<button class="pop-button">导入监测数据(新)</button>&emsp;&emsp;
+					<button class="pop-button">导入监测数据</button>
+				</div>
+				
+				<div class="zxy_daochu frame" style="text-align: center;">
+					<span>请点击上方的按钮导入需求的监测数据</span>
+					<iframe class="body-iframe" name="iframeRight" width="100%" height="100%" src="" frameborder="0" seamless></iframe>
+				</div>
+				
+				
+			<div class="zxy_daochu" style="text-align: center;">
+				<h4>导出后端数据：</h4><br>
+				<div id="hd_mes" style="color:red;"></div>
+				<span>选择日期：</span>
+				<input id="startDate" placeholder="请选择开始时间" class="text-input text-input-1 day-time" type="text" name="" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">&nbsp;&nbsp;&nbsp;
+				<input id="endDate1" placeholder="请选择结束时间" class="text-input text-input-1 day-time" type="text" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})"><br><br>
+				<textarea rows="3" cols="5" name="mic" style="min-width:350px; max-width:350px; min-height: 200px; max-height: 200px; background-color: rgba(0,93,93,0.8); border: 1px solid rgba(127,255,255,0.75); color: #efefef; box-shadow: 0px 0px 10px rgba(0,255,255,0.75); -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75); -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);" placeholder="请输入输入短代码,一行一个"></textarea><br><br>
+				
+				<span class="zxy_sp_one" style="padding-left: 80px;">
+					<input type="button" value="导出" id="sub" class="long_button_style" style="width: 6em;" onclick="send()">
+				</span>
+			</div>
+				
+				
+			</div>
+			
+			
+		</div>
+	</body>
+	<script>
+		/* 给导入监测数据的三个按钮绑定点击事件 */
+		$(function(){
+			$(".zxy_contain1").on("click",".zxy_daochu>button",function(){
+				
+				$(".frame").css("height","70%");
+				$(".frame").children("span").css("visibility","hidden");
+				
+				if($(this).index() == 0){
+					
+					$(".body-iframe").attr("src","file_upload_v4.jsp");
+				}else if($(this).index() == 1){
+					
+					$(".body-iframe").attr("src","file_upload_v2.jsp");
+				}else if($(this).index() == 2){
+					
+					$(".body-iframe").attr("src","file_upload_v3.jsp");
+				}
+			});
+		});
+	</script>
+</html>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+                        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd  
+                        http://www.springframework.org/schema/context  
+                        http://www.springframework.org/schema/context/spring-context-3.1.xsd  
+                        http://www.springframework.org/schema/mvc  
+                        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+                      	http://www.springframework.org/schema/tx  
+                      	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd  
+                      	http://www.springframework.org/schema/aop 
+                      	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd  
+                      ">
+	<!-- 自动扫描 -->
+	<context:component-scan base-package="com.udbac" />
+	<!-- 引入配置文件 -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:jdbc.properties" />
+	</bean>
+
+
+	<!-- ============第一个数据库的连接================= -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${driver}" />
+		<property name="url" value="${url}" />
+		<property name="username" value="${username}" />
+		<property name="password" value="${password}" />
+		<!-- 初始化连接大小 -->
+		<property name="initialSize" value="${initialSize}"></property>
+		<!-- 连接池最大数量 -->
+		<property name="maxActive" value="${maxActive}"></property>
+		<!-- 连接池最大空闲 -->
+		<property name="maxIdle" value="${maxIdle}"></property>
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="${minIdle}"></property>
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="${maxWait}"></property>
+	</bean>
+
+	<!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 自动扫描mapping.xml文件 -->
+		<property name="mapperLocations" value="classpath:com/udbac/mapping/*.xml"></property>
+	</bean>
+
+	<!-- DAO接口所在包名，Spring会自动查找其下的类 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.udbac.dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+	</bean>
+	
+	<!-- 配置文件上传路径 -->
+	<bean id="filePathManager" class="com.udbac.util.FilePathManager">
+	    
+	   
+	    
+		
+		    <property name="activityOnlineFile" value="d:/data/online/" />
+		    <property name="scheduleFilePath" value="d:/data/schedule/" /> 
+		     <property name="genSchedule" value="D:/apache-tomcat-7.0.47/webapps/amp/WEB-INF/classes/genSchedule.properties" /> 
+		     <property name="updateSchedulePath" value="d:/data/schedule/updateSchedule/" />
+		     <property name="jtScheduleInfoPath" value="D:/apache-tomcat-7.0.47/webapps/amp/WEB-INF/classes/JTSchedule.properties"/> 
+		     <property name="keyScheduleInfoPath" value="D:/apache-tomcat-7.0.47/webapps/amp/WEB-INF/classes/KeySchedule.properties"/> 
+		     <property name="mediaFilePath" value="D:/apache-tomcat-7.0.47/webapps/amp/WEB-INF/classes/media.properties"/>
+		     <property name="micAndUrlPath" value="d:/data/micAndUrl.csv"/>
+	   
+	     <!--上传图片类型-->
+	    <property name="onlineStateFileType" >
+	        <list>
+       	 		<value>.jpg</value>
+       			<value>.png</value>
+       			<value>.gif</value>
+       			<value>.jpeg</value>
+      		</list>
+	    </property>
+	     <!-- 上线点击核查图片保存路径 -->
+	    
+	    <!-- <property name="checkClickFilePath" value=" /data/online/upload/" /> 
+	    <property name="tmpExcel" value=" /data/export/template/"/> --> 
+	    
+	   	<property name="checkClickFilePath" value="D:/activity/online/upload/" />
+	    <property name="tmpExcel" value="D:/activity/export/template/"/>
+	    
+	    
+	</bean>
+	
+	<bean id="urlUpdateThread" class="com.udbac.thread.UrlUpdateThread"/>
+	<bean id="urlCheckThread" class="com.udbac.thread.UrlCheckThread"/>
+	
+	
+	<!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+		<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED"  rollback-for="java.lang.Exception" />
+		<!-- 2016-04-22 LQ 用户管理 start-->
+			<tx:method name="create*" propagation="REQUIRED"  rollback-for="java.lang.Exception" />
+			<tx:method name="update*" propagation="REQUIRED"  rollback-for="java.lang.Exception" />
+			<tx:method name="delete*" propagation="REQUIRED"  rollback-for="java.lang.Exception" />
+		<!--2016-04-22 LQ 用户管理 end-->
+		<!-- LFQ -->
+			<tx:method name="saveSchedule" propagation="REQUIRED"  rollback-for="java.lang.Exception" />
+			<tx:method name="addScheduleDate" propagation="REQUIRED"  rollback-for="java.lang.Exception" />
+			<tx:method name="saveUrlInfo" propagation="REQUIRED"  rollback-for="java.lang.Exception" />
+			<tx:method name="checkUrl" propagation="REQUIRED"  rollback-for="java.lang.Exception" />
+		<!-- /LFQ -->
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut id="transactionPointcut" expression="execution(* com.udbac.service.*.*(..))" />
+		<aop:advisor pointcut-ref="transactionPointcut"
+			advice-ref="transactionAdvice" />
+	</aop:config>
+	<!-- 
+	<bean id="druid-stat-interceptor"
+		class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+	</bean>
+	<bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut"
+		scope="prototype">
+		<property name="patterns">
+			<list>
+				<value>com.udbac.service.impl</value>
+			</list>
+
+		</property>
+	</bean>
+	<aop:config>
+		<aop:advisor advice-ref="druid-stat-interceptor"
+			pointcut-ref="druid-stat-pointcut" />
+	</aop:config> -->
+	
+	<import resource="spring-service.xml"/>
+	
+     <!-- ============第一个数据库的连接END================= -->
+
+</beans>

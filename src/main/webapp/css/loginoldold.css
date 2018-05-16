@@ -1,0 +1,64 @@
+body {
+	width: 100%;
+	height: 100%;
+	min-height: 650px;
+	FILTER: progid:DXImageTransform.Microsoft.Gradient(gradientType=0,
+		startColorStr=#b8c4cb, endColorStr=#f6f6f8); /*IE 6 7 8*/
+	background: -ms-linear-gradient(top, #b8c4cb, #f6f6f8); /* IE 10 */
+	background: -moz-linear-gradient(top, #B8C4CB, #F6F6F8); /*»ðºü*/
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#b8c4cb),
+		to(#f6f6f8)); /*¹È¸è*/
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#b8c4cb),
+		to(#f6f6f8)); /* Safari 4-5, Chrome 1-9*/
+	background: -webkit-linear-gradient(top, #b8c4cb, #f6f6f8);
+	/*Safari5.1 Chrome 10+*/
+	background: -o-linear-gradient(top, #b8c4cb, #f6f6f8); /*Opera 11.10+*/
+}
+
+.feather {
+	background: -webkit-gradient(radial, 50% 50%, 50, 50% 50%, 70, from(rgba(255, 255,
+		255, 0)), to(rgba(255, 255, 255, 1)));
+	background: -moz-radial-gradient(50% 50%, circle, rgba(255, 255, 255, 0)
+		50px, rgba(255, 255, 255, 1) 70px);
+}
+#divall{
+	width:100%;
+	height:100%;
+}
+#divleft{
+	float:left;
+	width:70%;
+	height:100%;
+}
+#divleft img{
+	margin-top:80px;
+	box-shadow: 0 0 20px 25px #cad3d8 inset;"
+}
+#divright{
+	margin-top: 100px; 
+	margin-right: 30px; 
+	height:400px;
+	float: right; 
+	width: 350px;
+}
+.button_style{
+	margin-top:5px;
+	width:100px;
+	height:35px;
+	margin-left:-30px;
+}
+#info{
+	font-size: 15px;
+	 color: red; 
+	 margin-left: 110px;
+}
+#d{
+	padding-top:50px;
+	height:200px;
+	margin: auto;
+	float:left;
+}
+#lo{
+	font-size: 1.8em;
+	margin-left:60px;
+}

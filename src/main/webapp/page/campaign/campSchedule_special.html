@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>活动投放排期</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<!-- 模板 -->
+<script type="text/javascript" src="../../js/com/jquery.tmpl.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+#thead_1 th {
+	border: 1px solid white;
+}
+</style>
+<script type="text/html" id="template">
+ 			<tr>
+				<td >${plan_name}</td>
+            	<td >${unit_name}</td>
+            	<td >${key_name}</td>
+            	<td >${url_pc}</td>
+            	<td >${mic}</td>
+				<td >${click_url}</td>
+            </tr>
+	</script>
+	
+<script>
+var a = new Array();
+var path;
+function init() {
+		$("#mb").css("display", "block");
+		// 加载等待效果
+		layer.load(2);
+	}
+	function to_data() {
+		window.location.href = "./campMonitingData.html";
+	}
+	function downSch() {
+		window.location.href = "./campSchedule.html";
+	}
+	function to_path() {
+		if(path==null || path ==''){
+			$(".msg").attr("style","").text("此活动没有排期文件!");
+			return;
+		}else{
+		location.href="/amp/campaign/downloadSchePath.do?path="+path;
+		}
+	}
+	function getData() {
+		//查出数据了
+		var loca = location.toString();
+		actCode = loca.substring(loca.indexOf("actCode=")+8,loca.length);
+		$.post('/amp/campaign/campSchedule.do', {"actCode" : actCode}, function(data) {
+			//未找到数据
+        	$("#div_table").find("div").remove();
+			if(data == null || data == ''){
+	        		$("#div_table").append("<div style='text-align:center; height:20px;'><b>未找到相关数据</b></div>");
+			}	
+			a = new Array();
+			for(var i=0;i<data.length;i++){
+				a[i] = {media_type:data[i].media.mediaType,
+        				media_name:data[i].media.mediaName,
+        				resource_type:data[i].extenInfo.resourceType,
+        				point_location:data[i].extenInfo.pointLocation,
+        				put_function:data[i].extenInfo.putFunction,
+        				url_pc:data[i].urlPc,
+        				material_require:data[i].extenInfo.materialRequire,
+        				unit:data[i].unit,
+        				resource_position:data[i].resource_position,
+        				put_frequency:data[i].put_frequency,
+        				click_avg:data[i].clickAvg,
+        		        exposure_avg:data[i].exposureAvg,
+        		        support_exposure:data[i].extenInfo.supportExposure,
+        		        support_click:data[i].extenInfo.support_click,
+        		        exposure_meterial:data[i].extenInfo.exposureMeterial,
+        		        click_meterial:data[i].extenInfo.clickMeterial,
+        		        mic:data[i].mic,
+//        		        put_value:data[i].calendarInfo.putValue,
+//        		        put_date:data[i].calendarInfo.putDate,
+        		        click_url:data[i].extenInfo.clickUrl,
+        		        exposure_url:data[i].extenInfo.exposureUrl,
+        		        plan_name:data[i].extenInfo.planName,
+        		        unit_name:data[i].extenInfo.unitName,
+        		        key_name:data[i].extenInfo.keyName,
+        		        reality_start_date:data[i].activityInfo.realityStartDate,
+        		        activity_end_date:data[i].activityInfo.activityEndDate,
+        		        schedule_path:data[i].activityInfo.schedulePath
+        		       };
+	        		//是否支持添加第三方曝光监测和点击监测判断 0:否,1:是
+	        		 if(a[i].support_exposure == "1" && a[i].support_click == "1"){
+	        			 a[i].support_exposure = "是";
+	        			 a[i].support_click = "是";
+					}else{
+						a[i].support_exposure = "否";
+						a[i].support_click = "否";
+					}
+	        		
+	        		//获取排期路径
+		        	path = a[0].schedule_path; 
+				}//for
+			var resultJson = eval(a);
+			$("#tbody_id").html($("#template").tmpl(eval(a)));
+			$("#mb").css("display", "none"); 
+			
+			//关闭等待效果
+			layer.closeAll();
+			timeOutLayer();
+		});
+	}
+	jQuery(document).ready(function() {
+
+		$(".headers").loadTemplate("../../common/header.html", {});
+		init();
+		getData(); //页面加载完查询数据
+		$(".query_id").on("click", function() {
+			to_data();
+		});
+		$(".url_id").on("click", function() {
+			urlUpdate();
+		});
+		$(".audi_id").on("click", function() {
+
+			audit();
+		});
+		/* $("#cancal_id").on("click", function() {
+			window.location.href = "./campaign.html";
+		}); */
+		//add by LiuJie
+		$('[data-toggle="popover"]').popover({
+			'animation' : true,
+			'trigger' : 'hover',
+		});
+		docScroll();
+	});
+</script>
+</head>
+<body>
+
+	<!-- 头部 -->
+	<div class="headers"></div>
+
+
+	<div class="contain">
+		<!-- 菜单导航 -->
+		<div id="template-nav"
+			style="padding: 0; margin: 0; padding-left: 0px;"></div>
+		<div class="row" style="padding-top: 30px; margin-left: 5px;">
+
+			<div style="width: 100%">
+				<div class="m_s_title" style="float: left; padding-left: 10px;">监测活动展示</div>
+				<br> <br>
+				<div style="float: left; padding-right: 50px;">
+					<input name="" type="button" id="query_id" value="下载排期"
+						class="button_style" onclick="to_path()" />
+				</div>
+			</div>
+			<br>
+			<hr>
+			<div class="col-sm-8" align="right">
+				<div class="row"></div>
+			</div>
+
+		</div>
+
+		<div class="table-responsive" id="div_table">
+			<table class="table table-striped table-hover" id="table_id">
+				<thead id='thead_1'>
+					<tr>
+						<td id="row_td_id" rowspan="2"
+							style="width: 12em; vertical-align: middle;">推广计划名称</td>
+						<td id="row_td_id" rowspan="2"
+							style="width: 8em; vertical-align: middle;">推广单元名称</td>
+						<td id="row_td_id" rowspan="2"
+						style="width: 7em; vertical-align: middle;">关键词名称</td>
+						<td id="row_td_id" rowspan="2"
+							style="width: 15em; vertical-align: middle;">URL-PC</td>
+						<td id="row_td_id" rowspan="2"
+							style="width: 13em; vertical-align: middle;">短代码</td>
+						<td id="row_td_id" rowspan="2"
+							style="width: 25em; vertical-align: middle;">点击代码</td>
+					</tr>
+				</thead>
+				<tbody id="tbody_id">
+
+				</tbody>
+			</table>
+		</div>
+		<div style="width: 240px; margin: auto;">
+				<input name="" type="button" id="cancal_id" value="返回"
+				class="button_style" onclick="$('#back')[0].click();" /> <a
+				id="back" style="display: none;"
+				href="../campaign/campaign.html?back"></a>
+		</div>
+	</div>
+
+	<div style="z-index: 19891015; background-color: #000; display: none; opacity: 0.3; filter: alpha(opacity = 30);" class="xubox_shade" id="mb" times="1"></div>
+</body>
+</html>

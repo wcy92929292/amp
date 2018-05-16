@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!--此代码段时为了兼容浏览器以IE最高版本的文档模式渲染-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>注册用户</title>
+<link href="../../css/com/bootstrap.css" rel="stylesheet">
+<link href="../../css/com/bootstrap-ie6.css" rel="stylesheet">
+<link href="../../css/com/ie.css" rel="stylesheet">
+<link href="../../css/style.css" rel="stylesheet">
+<link href="../../css/userold.css" rel="stylesheet">
+<!-- 头部和底部css -->
+<link href="../../css/headerorfooter.css" rel="stylesheet">
+<script src="../../js/com/jquery-1.9.1.js"></script>
+<script src="../../js/com/bootstrap.min.js"></script>
+<script src="../../js/com/jquery.cookie.js"></script>
+<script src="../../js/com/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../../js/udbac.js"></script>
+<script src="../../js/user/useradd.js"></script>
+<!-- echarts -->
+<script src="../../js/com/echarts-all.js"></script>
+<!-- 模板 -->
+<script type="text/javascript" src="../../js/com/jquery.tmpl.js"></script>
+<!-- 日期选择控件 -->
+<script type="text/javascript" src="../../js/my97DatePicker/WdatePicker.js"></script>
+<!-- layer图层加载样式 -->
+<script src="../../js/layer/layer.js"></script>
+<script src="../../js/layer/extend/layer.ext.js"></script>
+<link href="../../js/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+<link href="../../js/layer/skin/layer.ext.css" rel="stylesheet" type="text/css" />
+<Link Rel="ICON NAME" href="../../images/logoIcon.ico">
+</head>
+<body>
+	<!-- 头部 -->
+	<div class="headers"></div>
+	<!-- 菜单导航 -->
+	<div id="template-nav"
+		style="padding: 0; margin: 0; padding-left: 0px;"></div>
+	<div class="row" style="padding-top: 30px; margin-left: 5px;"></div>
+	<div class="contain">
+	<div class="modleBk">
+		<h2 class="modleTitle">注册用户</h2>
+	</div>
+	<div class="information marTop60px ">
+		<form action="" method="post" class='formcs' id='myform'>
+			<ul>
+				<li>
+					<label class="label"><span class="need">*</span> 用户名&nbsp;&nbsp;：&nbsp;</label>
+					<input type="text" id="username" name="username"placeholder="输入用户名">
+					<span style="color:#FF005C;font-size:0.7em" id="name_span"></span>
+				</li>
+				<li>
+					<label class="label"><span class="need">*</span> 登录密码：</label>
+					<input type="password" id="password"
+							name="password"placeholder="输入登录密码">
+					<span style="color:#FF005C;font-size:0.7em" id="pwd_span"></span>
+				</li>
+				<li>
+					<label class="label"><span class="need">*</span> 密码确认：</label>
+					<input type="password" id="confirmpwd" name="confirmpwd"
+							name="password"placeholder="再次输入密码">
+					<span style="color:#FF005C;font-size:0.7em" id="pswd_span"></span>
+				</li>
+				<li>
+					<label class="label"><span class="need">*</span> 姓&nbsp;&nbsp;&nbsp;名&nbsp;：&nbsp;</label>
+					<input type="text" id="uname" name="uname"placeholder="输入姓名">
+					<span style="color:#FF005C;font-size:0.7em" id="uname_span"></span>
+				</li>
+				<li>
+					<label class="label"><span class="need">*</span> 客&nbsp;&nbsp;&nbsp;户&nbsp;：&nbsp;</label>
+					<select id="province_id" name="province"
+							style="width:15.1em; padding-top: .2em; height: 28px; margin: 0;">
+								 <option value="" selected="selected">--请选择--</option>
+						</select>
+						<span style="color:#FF005C;font-size:0.7em" id="province_span"></span>
+				</li>
+				<li>
+					<label class="label"><span class="need">*</span> 角&nbsp;&nbsp;&nbsp;色&nbsp;：&nbsp;</label>
+					<select id="role_id" name="role"
+							style="width: 15.1em; padding-top: .2em; height: 28px; margin: 0;">
+								<option value="">--请选择--</option>
+						</select>
+						<span style="color:#FF005C;font-size:0.7em" id="role_span"></span>
+				</li>
+				<li>
+					<label class="label"><span class="need">*</span> 电&nbsp;&nbsp;&nbsp;话&nbsp;：&nbsp;</label>
+					<input type="tel" id="tel" name="tel" placeholder="输入电话" pattern="[0-9]{11}">
+					<span style="color:#FF005C;font-size:0.7em" id="tel_span"></span>
+				</li>
+				<li>
+					<label class="label"><span class="need">*</span> 邮&nbsp;&nbsp;&nbsp;箱&nbsp;：&nbsp;</label>
+					<input type="email" id="email" name="email"placeholder="输入邮件">
+					<span style="color:#FF005C;font-size:0.7em" id="email_span"></span>
+				</li>
+			</ul>
+			
+		</form>
+		
+		
+	</div>
+		<div id="button2" >
+			<input type="button" value="注册" class="button_style" id="submit" onclick='submitForm()'>
+			<input type="reset" value="取消" id="reset" class="button_style" onclick='resetForm()' style="margin-left: 60px;">
+		</div>
+	</div>
+</body>
+</html>

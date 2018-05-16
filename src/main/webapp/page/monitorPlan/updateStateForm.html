@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!-- 强制上线上传图片 -->
+<script src="../../js/cookie.js"></script>
+<script src="../../js/com/jquery-1.9.1.js"></script>
+
+<form id="usForm" action='/amp/monitorPlan/updateState.do' method='POST' enctype='multipart/form-data'>
+		<input type="file" id="stateFile" name="stateFile"/>
+		<input type="hidden" name="actCode" value=""/>
+		<input type="hidden" name="actState" value=""/>
+		<input type="hidden" name="updateState" value=""/>
+		<input type="text" name="cusCode" value=""/>
+</form>
+
+<script>
+	/**
+		更改活动状态
+		actCode:目标活动编号
+		actState:当前活动状态
+		cusCode:客户编号
+	*/
+	function online(actCode,actState,cusCode,updateState){
+		$("input[name='actCode']").val(actCode);
+		$("input[name='actState']").val(actState);
+		$("input[name='cusCode']").val(cusCode);
+		$("input[name='updateState']").val(updateState);
+		
+		//强制上线需要上传强制上线要求的截屏
+		if(2 == actState){
+			$("#stateFile")[0].click();
+			$("#stateFile").change(function(){
+				if(confirm("确认对"+actCode+"进行强制上线？")){
+					$("form")[0].submit();
+				}
+			});
+		}else {
+			$("form")[0].submit();		
+		}
+	}
+	
+</script>

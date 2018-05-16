@@ -1,0 +1,2278 @@
+/*
+name:zxy
+*/
+/**********************************************body等初始化开始****************************************************/
+body,
+div,
+dl,
+dt,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+fieldset,
+input,
+textarea,
+ul,
+ol,
+li,
+p,
+blockquote,
+tr,
+th,
+td {
+	padding: 0;
+	margin: 0;
+}
+
+table {
+	border-collapse: collapse;/*合并边框*/
+	border-spacing: 0;/*单元格的边框间的距离*/
+}
+
+fieldset,
+img {
+	border: 0;
+}
+
+address,
+caption,
+cite,
+code,
+dfn,
+th,
+var {
+	font-weight: normal;
+	font-style: normal;
+}
+
+ol,
+ul {
+	list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-weight: normal;
+}
+
+q:before,
+q:after {
+	content: '';
+}
+
+a {
+	text-decoration: none;
+}
+img {
+	max-width: 100%;
+	height: auto;
+}
+/******************************************************初始化end***************************************************/
+
+/*************************************************滚动条样式webkit or IE*******************************************/
+/*滚动条宽度*/
+::-webkit-scrollbar{
+	width:0.7em;
+	height:0.7em;
+}
+ /* 滑轨两头的按钮颜色 */
+::-webkit-scrollbar-button {
+        background-color: rgb(0,93,93);
+        width:1em;
+        height:1em;
+        border-radius:1em;
+}
+/* 滚动条的滑轨背景颜色 */
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0px 0px 20px rgba(127,255,255,1);
+    border-radius:10px;
+}
+/*内层滚动槽*/
+::-webkit-scrollbar-track-piece {
+    -webkit-box-shadow: inset 0px 0px 20px rgba(127,255,255,1);    
+}
+/* 滑块颜色 */
+::-webkit-scrollbar-thumb {
+       background-color: rgba(0,99,99,0.9);
+       border-radius:10px;
+}
+/* 滑块颜色备用 */
+::-webkit-scrollbar-thumb:window-inactive {
+    background-color: rgba(0,99,99,0.9);
+    border-radius:10px;
+} 
+ /* 横向滚动条和纵向滚动条相交处尖角的颜色 */
+::-webkit-scrollbar-corner {
+       background-color: rgba(0,99,99,0.9);
+}
+
+/* 清除浮动 */
+.clearfix{
+	zoom:1
+}
+
+.clearfix:after{
+	content:"020";
+	display:block;
+	height:0;
+	clear:both;
+	visibility:hidden
+}
+/* 清除浮动end */
+
+/*IE滚动条*/
+html,body{scrollbar-arrow-color: rgb(0, 93, 93);} /*三角箭头的颜色*/
+html,body{scrollbar-face-color: rgba(0, 99, 99, .9);} /*立体滚动条的颜色（包括箭头部分的背景色）*/
+html,body{scrollbar-3dlight-color: rgba(0, 99, 99 ,.9);} /*立体滚动条亮边的颜色*/
+html,body{scrollbar-highlight-color: rgba(0, 93, 93, .8);} /*滚动条的高亮颜色（左阴影？）*/
+html,body{scrollbar-shadow-color: rgba(0, 93, 93, .8); }/*立体滚动条阴影的颜色*/
+html,body{scrollbar-darkshadow-color: rgba(0, 99, 99, .9);} /*立体滚动条外阴影的颜色*/
+html,body{scrollbar-track-color: rgba(127,255,255,1);} /*立体滚动条背景颜色*/
+html,body{scrollbar-base-color: rgba(0,99,99,0.9);} /*滚动条的基色*/
+
+/******************************************************滚动条end***************************************************/
+
+
+/******************************************************公共样式开始***************************************************/
+body {
+	margin: 0;
+	padding: 0;
+	font-size: 15px;
+	background: url(../images/bg2.jpg) top center;
+	background-attachment:fixed;
+	-moz-background-size:100%;
+	-webkit-background-size:100%;
+	-o-background-size:100%;
+	background-size: cover;
+	background-size:100% 100%;
+}
+/*修改input文本框placeholder的默认字体颜色*/
+input::-webkit-input-placeholder { /* WebKit*/ 
+color: rgba(255, 255, 255, .6); 
+}
+input::-moz-placeholder { /*Firefox 19+ */ 
+color: rgba(255, 255, 255, .6); 
+} 
+input:-ms-input-placeholder { /*IE10+ */ 
+color: rgba(255, 255, 255, .6);
+}
+
+.contain,
+.containTwo{
+	width:100%;
+	min-width:1130px;
+	position:absolute;
+	overflow: auto;
+	left: 0px;
+	right: 0px;
+	top: 60px;
+	bottom:0;
+	padding-left:200px;
+}
+
+/*zxy_contain1主体公共的内容区域*/
+.zxy_contain1{
+	width:100%;
+	height:100%;
+	margin:0 auto;
+	overflow-y: auto;
+}
+
+/*数据表格公共样式css*/
+#div_table{
+	cursor: default;/*默认游标*/
+}
+
+#thead_1,.thead_zxy{
+	background-color: rgba(0,93,93,0.8);
+	color: #efefef;
+	/*text-shadow: 0px 0px 20px rgba(127,255,255,1);*/
+	font-weight: 300;
+}
+
+th, td {
+	border: 1px solid rgba(127,255,255,0.55);
+}
+
+
+#table_id tr:hover{
+	background-color: rgba(0,99,99,0.9) !important;
+}
+
+#tbody_id tr:nth-child(odd) td,
+#tbody_id2 tr:nth-child(odd) td {
+	background-color: rgba(0,127,127,0.1);
+}
+
+#tbody_id tr,
+#tbody_id2 tr{
+	background:rgba(0, 0, 0, 0.6);
+}
+
+/*监测方案or营销活动or角色查看->row头部样式*/
+.row .m_s_title{
+	float: left;
+    padding: 15px 0 0 10px;
+    font-size: 1.1em;
+	color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+input::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+/*监测方案&上线核查&营销活动&角色查看  四个页面的内容区域头部固定样式集合*/
+
+/*监测方案 & 角色查看 */
+#zxy_yilan_content,
+#zxy_pos_user{
+	width:100%;
+	height:79%;
+	overflow:auto;
+	position:relative;
+}
+
+#zxy_yilan_content table thead{
+	 position:absolute;
+	 top:0;
+	 width:2078px;
+}
+
+#zxy_pos_user #zxy_ul_jiaose{
+	position:absolute;
+}
+
+
+
+/*上线核查*/
+#myTabContent{
+	width:100%;
+	height:90%;
+	overflow:auto;
+	color:#efefef;
+	position:relative;
+}
+
+#myTabContent #zxy_ul_hecha{
+	position:absolute;
+	z-index:1;
+}
+
+#zxy_pos_hecha{
+	min-width:1600px;
+}
+
+#myTabContent,
+#zxy_pos_hecha{
+	font-size: 12px;
+}
+#zxy_pos_hecha #myTab{
+	width:27.2%;
+	float:left;
+}
+
+#zxy_pos_hecha .dropdown{
+	 float:left;
+	 display:none;
+}
+
+/*营销活动*/
+/* 营销活动页面，监测数据按钮，进入之后的表结构css */
+#zxy_yxiao_content,
+#zxy_yxiao_content2{
+	width:100%;
+	height:75%;
+	overflow:auto;
+	position:relative;
+}
+
+/*表头固定css样式 */
+.zxy_position_ul,
+#zxy_ul_yingxiao2{
+	position:absolute;
+}
+
+/* 活动名称按钮，进入之后表头固定css样式 */
+.zxy_contain1 .table-responsive table #thead_1 td{
+	vertical-align: middle;
+}
+
+/******************************************************公共样式结束************************************************/
+
+
+/******************************************************概览页面设置开始***********************************************/
+/*index页面上部的样式*/
+.div_left_content1 {
+	width:100%;
+	height: 142px;
+	min-width: 808px;
+	background-color: rgba(0,93,93,0.8);
+	font-size:20px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border: 1px solid rgba(127,255,255,0.75);
+	border-radius: 10px;
+	text-align:center;
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+/*总投放单位*/
+.div_left_content span {
+	color: #efefef;
+	line-height:142px;
+	margin-right:20px;
+}
+
+/*未查询到相关数据*/
+#error {
+	width:100%;
+	background:rgba(0,93,93,0.8);
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border:1px solid rgba(127,255,255,0.75);
+	border-radius: 10px;
+	margin: 80px auto;
+	text-align: center;
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+    -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    /* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+#error span{
+	font-size: 2.5em;
+	color:#fff;
+	line-height:3em;
+}
+
+/*概览页数据上部样式*/
+#popups{
+	width:100%;
+	margin:20px auto;
+	text-align:center;
+}
+		
+/*概览页点击数据圆圈进入页面样式*/
+#zxy_ul_gailan{
+	margin:0 auto 0;
+	width:100%;
+	height:50px;
+	background-color: rgba(0,93,93,0.8);
+	color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+#zxy_ul_gailan li{
+	line-height:48px;
+	float:left;
+	text-align:center;
+}
+
+#zxy_ul_gailan li:nth-child(1){
+	width:20%;
+}
+
+#zxy_ul_gailan li:nth-child(2){
+	width:60%;
+}
+
+#zxy_ul_gailan li:nth-child(3),
+#zxy_ul_gailan li:nth-child(4){
+	width:10%;
+}
+
+.div_all{
+	width: 100%;
+}
+
+.div_all .zxy_index {
+	margin: 0 auto;
+	width:100%;
+}
+
+.div_all .zxy_index .zxy_tab1 tr td{
+	color:#efefef;
+	text-align:center;
+	padding:15px;
+	overflow:hidden;
+}
+
+.div_all .zxy_index .zxy_tab1 tr td:nth-child(1){
+	width:20%;
+}
+
+.div_all .zxy_index .zxy_tab1 tr td:nth-child(2){
+	width:60%;
+}
+.div_all .zxy_index .zxy_tab1 tr td:nth-child(3),
+.div_all .zxy_index .zxy_tab1 tr td:nth-child(4){
+	width:10%;
+}
+/*未查询到数据*/
+#table_id .zxy_tab1 #sumtd{
+	width:578px;
+	color:#efefef;
+	text-align:center;
+}
+ /*返回按钮样式*/
+.div_all #cancal_id{
+	background-color: rgba(0,93,93,0.8);
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+.div_all #cancal_id:hover{
+	background-color: rgba(0,99,99,0.9);
+}
+/******************************************************概览页面设置结束***********************************************/
+
+
+/************************************************监测方案页面开始***************************************************/
+
+/*监测方案页面数据表头第一行样式css*/
+.zxy_thead_one tr th {
+	overflow: hidden;
+	height: 42px;
+	width: 155.5px;
+	display: block;
+	float: left;
+	line-height: 42px;
+	padding: 0;
+	text-align: center;
+}
+
+/*监测方案页面第一个row-title表头样式*/
+.zxy_row_one{
+	margin:0 0 10px 0;
+	min-width:1095px;
+}
+
+/*监测方案页面第一个row-title表头下面字体的样式*/
+.zxy_row_one .zxy_sp_jiance{
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+	color:#efefef;
+}
+/*监测方案页面第一个row-title表头下面input的样式*/
+.zxy_row_one .zxy_sp_jiance #sdate_id,
+.zxy_row_one .zxy_sp_jiance #edate_id,
+.zxy_row_one .zxy_sp_jiance #portUser,
+.zxy_row_one .zxy_sp_jiance #pageName{
+	background: rgba(0,93,93,0.8);
+}
+
+/*监测页面的表格样式css*/
+#div_table .zxy_table_one{
+	width:2078px;
+	min-width:2078px;
+	margin-top: 40px;
+}
+
+.zxy_tab_con2{
+    margin: 10px auto;
+}
+
+/*监测方案页面->三个日期搜索框的样式+
+页面活动单位和活动编号框样式 +
+营销活动一览页面->两个日期搜索框的样式+
+角色查看姓名角色文本框的样式*/
+#sdate_id,
+#edate_id,
+#portUser,
+#pageName,
+#activity_code,
+#unit,
+#mediaName_id,
+#marketingCode_id,
+#uname,
+#role_id{
+	 width: 10em;
+	 height: 30px;
+	 padding-left: 10px;
+	 border-radius: 5px;
+	 outline:none;
+	 color: #fff;
+	 background: rgba(255, 255, 255, .1);
+	 background-image: none;
+}
+
+
+/*监测方案下表格按钮添加活动方案页面form表单样式*/
+#formId , .addScheme {
+	width:80%;
+	margin:0 auto 15px;
+	padding:15px 0;
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+	color:#efefef;
+}
+
+/*监测方案下表格按钮添加活动方案页面form表单的标题样式*/
+#formId .zxy_title_one{
+	text-align:center;
+}
+
+/*清除添加方案的ul  li的边框*/
+#formId .zxy_ul_two,
+#formId .zxy_ul_two li{
+	border: none;
+}
+
+#formId .zxy_ul_two li{
+	line-height:3.5em;
+}
+
+/*增加活动方案样式or添加子方案样式*/
+#formId .zxy_ul_two{
+	margin:1em auto;
+	min-width: 700px;
+}
+
+/*监测方案下  按钮添加活动方案 or 活动名称进入后新增备注  页面form表单的  *  字提示样式*/
+#formId .zxy_ul_two li h6,
+#two form ul li h6{
+	color:red;
+}
+
+/*监测方案下表格按钮添加活动方案页面form表单的 label样式*/
+#formId .zxy_ul_two li .label{
+	padding-left:90px;
+}
+/*监测方案下表格按钮添加活动方案页面form表单的span-> * 的样式*/
+#formId .zxy_ul_two li .need{
+	width:0;
+	color:red;
+}
+
+/*添加方案的备注样式*/
+#formId .zxy_ul_two li area{
+	width: 440px;
+	margin-left:1em;
+	color:#efefef;
+}
+
+/*添加活动方案的form内部input和select样式*/
+#formId .zxy_ul_two li #customer_id,
+#formId .zxy_ul_two li #activity_name,
+#formId .zxy_ul_two li #monitor_peopleID,
+#formId .zxy_ul_two li #font_support_peopleID,
+#formId .zxy_ul_two li #after_support_peopleID,
+#formId .zxy_ul_two li #s_code,
+#formId .zxy_ul_two li #parent_activity_code,
+#formId .zxy_ul_two li #f_activity_name,
+#formId .zxy_ul_two li #province_id_0,
+#formId .zxy_ul_two li #province_id_1,
+#formId .zxy_ul_two li #province_id_2{
+	width: 10em;
+    height: 26px;
+    padding:0 0 0 10px;
+    border-radius: 5px;
+    outline: none;
+    color: #efefef;
+}
+
+/*查询和导出or用户头像的按钮or注册提交返回按钮css*/
+.button_style,
+#submit,
+#back,
+#reset{
+	background:rgba(80, 243, 63, .6);
+	color: #efefef;
+	border-radius: 7px;
+	border:0;
+	width: 5em;
+	height: 25px;
+	font-size: 15px;
+}
+
+/*增加活动方案按钮css*/
+.long_button_style {
+	background: rgba(221, 34, 14, .6) !important;
+	color: #efefef;
+	border-radius: 7px; /*设置圆角*/
+	border: 0;
+	width: 7.5em;
+	height: 25px;
+}
+
+/*监测方案一览查询css*/
+.button_style_moniSel,
+#submit,
+#back,
+#reset{
+	background:rgba(80, 243, 63, .6);
+	color: #efefef;
+	border-radius: 7px; /*设置圆角*/
+	border:0;
+	width: 45px;
+	height: 25px;
+}
+
+/*增加活动方案按钮css*/
+.button_style_moniAdd {
+	background: rgba(221, 34, 14, .6) !important;
+	color: #efefef;
+	border-radius: 7px; /*设置圆角*/
+	border: 0;
+	width: 45px;
+	height: 25px;
+}
+
+/*活动一览状态列表ul样式*/
+#myTab{
+	border-bottom:none;
+}
+
+#myTab li a{
+	 color: #efefef;
+	 cursor: default;
+	 background-color: rgba(0,93,93,0.8);
+	 /* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+/*监测方案新增活动备注---点击上传图片*/
+#box {
+	width: 515px;
+	min-height: 130px;
+	float:left;
+}
+
+/*监测方案页面修改按钮下的tbody的样式*/
+#tbody_id2 tr td{
+	vertical-align: middle;
+}
+#tbody_id2 tr td input{
+	width: 100%;
+    height: 26px;
+    padding-left: 10px;
+    border-radius: 5px;
+    outline: none;
+    color: #fff;
+    background-color: rgba(0,93,93,0.8);
+    border: 1px solid rgba(127,255,255,0.75);
+    box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+    -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+#tbody_id2 tr td select{
+    width: 100%;
+    padding-left: 0;
+    border-radius: 5px;
+    margin: 2px;
+    border: 1px solid rgba(127,255,255,0.55);
+    background-color: rgba(0,93,93,0.8);
+    color: #efefef;
+    /* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+
+/*监测方案页面的的增加活动方案or添加子方案or修改按钮进入后的ul表头样式*/
+#zxy_ul_jiance_one{
+	width: 1320px;
+    height: 50px;
+    margin:0 auto 0;
+    background-color: rgba(0,93,93,0.8);
+    color: #efefef;
+   /*  text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+    box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+    -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+#zxy_ul_jiance_one li{
+	width: 165px;
+    line-height: 48px;
+    float: left;
+    text-align: center;
+}
+
+/*监测方案页面的的增加活动方案or添加子方案or修改按钮进入后的内容样式*/
+.zxy_tab_two{
+	width: 1320px;
+	max-width:none;
+	margin:0 auto 0;
+}
+
+.zxy_tab_two .zxy_tab3 tr td{
+	padding:0 10px;
+	width:165px;
+	overflow: hidden;
+    height: 42px;
+    line-height: 42px;
+    color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+.zxy_tab_two #tbody_id tr td input{
+    height: 26px;
+    border: 1px solid rgba(127,255,255,0.75);
+    border-radius: 5px;
+    outline: none;
+    color: #fff;
+    background: rgba(255, 255, 255, .1);
+    background-image: none;
+}
+
+.zxy_tab_two #tbody_id tr td select{
+	width: 10em;
+    padding-left: 0;
+    border-radius: 5px;
+    margin: 2px;
+    border: 1px solid rgba(127,255,255,0.55);
+    background-color: rgba(0,93,93,0.8);
+    color: #efefef;
+    /* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+/*监测方案页面的增加活动方案里面的删除按钮or营销活动里面的变更url按钮内的删除按钮*/
+.zxy_tab_two #tbody_id tr td input[type="button"],
+#tbody_id2 tr td input[type="button"],
+#table_id2 tbody tr td button[type="button"]{
+    background: rgba(221, 34, 14, .6);
+}
+
+.zxy_table_one .zxy_tab2 tr td{
+	overflow: hidden;
+	height: 42px;
+	width: 155.5px;
+	display: block;
+	float: left;
+	line-height: 42px;
+	padding: 0;
+	color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+/*监测方案auditMonitorPlan页面未查旬到数据*/
+#table_id .zxy_tab3 #sumtd span{
+	text-align: center;
+	color: #efefef;
+}
+
+/*监测方案页面点击审核按钮进入的样式*/
+#div_table .zxy_hd #thead_1 tr th{
+	text-align:center;
+}
+
+#div_table .zxy_hd .zxy_tab3 tr td{
+	color:#efefef;
+}
+
+
+/*新增页面模块下的css样式*/
+.addRmove-container{
+	color: #efefef;
+}
+
+.container-children{
+	width:80%;
+	margin:20px auto 0;
+	background-color: rgba(0,93,93,0.8);
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+    -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+.top{
+	background-color: #047fb7;
+	padding: 5px 30px 5px 0;
+}
+
+.fl input{
+	color: #efefef;
+	border-radius: 5px;
+	height:26px;
+    background-color: rgba(0,93,93,0.8);
+    border: 1px solid rgba(127,255,255,0.75);
+}
+
+.bottom{
+	padding: 15px 0
+}
+
+.bottom table{
+	width: 100%;
+	margin:10px 0;
+	background: rgba(4, 127, 183, .6);
+}
+
+.bottom table thead{
+	line-height: 30px	
+}
+
+.bottom table tbody tr{
+	line-height: 40px	
+}
+
+.bottom table th,
+.bottom table td{
+	text-align:center;
+}
+
+.bottom table input,
+.bottom table select{
+	width:90%;
+    height: 26px;
+    margin:0;
+    border-radius: 5px;
+    color: #efefef;
+    background-color: rgba(0,93,93,0.8);
+    border: 1px solid rgba(127,255,255,0.75);
+    box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+    -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+.tab1 tr th:nth-child(1),
+.tab1 tr th:nth-child(2),
+.tab1 tr th:nth-child(3),
+.tab1 tr th:nth-child(4){
+	width:8%;
+}
+
+.tab2 tr th:nth-child(1){
+	width: 32%;
+}
+
+.tab2 tr th:nth-child(2){
+	width: 34%;
+}
+
+.tab2 tr th:nth-child(3){
+	width: 26%;
+}
+
+.mg{
+	margin-right:10px;
+}
+
+.bg{
+	background: rgba(221, 34, 14, .6)
+}
+
+
+
+/************************************************监测方案页面结束***************************************************/
+
+
+
+/************************************************上线核查页面开始***************************************************/
+/*上线核查table页面样式*/
+/*数据筛选，状态查看按钮位置css*/
+#zxy_pos_hecha .dropdown{
+	margin-top:3px;
+	width:62%;
+}
+
+#zxy_pos_hecha .dropdown button{
+	width: 130px;
+    font-size: 12px;
+	background-color: rgba(0,93,93,0.8);
+	color: #efefef;
+	margin-right: 20px;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+#zxy_pos_hecha .dropdown button:hover{
+	background-color: rgba(0,99,99,0.9);
+}
+
+#zxy_pos_hecha .dropdown ul{
+	background-color: rgba(0,93,93,0.9);
+	width:130px;
+	min-width:130px;
+	font-size: 12px;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+#zxy_pos_hecha .dropdown ul li a{
+	color: #efefef;
+}
+
+#zxy_pos_hecha .dropdown .zxy_sp_hecha{
+	float: right;
+    margin-top: 1px;
+}
+
+/*没有数据*/
+#tb, #tb2 {
+	color: #efefef;
+	padding-top: 15px;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+/*第二个tab页面 日期样式*/
+#zxy_pos_hecha .dropdown .ipt_zxy,
+#zxy_pos_hecha .dropdown #put_date{
+	width: 115px;
+    height: 29px;
+    padding-left: 10px;
+    margin-left: 20px;
+    border-radius: 5px;
+    outline: none;
+    color: #efefef;
+    background-color: rgba(0,93,93,0.8);
+    background-image: none;
+    border: 1px solid rgba(127,255,255,0.75);
+}
+
+/*两个tab页面的表头的投放单位样式*/
+#tb span,
+#tb2 span{
+	background-color: rgba(0,93,93,0.8);
+	display: inline;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+    border: 1px solid rgba(127,255,255,0.75);
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+/*第一个Table页下面的ul台头一行的样式*/
+#zxy_ul_hecha{
+	width:2010px;
+	height:39px;
+	margin:0 auto;
+    background-color: rgba(0,93,93,0.8);
+    color: #efefef;
+   /*  text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+    box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+    -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+#zxy_ul_hecha li{
+	float:left;
+	line-height: 39px;
+    text-align: center;
+}
+
+#zxy_ul_hecha li:nth-child(1){
+	width:128px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(2){
+	width:66px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(3){
+	width:95px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(4){
+	width:150px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(5){
+	width:75px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(6){
+	width:200px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(7){
+	width:170px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(8){
+	width:190px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(9),
+#zxy_ul_hecha li:nth-child(10),
+#zxy_ul_hecha li:nth-child(11),
+#zxy_ul_hecha li:nth-child(12){
+	width:70px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(13){
+	width:230px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(14){
+	width:185px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+	border-right: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(15){
+	width:65px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+	border-right: 1px solid rgba(127,255,255,0.75);
+	display:none;/* 备注这一栏误删，没加功能暂时隐藏 */
+}
+
+#zxy_ul_hecha li:nth-child(16),
+#zxy_ul_hecha li:nth-child(17){
+	width:70px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_hecha li:nth-child(18){
+	width:100px;
+	border-left: 1px solid rgba(127,255,255,0.75);
+}
+
+#home,#two{
+	padding-top:0.4em;
+	margin-top: 35px;
+}
+
+#t_th tr th,
+.table td{
+	text-align: center;
+}
+
+.table td {
+	white-space: nowrap; 
+}
+
+/*tb和tb2里面的table  里面表头样式*/
+#tb div table,
+#tb2 div table{
+	table-layout:fixed;
+}
+
+#tb div table tbody tr td,
+#tb2 div table  tbody tr td{
+	overflow:hidden;
+	vertical-align: middle;
+}
+
+#tb div table tbody tr:hover,
+#tb2 div table tbody tr:hover{
+	background-color: rgba(0,99,99,0.9) !important;
+}	
+
+#zxy_pos_hecha .dropdown span .zxy_FilterUnit{
+	width:130px;
+	outline: none;
+}
+
+
+/*是否正常and点位状态的下拉框样式*/
+#tab_1 #t_id tr td:nth-child(1) select,
+#tab_2 #t_id tr td:nth-child(1) select{
+	width:110px;
+}
+#tab_1 #t_id tr td:nth-child(14) select,
+#tab_2 #t_id tr td:nth-child(14) select{
+	width:165px;
+}
+
+
+
+#zxy_pos_hecha .dropdown span .zxy_FilterUnit,
+#tab_1 #t_id tr td:nth-child(1) select,
+#tab_1 #t_id tr td:nth-child(14) select,
+#tab_2 #t_id tr td:nth-child(1) select,
+#tab_2 #t_id tr td:nth-child(14) select
+{
+    border-radius: 5px;
+    border: 1px solid rgba(127,255,255,0.55);
+    background-color: rgba(0,93,93,0.8);
+    color: #efefef;
+}
+
+/*曝光核查页面上传按钮模态框样式*/
+#myMod .modal-dialog{
+	width: 450px;
+	height:400px;
+	margin: 65px auto;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+#myMod .modal-dialog .modal-content,
+#myPic .modal-dialog .modal-content{
+	height:100%;
+	background:rgba(0,93,93,0.6); 
+}
+
+#myPic .modal-dialog .modal-content,
+#myMod .modal-dialog .modal-content{
+	text-align:center;
+}
+
+#myMod .modal-dialog .modal-content .modal-header,
+#myPic .modal-dialog .modal-content .modal-header{
+	background:rgb(0,99,99);
+	color:#efefef;
+}
+
+#myMod .modal-dialog .modal-content .modal-header .msg{
+	display: none;
+	margin-left:20px;
+	color:red;
+}
+
+#myMod .modal-dialog .modal-content .modal-header button[type="button"],
+#myPic .modal-dialog .modal-content .modal-header button[type="button"]{
+	margin:-15px -15px 0 0;
+	background:#efefef;
+}
+
+#myMod .modal-dialog .modal-content .modal-header button[type="submit"]{
+	background: #449d44;
+	border:none;
+}
+
+#myMod .modal-dialog .modal-content .col-sm-6{
+	text-align:center;
+	padding-top: 15px;
+    height: 355px;
+    width:100%;
+}
+
+#myMod .modal-dialog .modal-content .col-sm-6 input{
+	width:13.5em;
+	height: 1.5em;
+	line-height:0;
+	display:inline-block;
+}
+
+#myMod .modal-dialog .modal-content .col-sm-6 #imgdiv{
+	overflow:hidden;
+}
+
+#myMod .modal-dialog .modal-content .col-sm-6 #imgdiv img{
+	width:100%;
+	height:310px;
+	border:none;
+}
+/************************************************上线核查页面结束***************************************************/
+
+
+
+/************************************************营销活动页面开始***************************************************/
+
+/*营销活动未查询的数据*/
+.zxy_tab_one .zxy_tab_yx #sumtd{
+	text-align: center;
+	width:1450px;
+	color:#efefef;
+}
+
+#table_id .zxy_tab4 #sumtd{
+	text-align: center;
+	color:#efefef;
+}
+/*营销活动查询数据表格的样式*/
+.zxy_tab_one{
+	width: 1485px;
+	max-width:none;
+	margin-top: 40px;
+}
+
+/*包围时间日期外面的div#sp 样式*/
+#sp{
+	float: left;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+	color: #efefef;
+}
+
+/*包围时间日期外面的div#sp 下面的四个input样式*/
+#sp #sdate_id,
+#sp #edate_id,
+#sp #unit,
+#sp #activity_code{
+	background: rgba(0,93,93,0.8);
+}
+
+/*营销页面数据里 监测数据按钮进入后的monitor样式*/
+ .zxy_monitor{
+ 	padding-left: 10px;
+ }
+.zxy_monitor span{
+	font-size:1.1em;
+	color:#efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+/* 历史数据 当天数据 小时数据 */
+.zxy_monitor span #check0,
+.zxy_monitor span #check1,
+.zxy_monitor span #check2{
+	width:20px;
+	height:20px;
+	color: #efefef;
+	margin:0;
+}
+
+.zxy_monitor #sdate_id,
+.zxy_monitor #edate_id,
+.zxy_monitor #mediaName_id,
+.zxy_monitor #marketingCode_id{
+	background: rgba(0,93,93,0.8);
+	width: 8em;
+    height: 25px;
+}
+
+
+/*营销活动查询数据or角色查看表头的ul样式*/
+.yingxiao{
+    height: 42px;
+    background-color: rgba(0,93,93,0.8);
+	border-bottom: 2px solid #efefef;
+    color: #efefef;
+    /* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+    box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+    -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+.yingxiao li{
+    line-height: 39px;
+    float: left;
+    text-align: center;
+    border-left: 1px solid rgba(127,255,255,0.75);
+    border-right: 1px solid rgba(127,255,255,0.75);
+}
+
+#zxy_ul_jiaose{
+	width: 1400px;
+	margin:0 auto;
+}
+
+#zxy_ul_yingxiao li,
+#zxy_ul_jiaose li{
+	width: 155.5px;
+}
+
+#zxy_ul_yingxiao li:last-child{
+	width: 240px;
+}
+
+#zxy_ul_yingxiao2{
+	width: 4354px;
+}
+
+#zxy_ul_yingxiao2 li{
+	width: 145px;
+}
+
+#table_id .zxy_tab_yx tr td{
+	overflow: hidden;
+	height: 50px;
+	width: 155.5px;
+	text-align: center;
+	display: block;
+	float: left;
+	line-height: 50px;
+	padding: 0;
+	color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+/*营销一览->查询->url变更按钮进入的页面css*/
+#table_id1{
+	width:100%;
+	cursor: default;
+	border: 1px solid rgba(127,255,255,0.75);
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+#table_id1 tbody tr td,
+#table_id2 tbody tr td{
+	text-align: center;
+	background-color: #005d5d;
+	color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+	vertical-align: middle;
+}
+
+#table_id1 tbody tr td label{
+	margin-bottom:0;
+}
+
+#table_id1 tbody tr td input,
+#table_id2 tbody tr td input{
+    height: 26px;
+    padding-left: 10px;
+    border-radius: 5px;
+    outline: none;
+    color: #fff;
+    background: rgba(255, 255, 255, .1);
+    background-image: none;
+}
+
+#table_id1 tbody tr td select,
+#table_id2 tbody tr td select,
+#updateBatchSelect{
+    padding-left: 5px;
+    border-radius: 5px;
+    margin: 2px;
+    border: 1px solid rgba(127,255,255,0.55);
+    background-color: rgba(0,93,93,0.8);
+    color: #efefef;
+    /* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+#table_id1 tbody tr td textarea{
+    background-color: rgba(0,93,93,0.8);
+    border: 1px solid rgba(127,255,255,0.75);
+    box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+    -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    color:#efefef;
+}
+/*红色字体活动名称进入之后的tbody的td样式*/
+#div_table .zxy_tab5 tr td{
+	overflow: hidden;
+	height: 42px;
+	width: 155.5px;
+	line-height: 42px;
+	padding: 0 5px;
+	color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+
+/*营销活动数据中 更改url按钮进入审核页面的table样式*/
+.zxy_contain1 .zxy-shenhe{
+	border: 1px solid rgba(127,255,255,0.75);
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	background-color: rgba(0,93,93,0.8);
+	color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+#tab_1 tbody tr:hover{
+	background-color: rgba(0,99,99,0.9);
+}
+
+#tab_1 tbody tr td,
+#div_table #table_id .tab tr td{
+	vertical-align: middle;
+	border-top:none;
+}
+
+#tab_1 tbody tr td label{
+	margin-bottom:0;
+	display:inline-block;
+}
+
+
+/*审核第二个表格的tbody样式*/
+#div_table #table_id .tab .del1,
+#div_table #table_id .tab .del1 td
+{
+	background: none;
+}
+
+/*审核第二个表格的tbody里面的input样式*/
+#div_table #table_id .tab tr td input{
+    border: 1px solid rgba(127,255,255,0.75);
+    padding-left: 10px;
+    border-radius: 5px;
+    outline: none;
+    color: #efefef;
+    background-color: rgba(0,93,93,0.8);
+    background-image: none;
+}
+
+/*审核第二个表格的tbody里面的select样式*/
+#div_table #table_id .tab tr td select{
+    width: 220px;
+    padding-left: 5px;
+    border-radius: 5px;
+    margin-bottom: 0;
+    border: 1px solid rgba(127,255,255,0.55);
+    background-color: rgba(0,93,93,0.8);
+    color: #efefef;
+   /*  text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+/*更改url审核的页面第一个table里四个input的样式*/
+.zxy_input,
+#sj{
+	width:100%;
+	height:30px;
+	border: 1px solid rgba(127,255,255,0.75);
+    padding-left: 10px;
+    border-radius: 5px;
+    outline: none;
+    color: #efefef;
+    background: rgba(255, 255, 255, .1);
+    background-image: none;
+}
+
+/*更改url审核页面第一个table里四个select的样式*/
+#one,
+.two,
+#three,
+.four{
+	width:150px;
+	padding-left: 5px;
+    border-radius: 5px;
+    margin: 2px;
+    border: 1px solid rgba(127,255,255,0.55);
+    background-color: rgba(0,93,93,0.8);
+    color: #efefef;
+    /* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+/*更改url审核页面第一个table里两个textarea的样式*/
+#tab_1 tbody tr td .zxy_shenhe_textarea{
+    background-color: rgba(0,93,93,0.8);
+    border: 1px solid rgba(127,255,255,0.75);
+    color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+    box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+    -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+/*更改url审核页面通过按钮样式*/
+.zxy_shenhe_btn{
+	width:100%;
+	margin:0 auto;
+	text-align:center;
+}
+
+.zxy_shenhe_btn button{
+	color: #efefef;
+    border-radius: 7px;
+    border: 0;
+    width: 6em;
+    height: 30px;
+}
+
+.zxy_shenhe_btn button:hover{
+	color:#efefef;
+}
+.zxy_shenhe_btn #comfirm_id{
+	background: rgba(80, 243, 63, .6);
+}
+
+.zxy_shenhe_btn #cancal_id{
+	background: rgba(221, 34, 14, .6);
+}
+
+/*营销活动红色活动名称进入之后ul表头zxy_yingxiao3样式*/
+#table_id #tbody_id .trline td{
+	/* word-wrap: break-word; */
+}
+
+/*营销活动更改url地址界面下的修改批次条件生效下DIV显现的样式*/
+.zxy_contain1 #result{
+	display: none;
+	color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+    box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+    -webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+    -moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+.zxy_contain1 #result h4{
+	line-height:2.5em;
+	background: rgba(0,93,93,0.8);
+}
+
+.zxy_contain1 #result div{
+	height:8em;
+	background: #005d5d;
+	overflow-y: auto;
+	border:1px solid rgba(127,255,255,0.75);
+}
+/************************************************营销活动页面结束***************************************************/
+
+
+/************************************************左面测导航页面开始***************************************************/
+/*角色查看tbody的td样式*/
+#table_id .zxy_tab4 tr td{
+	overflow: hidden;
+    height: 42px;
+    width: 155.5px;
+    display: block;
+    float: left;
+    line-height: 42px;
+    padding: 0;
+    color: #efefef;
+    /* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+    text-align:center;
+}
+
+/************************************************todo页面开始***************************************************/
+.zxy_zong {
+	width:79.9%;
+	min-width:1001px;
+	height: 82px;
+	position:fixed;
+	top:65px;
+	background-color: rgba(6, 10, 60,0.7);
+	color: #efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+.zxy_jiantou{
+	width: 0;
+	height: 0;
+	margin-top:15px;
+	border-bottom: 25px solid transparent;
+	border-top: 25px solid transparent;
+	font-size: 0;
+	line-height: 0;
+	cursor: pointer;
+}
+.zxy_jiantouL {
+	border-right: 30px solid rgb(0,130,130);
+	float: left;
+}
+
+.zxy_jiantouR {
+	border-left: 30px solid rgb(0,130,130);
+	float: right;
+}
+
+#myTabDiv {
+	width: 94%;
+	overflow: hidden;
+	float: left;
+}
+
+.zxy_zong ul {
+	white-space: nowrap;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	float: left;
+}
+
+.zxy_zong ul li {
+	transition: all 300ms ease-in-out;
+	display: inline-block;
+	text-align: center;
+	background: rgba(0,93,93,0.8);
+	height: 50px;
+	padding:0 15px;
+	line-height: 55px;
+	border-radius: 30px;
+	margin: 16px 0 14px 15px;
+}
+
+#myTab li:hover{
+	background: rgb(14, 113, 77);
+	cursor: pointer;
+} 
+
+#myTabDiv #myTab li a{
+    background: none;
+}
+#myTab li a:hover{
+	text-decoration: none;
+	cursor: pointer;
+}
+#myTab .selected {
+	background: rgba(28, 171, 65, .75);
+}
+
+#myTab .selected a{
+	color:red;
+}
+
+.zxy_tab_con1{
+	width:100%;
+	margin: 90px auto;
+}
+/************************************************todo页面结束***************************************************/
+
+
+/************************************************排期插码页面开始***************************************************/
+/*title样式*/
+.zxy_title_style{
+	font-size:1.2em;
+	color:#efefef;
+	/* text-shadow: 0px 0px 20px rgba(127,255,255,1); */
+}
+
+/*提示文字样式*/
+.paddingDiv{
+	padding-top: 20px;
+}
+
+/*排期插码中下拉框样式*/
+#after,
+#before,
+#center,
+#mediaType{
+	margin:0;
+	text-align:center;
+	padding-left: 5px;
+    border-radius: 5px;
+    border: 1px solid rgba(127,255,255,0.55);
+    background-color: rgba(0,93,93,0.8);
+    color: #efefef;
+   /*text-shadow: 0px 0px 20px rgba(127,255,255,1);*/
+}
+
+.thead_zxy_tr{
+	height:50px;
+}
+			
+.thead_zxy_td{
+	width:18%;
+	text-align:center !important;
+	line-height: 32px !important;
+}
+			
+.thead_zxy_td_r{
+	line-height: 32px !important;
+}
+
+/*排期插码页面的input的样式*/
+#updateFileText,
+#actCode,
+#addDateText,
+#updateForecastText,
+#scheduleFileText,
+.newMedia{
+	width: 20em;
+    height: 25px;
+    padding-left: 3px;
+    border-radius: 5px;
+    outline: none;
+    color: #fff;
+    background: rgba(0,93,93,0.8);
+    background-image: none;
+}
+
+/*排期插码内tbody的tr td样式*/
+
+.table-striped #zxy_paiqi_tbody tr{
+	background-color: rgba(0,93,93,0.8);
+}
+
+.table-striped #zxy_paiqi_tbody tr td{
+	background-color: rgba(0,93,93,0.8);
+}
+
+/*排期插码里th td 居左设置*/
+.thead_zxy #zxy_paiqi_tbody tr td,
+.zxy_table5 tr .thead_zxy_td_r{
+	text-align: left;	
+}
+
+/*是否增加点位*/
+.zxy_table5 tr .thead_zxy_td_r .b_zxy{
+	color:#efefef;
+	line-height:10px;
+	/*text-shadow: 0px 0px 20px rgba(127,255,255,1);*/
+}
+
+.zxy_table5 tr .thead_zxy_td_r #isAddPoint{
+	width: 1em;
+	height: 14px;
+	margin-top: -4px;
+}
+/************************************************排期插码页面结束***************************************************/
+
+
+/************************************************报告导出页面开始***************************************************/
+/*横线hr样式*/
+hr{
+	border-top:1px solid #efefef;
+}
+
+/*报告导出页面提示*/
+.day_span{
+	display: none;
+	color: red;
+}
+
+.zxy_daochu{
+	width:75%;
+	min-width:785px;
+	margin:0 auto;
+	padding:25px;
+	color: #efefef;
+	/*text-shadow: 0px 0px 20px rgba(127,255,255,1);*/
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+}
+
+/*报告导出页面input和下拉框的的样式*/
+.day-time,
+#customer_id,
+#d122,
+#startDate,
+#customer_id_week,
+#month_date,
+#month_customer,
+#month_type,
+#month_location,
+#customer_id_end,
+#date_region,
+#frequency_id_region,
+#customer_id_region,
+#leiji_location,
+#month_file,
+#month_summary,
+#month_media,
+#month_summary_data,
+#date_end,
+#prov_prov,
+#prov_city,
+.zxy_name{
+	width: 15em;
+    height: 26px;
+    padding:0 0 0 10px;
+    border-radius: 5px;
+    outline: none;
+    color: #efefef;
+	background-color: rgba(0,93,93,0.8);
+    background-image: none;
+}
+.range_name{
+	width: 5em;
+    height: 26px;
+    padding:0 0 0 10px;
+    border-radius: 5px;
+    outline: none;
+    color: #efefef;
+	background-color: rgba(0,93,93,0.8);
+    background-image: none;
+}
+
+/*第几周数字框样式*/
+#d122_1{
+	width:40px;
+	text-align: center;
+	border-radius: 5px;
+    outline: none;
+    color: #efefef;
+    background-color: rgba(0,93,93,0.8);
+    background-image: none;
+}
+
+/*报告导出页面input->radio复选框样式*/
+#month input[type="radio"]{
+	width: 15px;
+	height: 15px;
+}
+ input#one,
+ input#zero{
+	width: 20px;
+	height: 20px;
+	color: #efefef;
+}
+.checks{
+	color: #efefef;
+}
+
+/*导出按钮外层a标签内部span样式*/
+.zxy_daochu #dayId .btn_day #exportDay,
+.zxy_daochu #weekId .btn_week span,
+.zxy_daochu	#month .zxy_sp_one,
+.zxy_daochu #dayEnd .zxy_sp_one,
+.zxy_daochu #regionId .regoin_id span{
+	padding-left: 80px;
+}
+
+/*span内部input按钮样式*/
+.zxy_daochu #dayId .btn_day #exportDay input,
+.zxy_daochu #weekId .btn_week span input,
+.zxy_daochu	#month .zxy_sp_one input,
+.zxy_daochu #dayEnd .zxy_sp_one input,
+.zxy_daochu #regionId .regoin_id span input,
+.zxy_daochu .zxy_sp_one #month_report,
+.zxy_sp_one #leijiD{
+	 width: 6em;
+	 height: 25px;
+	 padding-left: 3px;
+	 border-radius: 5px;
+}
+
+/*报告导出页面数据筛选a标签样式*/
+.zxy_daochu	#month .zxy_data{
+	color:#efefef;
+}
+
+.zxy_daochu	#month .zxy_data:hover{
+	color:red;
+}
+/************************************************报告导出页面结束***************************************************/
+
+/*超级管理员角色进入角色查看界面的上部zxy_role样式*/
+.zxy_role span{
+	font-size:1.1em;
+	color:#efefef;
+	/*text-shadow: 0px 0px 20px rgba(127,255,255,1);*/
+}
+
+.zxy_role #uname,
+.zxy_role #role_id,
+.zxy_role #sdate_id,
+.zxy_role #edate_id{
+	background: rgba(0,93,93,0.8);
+}
+
+/*延时加载遮罩层样式*/
+.zxy_mask{
+	width:100%;
+	height:100%;
+	background: url(../images/bg2.jpg) top center;
+	background-size: 100% 100%;
+	-moz-background-size:100%;
+	-webkit-background-size:100%;
+	-o-background-size:100%;
+	background-size: cover;
+	position:absolute;
+	top:60px;
+	left:180px;
+	z-index:999;
+	text-align: center;
+	font-size: 10px;
+}
+
+.zxy_mask > div {
+  background:#67CF22;
+  height: 60px;
+  width: 6px;
+  margin:20% auto 0;
+  display: inline-block;
+  -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+  animation: stretchdelay 1.2s infinite ease-in-out;
+}
+.zxy_mask > span{
+	color:#efefef;
+	font-size:3em;
+	text-shadow:0 0 6px blue,
+				-1px -1px  #FFF, 
+        		1px -1px  #444;
+}
+.zxy_mask .rect2 {
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
+}
+ 
+.zxy_mask .rect3 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+ 
+.zxy_mask .rect4 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+ 
+.zxy_mask .rect5 {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+ 
+@-webkit-keyframes stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) } 
+  20% { -webkit-transform: scaleY(1.0) }
+}
+ 
+@keyframes stretchdelay {
+  0%, 40%, 100% {
+    transform: scaleY(0.4);
+    -webkit-transform: scaleY(0.4);
+  }  20% {
+    transform: scaleY(1.0);
+    -webkit-transform: scaleY(1.0);
+  }
+}
+/*zxy页面设置end*/
+
+
+/*设置TH头部问号帮助颜色 th  start*/
+#thead_1 tr th span,
+#thead_1 tr td span {
+	color: #ebf30f;
+}
+
+#thead_1 tr td span {
+	color: #ebf30f;
+}
+
+
+#thead_2 {
+	background-color: #0085d0;
+}
+/**设置TH头部问号帮助颜色 end**/
+
+/*设置TH头部问号帮助颜色(table滚动时使用)*/
+#thead_2 tr th span,
+#thead_2 tr td span {
+	color: #ebf30f;
+}
+
+/*查询和导出按钮css*/
+.disable_button_style {
+	background: rgb(183, 183, 183);
+	color: #efefef;
+	border-radius: 7px; /*设置圆角*/
+	border: 0px solid #dddddd;
+	width: 5em;
+	height: 25px;
+}
+
+.button_style2 {
+	/* background:A4D3EE; */
+	color: #efefef;
+	font-family: 微软雅黑;
+	border-radius: 7px; /*设置圆角*/
+	border: 1px solid #dddddd;
+	box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
+	width: 5em;
+	height: 25px;
+}
+
+.button_disabled {
+	disabled: disabled;
+}
+
+.rollbar a {
+	background-color: #666;
+	border-radius: 2px;
+	color: #fff;
+	display: block;
+	height: 50px;
+	position: relative;
+	z-index: 2;
+}
+
+.fa-angle-up::before {
+	content: "去顶部";
+}
+
+.fa {
+	display: inline-block;
+	font-family: FontAwesome;
+	font-feature-settings: normal;
+	font-kerning: auto;
+	font-language-override: normal;
+	font-size: inherit;
+	font-size-adjust: none;
+	font-stretch: normal;
+	font-style: normal;
+	font-synthesis: weight style;
+	font-variant: normal;
+	font-weight: normal;
+	line-height: 1;
+	text-rendering: auto;
+}
+
+#tbody_sum_id {
+	background-color: #E0E4E4;
+	color: #000000;
+	font-weight: bold;
+}
+
+#tbody_sum_id td {
+	font-weight: bold;
+}
+
+#updown {
+	_top: expression(eval(( document.compatMode && document.compatMode == 
+		 "CSS1Compat")?documentElement.scrollTop+documentElement.clientHeight-this.clientHeight-1:document.body.scrollTop+document.body.clientHeight-this.clientHeight-1));
+	position: fixed;
+	_position: absolute;
+	top: 200px;
+	right: 30px;
+	display: none;
+}
+
+#updown span {
+	cursor: pointer;
+	width: 48px;
+	height: 50px;
+	display: block;
+}
+
+#updown .up {
+	background: url(../images/updown.png) no-repeat;
+}
+
+#updown .up:hover {
+	background: url(../images/updown.png) top right no-repeat;
+}
+
+#updown .down {
+	background: url(../images/updown.png) bottom left no-repeat;
+}
+
+#updown .down:hover {
+	background: url(../images/updown.png) bottom right no-repeat;
+	color: #333333;
+	font-weight: 900 !important;
+}
+
+
+.dropdown-menu3 {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1000;
+	display: none;
+	float: left;
+	*width: auto !important;
+	*width: 160px;
+	*height: 1px;
+	min-width: 160px;
+	padding: 5px 0;
+	margin: 2px 0 0;
+	list-style: none;
+	background-color: #ffffff;
+	border: 1px solid #ccc;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	*border-right-width: 2px;
+	*border-bottom-width: 2px;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+	-webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding;
+	background-clip: padding-box;
+}
+
+
+date_1 {
+	width: 7em;
+}
+
+/**我的TODU 样式集 start**/
+ul#quoteId {
+	padding: 0;
+}
+
+ul#quoteId li {
+	width: 95%;
+	margin: 30px auto;
+	overflow-y: hidden;
+	padding: 20px 24px;
+	border: 1px #e3e3e3 solid;
+	line-height: 23px;
+	background-color: #fff;
+}
+
+.topicsList{
+	padding: 0;
+}
+/**楼层**/
+.userBox .userTop {
+	float: right;
+	color: #888;
+	font-size: 14px;
+}
+/**用户名称 时间**/
+.userName {
+	height: 23px;
+	font-size: 15px;
+	line-height: 23px;
+}
+/**用户截屏**/
+.msgBox {
+	overflow: hidden;
+	margin-top: 10px;
+	word-wrap: break-word;
+	clear: both;
+}
+/**图片**/
+.userPic {
+	margin-top: 20px;
+	height: 90px;
+}
+
+#box div ul {
+	padding-left: 0px;
+}
+
+
+
+
+/*概览页的下部数据汇总样式*/
+.div_css {
+	margin: 11px;
+    float: left;
+    width: 10em;
+    height: 10em;
+	background-color: rgba(0,93,93,0.8);
+	border: 1px solid rgba(127,255,255,0.75);
+	box-shadow: 0px 0px 10px rgba(0,255,255,0.75);
+	-webkit-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	-moz-box-shadow: 0px 0px 8px rgba(0,255,255,0.75);
+	border-radius: 50%;
+	-moz-border-radius: 80px;
+	-webkit-border-radius: 80px;
+	color:#efefef;
+	/*text-shadow: 0px 0px 20px rgba(127,255,255,1);*/
+	cursor: pointer;
+}
+
+.div_left_content {
+	width:100%;
+	height: 100%;
+	font-size:1em;
+}
+
+
+#s {
+	margin: 2em auto;
+}
+
+#s li {
+	line-height:1.7em;
+}
+
+
+.main {
+	width: 300px;
+	height: 60px;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -150px;
+	margin-top: -30px;
+}
+
+.filebox {
+	position: relative;
+	float: left;
+}
+
+input.uploadFile {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	opacity: 0;
+	filter: alpha(opacity = 0);
+	cursor: pointer;
+	width: 276px;
+	height: 36px;
+	overflow: hidden;
+}
+
+input.textbox {
+	float: left;
+	padding: 5px;
+	color: #999;
+	height: 24px;
+	line-height: 24px;
+	border: 1px #ccc solid;
+	width: 200px;
+	margin-right: 4px;
+}
+
+a.link {
+	float: left;
+	display: inline-block;
+	padding: 4px 16px;
+	color: #fff;
+	font: 14px "Microsoft YaHei", Verdana, Geneva, sans-serif;
+	cursor: pointer;
+	background-color: #0099ff;
+	line-height: 28px;
+	text-decoration: none;
+}
+
+.div {
+	margin: auto;
+	width: 100%;
+	height: 100%;
+}
+
+#table_2 {
+	margin: auto;
+	margin-top: 10px;
+	width: 600px;
+	height: 450px;
+	background-color: #D0D0D0;
+	text-align: right;
+	font-size: 1.2em;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+
+#table_2e {
+	margin: 30px auto auto 150px;
+	margin-top: 10px;
+	width: 600px;
+	height: 450px;
+	background-color: #D0D0D0;
+	text-align: right;
+	font-size: 1.2em;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+
+#right {
+	text-align: left;
+}
+
+#button2 {
+	text-align: center;
+}
+
+#message {
+	color: red;
+}
+
+.fl{
+	float:left;
+}
+.fr{
+	float:right;
+}
+
+/*添加监测数据页面的样式css*/
+.zxy_daochu .pop-button{
+	width:auto;
+	background:rgba(221, 34, 14, .6);
+	border:none;
+	border-radius: 7px;
+	display:inline-block;
+}

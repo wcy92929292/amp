@@ -1,0 +1,219 @@
+/*字体边框等初始化*/
+
+body,
+div,
+dl,
+dt,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+fieldset,
+input,
+textarea,
+ul,
+ol,
+li,
+p,
+blockquote,
+th,
+td {
+	padding: 0;
+	margin: 0;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+fieldset,
+img {
+	border: 0;
+}
+
+address,
+caption,
+cite,
+code,
+dfn,
+th,
+var {
+	font-weight: normal;
+	font-style: normal;
+}
+
+ol,
+ul {
+	list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-weight: normal;
+}
+
+q:before,
+q:after {
+	content: '';
+}
+
+a {
+	text-decoration: none;
+}
+html {height:100%;}
+body {
+	width:100%;
+	height:100%;
+	min-width:748px;
+	background:url(../images/background2.png) top left;
+	background-size:100% 100%;
+	overflow:hidden;
+	-moz-background-size:100%;
+	-webkit-background-size:100%;
+	-o-background-size:100%;
+	background-size: cover;
+	font-family: 'Source Sans Pro', sans-serif;
+	color: white;
+	font-weight: 300;
+	text-align:center;
+	}
+.zxy_content{width:90%;
+			margin:0 auto;
+			display:inline-block; 
+			zoom:1; 
+			*display:inline; 
+			vertical-align:middle;
+			position:relative;
+			}
+.zxy_content1{height:100%;
+			overflow:hidden;
+			display:inline-block;
+			width:1px;
+			margin-left:-1px; zoom:1;
+			*display:inline;
+			*margin-top:-1px;
+			_margin-top:0;
+			vertical-align:middle;
+			}
+.logo{
+	display:inline-block;
+	margin-right:1.5em;
+	position:absolute;
+	top:0;
+	left:5px;
+	}
+			
+.content{width:100%;
+		height:30em;}
+
+
+.content h2 {
+	margin: 1em 0 2em 0;
+}
+
+/*none： 无阴影 
+<length>①： 第1个长度值用来设置对象的阴影水平偏移值。可以为负值 
+<length>②： 第2个长度值用来设置对象的阴影垂直偏移值。可以为负值 
+<length>③： 如果提供了第3个长度值则用来设置对象的阴影模糊值。不允许负值 
+<length>④： 如果提供了第4个长度值则用来设置对象的阴影外延值。可以为负值 
+<color>： 设置对象的阴影的颜色。 
+inset： 设置对象的阴影类型为内阴影。该值为空时，则对象的阴影类型为外阴影 */
+
+.content1 {
+	width: 70%;
+	min-width:690px;
+	height: 22.75em;
+	background: rgba(255, 255, 255, 0.1);
+	margin: 0 auto;
+	padding: 1.5em 1em 1em;
+	border: 1px solid #87dbff;
+	box-shadow: 0px 7px 30px 3px #9edeff inset;
+	-moz-box-shadow: 0px 7px 30px 3px #9edeff inset;
+	-webkit-box-shadow: 0px 7px 30px 3px #9edeff inset;
+}
+
+.content2 {
+	width: 80%;
+	height: 19em;
+	margin: 0 auto;
+	background: rgba(255, 255, 255, 0.2);
+	border: 1px solid #87dbff;
+	box-shadow: 0px 7px 30px 3px #9edeff inset;
+	-moz-box-shadow: 0px 7px 30px 3px #9edeff inset;
+	-webkit-box-shadow: 0px 7px 30px 3px #9edeff inset;
+}
+.content3{border:1px solid #87dbff;
+		width:70%;
+		height:100%;
+		margin:0 auto;
+		box-shadow: 0px 7px 30px 3px #9edeff inset;
+		-moz-box-shadow: 0px 7px 30px 3px #9edeff inset;
+		-webkit-box-shadow: 0px 7px 30px 3px #9edeff inset;
+		text-align:center;
+		}
+form {
+	margin-top:2.5em;
+	width:77%;
+	min-width:350px;
+	min-height:172px;
+	display:inline-block;
+	*display:inline;
+	zoom:1;
+	padding-right:3em;
+}
+
+form input {
+	height: 2em;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	outline: 0;
+	border: 1px solid rgba(255, 255, 255, 0.4);
+	background-color: rgba(255, 255, 255, 0.2);
+	border-radius: 3px;
+	display: block;
+	color: #000;
+	font-weight: 300;
+}
+
+.control-label {
+	font: 1em/16px "微软雅黑";
+	width:6.8em !important;
+}
+.controls{margin-left:100px !important;}
+
+form input:hover {
+	background-color: rgba(255, 255, 255, 0.4);
+	cursor: pointer;
+}
+
+form input:focus {
+	background-color: white;
+	color: #73a7e0;
+}
+
+#check_code {
+	width: 7em;
+}
+
+#comfirm_id {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	outline: 0;
+	cursor: pointer;
+	font-size: 1em;
+	-webkit-transition-duration: 0.25s;
+	transition-duration: 0.25s;
+}
+#check_code{margin-right: 20px;}

@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.udbac.dao.CampScheduleDao">
+	<resultMap id="media" type="com.udbac.entity.TbAmpBasicMediaInfo">
+		<id column="media_id" property="mediaId" />
+		<result column="media_type" property="mediaType" />
+		<result column="media_name" property="mediaName" />
+		<result column="parent_media" property="parentMedia" />
+	</resultMap>
+
+
+	<select id="getMedias" resultMap="media">
+		SELECT
+		media_id ,
+		media_type ,
+		media_name ,
+		parent_media
+		FROM
+		tb_amp_basic_media_info
+		ORDER BY media_name
+	</select>
+
+	<select id="findMediaById" resultMap="media">
+		SELECT
+		media_id ,
+		media_type,
+		media_name ,
+		parent_media
+		FROM
+		tb_amp_basic_media_info
+		WHERE media_id =
+		#{mediaId}::integer;
+	</select>
+
+	<sql id="campBasicActivityInfoColumns">
+		act.CREATE_DATE,
+		ACTIVITY_CODE,
+		ACTIVITY_NAME,
+		act.CUSTOMER_ID,
+		ACTIVITY_STATE,
+		GO_LIVE_TYPE,
+		PREDICT_START_DATE,
+		REALITY_START_DATE,
+		ACTIVITY_END_DATE,
+		PORT_PEOPLE,
+		MONITOR_PEOPLE,
+		FONT_SUPPORT_PEOPLE,
+		AFTER_SUPPORT_PEOPLE,
+		SCHEME_STATE,
+		UPDATE_USER,
+		UPDATE_DATE,
+		SCHEDULE_PATH,
+		MEMO,
+		PARENT_IDF,
+		PARENT_ACTIVITY_CODE
+	</sql>
+
+	<!-- 根据活动编号，查找某个监测方案 -->
+	<select id="findByCode" resultMap="campBasicActivityInfo">
+		SELECT
+		<include refid="campBasicActivityInfoColumns" />
+		FROM
+		tb_amp_basic_activity_info act
+		WHERE
+		act.activity_code = #{actCode}
+	</select>
+
+	<resultMap type="com.udbac.entity.CampBasicActivityInfo" id="campBasicActivityInfo">
+		<id column="activity_code" property="activityCode" />
+		<result column="create_date" property="createDate" />
+		<result column="activity_name" property="activityName" />
+		<result column="activity_state" property="activityState" />
+		<result column="go_live_type" property="goLiveType" />
+		<result column="predict_Start_Date" property="predictStartDate" />
+		<result column="reality_Start_Date" property="realityStartDate" />
+		<result column="activity_End_Date" property="activityEndDate" />
+		<result column="scheme_State" property="schemeState" />
+		<result column="update_Date" property="updateDate" />
+		<result column="schedule_Path" property="schedulePath" />
+		<result column="memo" property="memo" />
+		<result column="parent_Idf" property="parentIdf" />
+		<result column="parent_Activity_Code" property="parentActivityCode" />
+		<association column="customer_id" property="customer"
+			javaType="com.udbac.entity.TbAmpBasicCustomerInfo">
+			<result column="customer_Id" property="customerId" />
+			<result column="customer_code" property="customerCode" />
+			<result column="customer_Name" property="customerName" />
+		</association>
+		<association column="port_People" property="portPeople"
+			javaType="com.udbac.entity.TbAmpBasicUserInfo">
+			<result column="port_people" property="userId" />
+			<result column="port_people_name" property="realName" />
+		</association>
+		<association column="monitor_People" property="monitorPeople"
+			javaType="com.udbac.entity.TbAmpBasicUserInfo">
+		</association>
+		<association column="front_Support_People" property="frontSupportPeople"
+			javaType="com.udbac.entity.TbAmpBasicUserInfo">
+		</association>
+		<association column="after_Support_People" property="afterSupportPeople"
+			javaType="com.udbac.entity.TbAmpBasicUserInfo">
+		</association>
+		<association column="update_User" property="updateUser"
+			javaType="com.udbac.entity.TbAmpBasicUserInfo">
+		</association>
+	</resultMap>
+
+	<resultMap id="scheduleCalendarMap" type="com.udbac.entity.CampBasicSchedulCalendarInfo">
+		<id column="mic" property="mic" />
+		<result column="put_Date" property="putDate" />
+		<result column="put_Value" property="putValue" />
+		<result column="memo" property="memo" />
+		<result column="click_File" property="clickFile" />
+		<result column="exposure_File" property="exposureFile" />
+		<result column="after_File" property="afterFile" />
+	</resultMap>
+
+	<select id="findScheduleCalendarBymic" resultMap="scheduleCalendarMap">
+		SELECT
+		mic,
+		put_date,
+		put_value,
+		memo,
+		click_file,
+		exposure_file,
+		after_file
+		FROM
+		tb_amp_basic_schedule_calendar_info
+		WHERE
+		mic = #{mic}
+		ORDER BY
+		put_date
+	</select>
+
+	<!-- 通过活动编号查找排期基本信息 -->
+	<select id="findScheduleByActCode" resultMap="scheduleMap">
+		SELECT
+		create_time,
+		MARKETING_CODE,
+		sche.MIC,
+		ACTIVITY_CODE,
+		MEDIA_ID,
+		URL_PC,
+		TERMINAL_TYPE,
+		UNIT,
+		URL_UPDATE,
+		URL_UPDATE_TIME,
+		CLICK_AVG,
+		EXPOSURE_AVG,
+		ENABLE,
+		IS_FREQUENCY,
+		NUM_FREQUENCY,
+		PERIOD_FREQUENCY,
+		FUN_FREQUENCY,
+		POINT_LOCATION,
+		PUT_FUNCTION,
+		MATERIAL_REQUIRE,
+		RESOURCE_TYPE,
+		PLAN_NAME,
+		UNIT_NAME,
+		KEY_NAME,
+		CLEAR_CODE,
+		RESOURCE_POSITION,
+		PUT_FREQUENCY,
+		EXPOSURE_METERIAL,
+		imp_data_caliber,
+		clk_data_caliber,
+		SUPPORT_EXPOSURE,
+		SUPPORT_CLICK,
+		CLICK_METERIAL,
+		CLICK_URL,
+		EXPOSURE_URL,
+		AREA
+		FROM
+		tb_amp_basic_schedule_info sche,
+		tb_amp_basic_schedule_extend_info extend
+		WHERE
+		sche.activity_code =
+		#{actCode}
+		AND
+		sche.mic = extend.mic;
+	</select>
+
+	<resultMap id="scheduleMap" type="com.udbac.entity.CampScheduleInfo">
+		<id column="mic" property="mic" />
+		<result column="CREATE_TIME" property="createTime" />
+		<result column="MARKETING_CODE" property="marketingCode" />
+		<result column="ACTIVITY_CODE" property="activityCode" />
+		<result column="URL_PC" property="urlPc" />
+		<result column="TERMINAL_TYPE" property="terminalType" />
+		<result column="UNIT" property="unit" />
+		<result column="URL_UPDATE" property="urlUpdate" />
+		<result column="URL_UPDATE_TIME" property="urlUpdateTime" />
+		<result column="CLICK_AVG" property="clickAvg" />
+		<result column="EXPOSURE_AVG" property="exposureAvg" />
+		<result column="ENABLE" property="enable" />
+		<result column="IS_FREQUENCY" property="isFrequency" />
+		<result column="NUM_FREQUENCY" property="numFrequency" />
+		<result column="PERIOD_FREQUENCY" property="periodFrequency" />
+		<result column="FUN_FREQUENCY" property="funFrequency" />
+		<result column="imp_data_caliber" property="impDataCaliber" />
+		<result column="clk_data_caliber" property="clkDataCaliber" />
+		<association property="activityInfo" column="ACTIVITY_CODE"
+			select="com.udbac.dao.CampScheduleDao.findByCode" />
+		<association property="media" column="MEDIA_ID"
+			select="com.udbac.dao.CampScheduleDao.findMediaById" />
+		<association property="extenInfo" resultMap="scheduleExtenMap" />
+		<collection property="calendarInfo" column="mic"
+			select="com.udbac.dao.CampScheduleDao.findScheduleCalendarBymic"
+			ofType="com.udbac.entity.CampBasicSchedulCalendarInfo" />
+	</resultMap>
+
+	<resultMap id="scheduleExtenMap" type="com.udbac.entity.CampBasicScheduleInfo">
+		<id column="mic" property="mic" />
+		<result column="POINT_LOCATION" property="pointLocation" />
+		<result column="PUT_FUNCTION" property="putFunction" />
+		<result column="MATERIAL_REQUIRE" property="materialRequire" />
+		<result column="RESOURCE_TYPE" property="resourceType" />
+		<result column="PLAN_NAME" property="planName" />
+		<result column="UNIT_NAME" property="unitName" />
+		<result column="KEY_NAME" property="keyName" />
+		<result column="CLEAR_CODE" property="clearCode" />
+		<result column="RESOURCE_POSITION" property="resourcePosition" />
+		<result column="PUT_FREQUENCY" property="putFrequency" />
+		<result column="EXPOSURE_METERIAL" property="exposureMeterial" />
+		<result column="SUPPORT_EXPOSURE" property="supportExposure" />
+		<result column="SUPPORT_CLICK" property="supportClick" />
+		<result column="CLICK_METERIAL" property="clickMeterial" />
+		<result column="CLICK_URL" property="clickUrl" />
+		<result column="EXPOSURE_URL" property="exposureUrl" />
+		<result column="AREA" property="area" />
+	</resultMap>
+	
+	
+	
+	<update id="updateClickAvg">
+		update tb_amp_basic_schedule_info 
+		     <if test="clickAvg!=null and clickAvg!=''">  
+			    set click_avg = #{clickAvg}
+		     </if>
+		where mic = #{mic}
+	</update>
+	
+	<update id="updateExposureAvg">
+		update tb_amp_basic_schedule_info 
+		     <if test="exposureAvg!=null and exposureAvg!=''">  
+			    set exposure_avg = #{exposureAvg}
+		     </if>
+		where mic = #{mic}
+	</update>
+</mapper>

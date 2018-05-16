@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 营销活动一览 lp 2016-04-12 -->
+<mapper namespace="com.udbac.dao.CampaignDao">
+	<resultMap type="com.udbac.entity.TbAmpBasicActivityInfo" id="tbAmpBasicActivityInfo">
+	    <result column="activityCode" property="activityCode"/>
+	    <result column="create_date" property="createDate"/>
+	    <result column="activityName" property="activityName"/>
+	    <result column="activityState" property="activityState"/>
+	    <result column="realityStartDate" property="realityStartDate"/>
+	    <result column="activityEndDate" property="activityEndDate"/>
+	    <result column="countMedia" property="countMedia"/>
+	    <result column="realName" property="realName"/>
+	    <association column="customerId" property="customer" javaType="com.udbac.entity.TbAmpBasicCustomerInfo">
+	        <result column="customerId" property="customerId"/>
+	        <result column="customer_code" property="customerCode"/>
+	        <result column="customerName" property="customerName"/>
+	    </association>
+	</resultMap>
+	
+	<select id="queryCampaignList" parameterType="map"
+		resultMap="tbAmpBasicActivityInfo">
+ <![CDATA[ 
+	SELECT  A.activity_code activityCode,
+			A.activity_name activityName,
+			A.customer_id customerId,
+			A.reality_start_date realityStartDate,
+			A.activity_end_date activityEndDate,
+			A.activity_state activityState,
+			B.customer_name customerName,
+			count(distinct d.media_id) countMedia ,
+			C.real_name realName 
+	FROM tb_amp_basic_activity_info A
+	LEFT JOIN tb_amp_basic_customer_info B ON A.customer_id::numeric = B.customer_id 
+	LEFT JOIN tb_amp_basic_schedule_info D ON A.activity_code = D.activity_code
+	LEFT JOIN tb_amp_basic_user_info C ON A.port_people::numeric = C.user_id 
+	WHERE 1=1  AND A.go_live_type != '2' and a.ACTIVITY_STATE in (6,8,3,4,5) 
+	 ]]>
+		<if test="null != unit and '' != unit">
+			AND B.customer_name=#{unit}
+		</if>
+		<if test="edate != null  and edate != ''">
+	<![CDATA[   
+			AND A.activity_end_date <= #{edate}::timestamp
+ 	]]>
+		</if>
+		<if test="null != activityCode and '' != activityCode">
+			AND A.activity_code  like CONCAT(CONCAT('%', #{activityCode}), '%') 
+		</if>
+
+	 <![CDATA[ 
+	  AND A.reality_start_date>=#{sdate}::timestamp  
+	GROUP BY  A.activity_code,A.activity_name,A.reality_start_date,A.activity_end_date,A.activity_state,C.real_name,B.customer_name
+
+ 	]]>
+	</select>
+	
+	
+	<resultMap type="com.udbac.entity.TbAmpUpdateUrl" id="TbAmpUpdateUrl">
+		<result column="update_state" property="updateState"/>
+		<result column="update_batch" property="updateBatch"/>
+		<result column="mic" property="mic"/>
+		<result column="activity_code" property="activityCode"/>	
+	</resultMap>
+	<!-- 查询URL变更 -->
+	<select id="queryCampaignUpdate" resultMap="TbAmpUpdateUrl">
+		SELECT 
+		 	a.update_state,
+		 	a.update_batch,
+		 	b.mic,
+		 	c.activity_code
+		FROM tb_amp_update_url_info as a
+		  JOIN tb_amp_update_url_and_schedule as b on a.update_batch=b.update_batch
+		  JOIN tb_amp_basic_schedule_info as c on b.mic = c.mic
+		WHERE update_state='1';
+	</select>
+	
+	
+	<!-- 查询活动编号是否存在 -->
+	<select id="QueryActivitycode" resultType="Integer"  parameterType="String">
+		SELECT  count(activity_code)
+		FROM tb_amp_basic_activity_info 
+		WHERE activity_code like  CONCAT(CONCAT('%', #{activityCode}), '%')
+	</select>
+
+
+	<!-- 查询客户是否存在 -->
+	<select id="QueryUnit" resultType="Integer"  parameterType="String">
+		SELECT  count(customer_name)
+		FROM tb_amp_basic_customer_info 
+		WHERE customer_name=#{Unit}
+	</select>
+
+</mapper>

@@ -1,0 +1,38 @@
+.m_header{width:10em;height: 3em;}
+img{max-width: 100%;height: auto;}
+.m_nav{margin-top: 0em;}
+.m_color{color: #3771AF;padding-left: 1em;}
+.m_sm_font{font-size: .2em;}
+.m_top{margin-top: .9em;}
+.m_logo_top{margin-top: 1.3em;}
+.m_logo_top_1{margin-top: 1em;}
+.m_border_left{border-left: .1em solid lightgray;}
+.m_border_bottom{border-bottom: .1em solid lightgray;padding-bottom: 1.3em;}
+.m_title{font-size: 1.5em;}
+.m_b_color{background-color: #ededed;}
+.m_s_title{border-bottom: .1em solid #3771AF;width: 6em;font-size: 1.6em; color: #3771AF;}
+.m_b_t_color{background-color: #3771AF;color: #fff;}
+@media (max-width: 1920px) {
+    .table-responsive {
+        width: 100%;
+        margin-bottom: 15px;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        border: 0px solid #dddddd;
+        -ms-overflow-style: -ms-autohiding-scrollbar;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-responsive > .table {
+        margin-bottom: 0;
+    }
+
+    .table-responsive > .table > thead > tr > th,
+    .table-responsive > .table > tbody > tr > th,
+    .table-responsive > .table > tfoot > tr > th,
+    .table-responsive > .table > thead > tr > td,
+    .table-responsive > .table > tbody > tr > td,
+    .table-responsive > .table > tfoot > tr > td {
+        white-space: nowrap;
+    }
+}

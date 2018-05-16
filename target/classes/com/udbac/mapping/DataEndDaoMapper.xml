@@ -1,0 +1,871 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.udbac.dao.DataEndDao">
+<select id="listYgdj"  resultType="java.lang.Integer" parameterType="java.util.List">
+    select AVG(CLICK_AVG ::numeric)CLICK_AVG from (
+			 SELECT MEDIA_ID ,AVG(CLICK_AVG ::numeric)CLICK_AVG ,ACTIVITY_CODE FROM (
+		 SELECT SCHE.ACTIVITY_CODE,SCHE.MEDIA_ID,CASE WHEN EXPOSURE_AVG ='' THEN '0'ELSE EXPOSURE_AVG END EXPOSURE_AVG,
+		 CASE WHEN CLICK_AVG=''THEN '0'ELSE CLICK_AVG END CLICK_AVG  FROM TB_AMP_BASIC_SCHEDULE_INFO SCHE  JOIN TB_AMP_CLOSED_BASE_DATA BASE 
+		 ON SCHE.MIC=BASE.MIC ORDER BY SCHE.MEDIA_ID 
+		  )A WHERE ACTIVITY_CODE =#{actCode}  GROUP BY MEDIA_ID,ACTIVITY_CODE 
+
+	)avg
+
+</select>
+<select id="showDW" resultType="java.lang.String" parameterType="java.util.List">
+	  select sum_status from 
+     tb_amp_basic_activity_info act 
+     join TB_AMP_CLOSED_BREAK_POINT point 
+     on act.activity_code=point.activity_code
+	<if test="actName!=null and actName!=''">  
+		    AND act.activity_name = #{actName}
+		</if>
+		<if test="actCode!=null and actCode!=''">  
+		   AND act.activity_code = #{actCode}
+		</if>
+</select>
+<select id="sumSame" resultType="java.lang.Integer" parameterType="java.util.List">
+select COUNT(activity_name) from(
+   select activity_name,
+        activity_code from tb_amp_basic_activity_info 
+        where 1=1
+        <if test="actName!=null and actName!=''">  
+		    AND activity_name = #{actName}
+		</if>
+		<if test="actCode!=null and actCode!=''">  
+		   AND activity_code = #{actCode}
+		</if>
+		and customer_id in('46','16','39','40','41','42','43','44','108','106')
+)sum
+</select>
+<select id="sumName" resultType="java.lang.Integer" parameterType="java.util.List">
+select COUNT(activity_name) from(
+   select activity_name,
+        activity_code from tb_amp_basic_activity_info 
+        where activity_name like CONCAT(CONCAT('%', #{actName}), '%') 
+        and customer_id in('46','16','39','40','41','42','43','44','108','106')
+)sum
+</select>
+<select id="checkName" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+ select distinct activity_name from (
+        select activity_name,
+        activity_code from tb_amp_basic_activity_info 
+        where activity_name like CONCAT(CONCAT('%', #{actName}), '%') 
+        and customer_id in('46','16','39','40','41','42','43','44','108')
+        ) act 
+      
+</select>
+<select id="listDataHuiInfo" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+	      SELECT DISTINCT MEDIA_ID,MEDIA_NAME,ACTIVITY_NAME,
+            ACTIVITY_CODE ,DIRTY_IMP_PV,DIRTY_CLK_PV,CLICK_AVG,
+            EXPOSURE_AVG,VISITS, BOUNCE_VISIT,VISITS_TIME,UNIT,PUT_VALUE         
+            FROM(
+		    SELECT   
+			MEDIA.MEDIA_ID,
+			MEDIA.MEDIA_NAME,
+			ACT.ACTIVITY_NAME,
+			ACT.ACTIVITY_CODE,
+			CASE WHEN SCHES.EXPOSURE_AVG IS NULL THEN -1
+                        ELSE SCHES.EXPOSURE_AVG END EXPOSURE_AVG,
+			CASE WHEN SCHES.CLICK_AVG IS NULL THEN -1
+			 ELSE SCHES.CLICK_AVG END CLICK_AVG,
+			 CASE WHEN SCHE. ='1' THEN CLO.CLEAN_IMP_PV  
+                         WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_PV 
+                         ELSE CLO.DIRTY_IMP_PV 
+                         END   DIRTY_IMP_PV,
+                         CASE WHEN SCHE.CLK_DATA_CALIBER ='1' THEN CLO.CLEAN_CLK_PV  
+                         WHEN SCHE.CLK_DATA_CALIBER ='2' THEN CLO.DCLEAN_CLK_PV 
+                         ELSE CLO.DIRTY_CLK_PV 
+                         END   DIRTY_CLK_PV ,
+                         CASE WHEN BACK. VV IS NULL THEN 0
+	 		ELSE BACK. VV END VISITS,
+			CASE WHEN BACK.BOUNCE_TIMES IS NULL THEN 0
+			ELSE BACK.BOUNCE_TIMES END BOUNCE_VISIT,
+			CASE WHEN BACK.TIME_SPENT IS NULL THEN 0.00
+                        ELSE BACK.TIME_SPENT END VISITS_TIME,                     
+                        SCHE.UNIT,
+                        CALE.PUT_VALUE
+
+		 FROM  
+		   TB_AMP_BASIC_MEDIA_INFO MEDIA,
+		   TB_AMP_BASIC_ACTIVITY_INFO ACT,
+		   TB_AMP_CLOSED_SUMMARY CLO,
+		   TB_AMP_CLOSED_BASE_DATA BASE,
+		   TB_AMP_BASIC_SCHEDULE_INFO SCHE,
+		   (
+	          SELECT MEDIA_ID ,SUM(EXPOSURE_AVG ::numeric)EXPOSURE_AVG,SUM(CLICK_AVG ::numeric)CLICK_AVG ,ACTIVITY_CODE FROM (
+		 SELECT SCHE.ACTIVITY_CODE,SCHE.MEDIA_ID,
+           CASE WHEN EXPOSURE_AVG ='' THEN '0'  WHEN EXPOSURE_AVG ='-' THEN '0' ELSE EXPOSURE_AVG  END EXPOSURE_AVG,   
+         CASE WHEN CLICK_AVG=''THEN '0' WHEN CLICK_AVG ='-' THEN '0' ELSE CLICK_AVG  END CLICK_AVG FROM TB_AMP_BASIC_SCHEDULE_INFO SCHE  
+         JOIN TB_AMP_CLOSED_BASE_DATA BASE 
+		 ON SCHE.MIC=BASE.MIC ORDER BY SCHE.MEDIA_ID 
+		  )A  GROUP BY MEDIA_ID,ACTIVITY_CODE 
+		   )SCHES,
+		 (SELECT MEDIA_ID,SUM(VV)VV,SUM(BOUNCE_TIMES)BOUNCE_TIMES,AVG(TIME_SPENT)TIME_SPENT,ACTIVITY_CODE FROM (
+	SELECT DISTINCT MEDIA_ID,MIC,SUM(VV)VV,SUM(BOUNCE_TIMES)BOUNCE_TIMES,AVG(TIME_SPENT)TIME_SPENT,ACTIVITY_CODE FROM (
+	SELECT D.MEDIA_ID,D.ACTIVITY_CODE,VV,BOUNCE_TIMES,D.MIC,
+                     CASE WHEN TIME_SPENT IS NULL THEN 0.00 ELSE TIME_SPENT END  FROM TB_AMP_SUM_BACK_D B FULL JOIN TB_AMP_CLOSED_BASE_DATA D ON D.MIC=B.MIC 
+           )A GROUP BY MIC,ACTIVITY_CODE, MEDIA_ID
+    )  B GROUP BY ACTIVITY_CODE,MEDIA_ID
+                  )BACK,
+                  (
+		    SELECT SUM(PUT_VALUE)PUT_VALUE,D.MEDIA_ID ,ACTIVITY_CODE FROM TB_AMP_BASIC_SCHEDULE_CALENDAR_INFO C 
+		   JOIN TB_AMP_CLOSED_BASE_DATA D ON C.MIC=D.MIC GROUP BY D.MEDIA_ID,D.ACTIVITY_CODE
+                  )CALE
+		  WHERE 
+		  SCHE.MIC=BASE.MIC
+		  AND CLO.MEDIA_ID = CALE.MEDIA_ID
+		  AND CALE.MEDIA_ID=CLO.MEDIA_ID
+		  AND CLO.MEDIA_ID = MEDIA.MEDIA_ID
+		  AND BASE.MEDIA_ID=CLO.MEDIA_ID
+		  AND BACK.MEDIA_ID = MEDIA.MEDIA_ID
+		  AND BASE.MEDIA_ID=BACK.MEDIA_ID
+		  AND BACK.ACTIVITY_CODE=CALE.ACTIVITY_CODE
+		  AND CLO.ACTIVITY_CODE=ACT.ACTIVITY_CODE
+		  AND CLO.ACTIVITY_CODE=CALE.ACTIVITY_CODE
+		  AND CLO.ACTIVITY_CODE=BASE.ACTIVITY_CODE
+		  AND CLO.MEDIA_ID=SCHES.MEDIA_ID ::INTEGER
+		  AND CLO.ACTIVITY_CODE=SCHES.ACTIVITY_CODE
+		 <if test="actName!=null and actName!=''">  
+		    AND ACT.ACTIVITY_NAME = #{actName}
+		  </if>
+		  <if test="actCode!=null and actCode!=''">  
+		   AND  ACT.ACTIVITY_CODE = #{actCode}
+		  </if>
+		 )BAS order by MEDIA_ID
+</select>
+<select id="listInJCfo" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+SELECT O.MIC,mic_no,
+       M.MEDIA_NAME,
+       M.PUT_FUNCTION,
+       M.ACTIVITY_CODE,
+       M.ACTIVITY_NAME,
+       M.POINT_LOCATION,
+       COALESCE(CASE WHEN M.IMP_DATA_CALIBER ='1' THEN O.CLEAN_IMP_PV  
+                     WHEN M.IMP_DATA_CALIBER ='2' THEN O.DCLEAN_IMP_PV 
+                     ELSE O.DIRTY_IMP_PV 
+                 END,0) AS DIRTY_IMP_PV,
+       COALESCE(CASE WHEN M.IMP_DATA_CALIBER ='1' THEN O.CLEAN_IMP_UV  
+                     WHEN M.IMP_DATA_CALIBER ='2' THEN O.DCLEAN_IMP_UV 
+                     ELSE O.DIRTY_IMP_UV 
+                 END,0) AS DIRTY_IMP_UV,
+       COALESCE(CASE WHEN M.CLK_DATA_CALIBER ='1' THEN O.CLEAN_CLK_PV  
+                     WHEN M.CLK_DATA_CALIBER ='2' THEN O.DCLEAN_CLK_PV 
+                     ELSE O.DIRTY_CLK_PV 
+                 END,0) AS DIRTY_CLK_PV ,
+       COALESCE(CASE WHEN M.CLK_DATA_CALIBER ='1' THEN O.CLEAN_CLK_UV  
+                     WHEN M.CLK_DATA_CALIBER ='2' THEN O.DCLEAN_CLK_UV 
+                     ELSE O.DIRTY_CLK_UV 
+                 END,0) AS DIRTY_CLK_UV,
+       COALESCE(M.EXPOSURE_AVG,0) AS EXPOSURE_AVG ,
+       COALESCE(M.CLICK_AVG,0) AS CLICK_AVG,
+       COALESCE(N.VV,0) AS VISITS,
+       COALESCE(N.UV,0) AS VISITOR,
+       COALESCE(N.PV,0) AS PV,
+       COALESCE(N.BOUNCE_TIMES,0) AS BOUNCE_VISIT,
+       COALESCE(N.TIME_SPENT,0) AS VISITS_TIME,
+       M.UNIT,
+       M.PUT_VALUE,
+       M.MEDIA_ID
+  FROM (SELECT C.MIC,
+               A.ACTIVITY_CODE,
+               A.ACTIVITY_NAME,
+               B.MEDIA_ID,
+               B.MEDIA_NAME,
+               C.IMP_DATA_CALIBER,
+               C.CLK_DATA_CALIBER,
+               C.UNIT,
+               D.POINT_LOCATION,
+               D.PUT_FUNCTION,
+               SUM(E.PUT_VALUE) AS PUT_VALUE,
+               SUM(CASE WHEN EXPOSURE_AVG ='' THEN 0  WHEN EXPOSURE_AVG ='-' THEN 0 ELSE EXPOSURE_AVG::NUMERIC  END) AS EXPOSURE_AVG,   
+               SUM(CASE WHEN CLICK_AVG=''THEN 0 WHEN CLICK_AVG ='-' THEN 0 ELSE CLICK_AVG::NUMERIC  END) AS CLICK_AVG
+          FROM TB_AMP_BASIC_ACTIVITY_INFO A,
+               TB_AMP_BASIC_MEDIA_INFO B,
+               TB_AMP_BASIC_SCHEDULE_INFO C,
+               TB_AMP_BASIC_SCHEDULE_EXTEND_INFO D,
+               TB_AMP_BASIC_SCHEDULE_CALENDAR_INFO E
+         WHERE A.ACTIVITY_CODE = C.ACTIVITY_CODE
+               AND B.MEDIA_ID = C.MEDIA_ID::INTEGER
+               AND C.MIC = D.MIC
+               AND C.MIC = E.MIC
+                <if test="actName!=null and actName!=''">  
+		    AND A.ACTIVITY_NAME = #{actName}
+		  </if>
+		  <if test="actCode!=null and actCode!=''">  
+		   AND  A.ACTIVITY_CODE = #{actCode}
+		  </if>
+           
+         GROUP BY 1,2,3,4,5,6,7,8,9,10) M
+  LEFT OUTER JOIN 
+      (SELECT A.MIC,mic_no,
+              SUM(C.VV) AS VV,
+              SUM(C.UV) AS UV,
+              SUM(C.PV) AS PV,
+              SUM(C.BOUNCE_TIMES) BOUNCE_TIMES,
+              (CASE WHEN A.ACTIVITY_CODE LIKE 'JT%' THEN SUM(C.TIME_SPENT*C.VV)/SUM(C.VV)
+                    ELSE AVG(C.TIME_SPENT) 
+                END) TIME_SPENT
+         FROM TB_AMP_BASIC_SCHEDULE_INFO A,
+              (SELECT MIC,
+                      MIN(PUT_DATE) AS MIN_DAY,
+                      MAX(PUT_DATE) AS MAX_DAY
+                 FROM TB_AMP_SUM_FORE_D
+                 
+              WHERE
+               
+		  <if test="actCode!=null and actCode!=''">  
+		   ACTIVITY_CODE = #{actCode}
+		  </if> 
+                GROUP BY 1) B,
+              TB_AMP_SUM_BACK_D C,TB_AMP_BASIC_ACTIVITY_INFO D
+        WHERE A.MIC = B.MIC
+              AND A.MIC = C.MIC AND A.ACTIVITY_CODE=D.ACTIVITY_CODE
+              AND C.DAYTIME BETWEEN B.MIN_DAY AND B.MAX_DAY
+           <if test="actName!=null and actName!=''">  
+		    AND D.ACTIVITY_NAME = #{actName}
+		  </if>
+		  <if test="actCode!=null and actCode!=''">  
+		   AND  A.ACTIVITY_CODE = #{actCode}
+		  </if> 
+        GROUP BY 1) N
+    ON M.MIC = N.MIC
+  LEFT OUTER JOIN TB_AMP_CLOSED_BASE_DATA O
+    ON M.MIC = O.MIC
+ ORDER BY media_id,mic_no
+	</select>
+	<select id="listFMTfo" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">  
+	 select distinct (NUM_FRE)NUM_FRE,media_name,media_id,sum(DIRTY_IMP_UV)DIRTY_IMP_UV,sum(DIRTY_IMP_PV)DIRTY_IMP_PV from (
+	SELECT SUM(DIRTY_IMP_UV)DIRTY_IMP_UV,
+        SUM(DIRTY_IMP_PV)DIRTY_IMP_PV,
+              POINT_LOCATION ,
+              PUT_FUNCTION,
+              MEDIA_ID,MEDIA_NAME,
+             NUM_FRE,MIC FROM(
+	         SELECT EXT.POINT_LOCATION,
+	                 EXT.PUT_FUNCTION,
+		        CLO.MEDIA_ID,
+		        CLO.MIC,
+		        MEDIA.MEDIA_NAME,
+			CLO.TIMES AS NUM_FRE,
+			 CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_PV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_PV 
+            ELSE CLO.DIRTY_IMP_PV 
+            END   DIRTY_IMP_PV,
+            CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_UV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_UV 
+            ELSE CLO.DIRTY_IMP_UV 
+             END   DIRTY_IMP_UV
+			FROM 
+			TB_AMP_BASIC_SCHEDULE_EXTEND_INFO EXT JOIN
+			TB_AMP_CLOSED_IMP_POSITION  CLO
+			ON EXT.MIC=CLO.MIC 
+			JOIN TB_AMP_BASIC_ACTIVITY_INFO ACT
+			ON ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			JOIN TB_AMP_BASIC_SCHEDULE_INFO SCHE
+			ON CLO.MIC=SCHE.MIC
+			JOIN  TB_AMP_BASIC_MEDIA_INFO MEDIA
+			ON CLO.MEDIA_ID=MEDIA.MEDIA_ID
+			WHERE  1=1 
+		      	<if test="actName!=null and actName!=''">  
+		        AND ACT.ACTIVITY_NAME = #{actName}
+		        </if>
+		        <if test="actCode!=null and actCode!=''">  
+		        AND  ACT.ACTIVITY_CODE = #{actCode}
+		        </if>
+			ORDER BY MEDIA_ID,EXT.POINT_LOCATION,CLO.TIMES
+                      )BAK
+			GROUP BY MEDIA_ID,POINT_LOCATION,PUT_FUNCTION,NUM_FRE,MEDIA_NAME,MIC
+		      )CLO
+		       where mic in(
+		    select mic from  TB_AMP_CLOSED_IMP_POSITION where times <![CDATA[<>0]]>  and DIRTY_IMP_PV <![CDATA[<>0]]>and DIRTY_IMP_UV <![CDATA[<>0]]> and ACTIVITY_CODE = #{actCode}
+                 )
+   GROUP BY NUM_FRE,media_name ,media_id order by media_id
+	</select> 
+    <select id="listMeiNum" resultType="java.lang.Integer" parameterType="java.util.List">
+     select count(distinct media_name)mednum from (
+          select distinct (NUM_FRE)NUM_FRE,media_name,media_id,sum(DIRTY_IMP_UV)DIRTY_IMP_UV,sum(DIRTY_IMP_PV)DIRTY_IMP_PV from (
+	SELECT SUM(DIRTY_IMP_UV)DIRTY_IMP_UV,
+        SUM(DIRTY_IMP_PV)DIRTY_IMP_PV,
+              POINT_LOCATION ,
+              PUT_FUNCTION,
+              MEDIA_ID,MEDIA_NAME,
+             NUM_FRE,MIC FROM(
+	         SELECT EXT.POINT_LOCATION,
+	                 EXT.PUT_FUNCTION,
+		        CLO.MEDIA_ID,
+		        CLO.MIC,
+		        MEDIA.MEDIA_NAME,
+			CLO.TIMES AS NUM_FRE,
+			 CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_PV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_PV 
+            ELSE CLO.DIRTY_IMP_PV 
+            END   DIRTY_IMP_PV,
+            CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_UV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_UV 
+            ELSE CLO.DIRTY_IMP_UV 
+             END   DIRTY_IMP_UV
+			FROM 
+			TB_AMP_BASIC_SCHEDULE_EXTEND_INFO EXT JOIN
+			TB_AMP_CLOSED_IMP_POSITION  CLO
+			ON EXT.MIC=CLO.MIC 
+			JOIN TB_AMP_BASIC_ACTIVITY_INFO ACT
+			ON ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			JOIN TB_AMP_BASIC_SCHEDULE_INFO SCHE
+			ON CLO.MIC=SCHE.MIC
+			JOIN  TB_AMP_BASIC_MEDIA_INFO MEDIA
+			ON CLO.MEDIA_ID=MEDIA.MEDIA_ID
+			WHERE  1=1 
+		       <if test="actName!=null and actName!=''">  
+		    AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+			ORDER BY MEDIA_ID,EXT.POINT_LOCATION,CLO.TIMES
+                   )BAK
+			GROUP BY MEDIA_ID,POINT_LOCATION,PUT_FUNCTION,NUM_FRE,MEDIA_NAME,MIC
+		      )CLO
+		       where mic in(
+		    select mic from  TB_AMP_CLOSED_IMP_POSITION where times <![CDATA[<>0]]>  and DIRTY_IMP_PV <![CDATA[<>0]]>and DIRTY_IMP_UV <![CDATA[<>0]]> and ACTIVITY_CODE = #{actCode}
+                 )
+   GROUP BY NUM_FRE,media_name ,media_id order by media_id     
+
+   ) a
+    </select>
+     <select id="listGGfo" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+    SELECT MEDIA_ID,DIRTY_IMP_UV,DIRTY_IMP_PV,POINT_LOCATION,PUT_FUNCTION,MEDIA_NAME,NUM_FRE,MIC FROM (
+	SELECT SUM(DIRTY_IMP_UV)DIRTY_IMP_UV,
+        SUM(DIRTY_IMP_PV)DIRTY_IMP_PV,
+              POINT_LOCATION ,
+              PUT_FUNCTION,
+              MEDIA_ID,MEDIA_NAME,
+             NUM_FRE,MIC ,MIC_NO FROM(
+	         SELECT EXT.POINT_LOCATION,
+	                 EXT.PUT_FUNCTION,
+		        CLO.MEDIA_ID,
+		        CLO.MIC,
+		        MIC_NO,
+		        MEDIA.MEDIA_NAME,
+			CLO.TIMES AS NUM_FRE,
+			 CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_PV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_PV 
+            ELSE CLO.DIRTY_IMP_PV 
+            END   DIRTY_IMP_PV,
+            CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_UV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_UV 
+            ELSE CLO.DIRTY_IMP_UV 
+             END   DIRTY_IMP_UV
+			FROM 
+			TB_AMP_BASIC_SCHEDULE_EXTEND_INFO EXT JOIN
+			TB_AMP_CLOSED_IMP_POSITION  CLO
+			ON EXT.MIC=CLO.MIC 
+			JOIN TB_AMP_BASIC_ACTIVITY_INFO ACT
+			ON ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			JOIN TB_AMP_BASIC_SCHEDULE_INFO SCHE
+			ON CLO.MIC=SCHE.MIC
+			JOIN  TB_AMP_BASIC_MEDIA_INFO MEDIA
+			ON CLO.MEDIA_ID=MEDIA.MEDIA_ID
+			WHERE  1=1 
+		          <if test="actName!=null and actName!=''">  
+		    AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		     AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+			ORDER BY MEDIA_ID,EXT.POINT_LOCATION,CLO.TIMES
+                   )BAK
+			GROUP BY MEDIA_ID,POINT_LOCATION,PUT_FUNCTION,NUM_FRE,MEDIA_NAME,MIC,MIC_NO
+		      )CLO
+		      where mic in(
+		    select mic from  TB_AMP_CLOSED_IMP_POSITION where times <![CDATA[<>0]]>  and DIRTY_IMP_PV <![CDATA[<>0]]>and DIRTY_IMP_UV <![CDATA[<>0]]> and ACTIVITY_CODE = #{actCode}
+                 )
+                ORDER BY  MEDIA_ID, MIC_NO, MIC,NUM_FRE
+     </select>
+     <select  id="listFirstInfo" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+          SELECT MEDIA_ID,DIRTY_IMP_UV,DIRTY_IMP_PV,POINT_LOCATION,PUT_FUNCTION,MEDIA_NAME,NUM_FRE,MIC FROM (
+	SELECT SUM(DIRTY_IMP_UV)DIRTY_IMP_UV,
+        SUM(DIRTY_IMP_PV)DIRTY_IMP_PV,
+              POINT_LOCATION ,
+              PUT_FUNCTION,
+              MEDIA_ID,MEDIA_NAME,
+             NUM_FRE,MIC ,MIC_NO FROM(
+	         SELECT EXT.POINT_LOCATION,
+	                 EXT.PUT_FUNCTION,
+		        CLO.MEDIA_ID,
+		        CLO.MIC,
+		        MIC_NO,
+		        MEDIA.MEDIA_NAME,
+			CLO.TIMES AS NUM_FRE,
+			 CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_PV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_PV 
+            ELSE CLO.DIRTY_IMP_PV 
+            END   DIRTY_IMP_PV,
+            CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_UV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_UV 
+            ELSE CLO.DIRTY_IMP_UV 
+             END   DIRTY_IMP_UV
+			FROM 
+			TB_AMP_BASIC_SCHEDULE_EXTEND_INFO EXT JOIN
+			TB_AMP_CLOSED_IMP_POSITION  CLO
+			ON EXT.MIC=CLO.MIC 
+			JOIN TB_AMP_BASIC_ACTIVITY_INFO ACT
+			ON ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			JOIN TB_AMP_BASIC_SCHEDULE_INFO SCHE
+			ON CLO.MIC=SCHE.MIC
+			JOIN  TB_AMP_BASIC_MEDIA_INFO MEDIA
+			ON CLO.MEDIA_ID=MEDIA.MEDIA_ID
+			WHERE  1=1 
+			     <if test="actName!=null and actName!=''">  
+		    AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		     AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+		     AND TIMES ='1'
+			ORDER BY MEDIA_ID,EXT.POINT_LOCATION,CLO.TIMES
+                   )BAK
+			GROUP BY MEDIA_ID,POINT_LOCATION,PUT_FUNCTION,NUM_FRE,MEDIA_NAME,MIC,MIC_NO
+		      )CLO
+		       where mic in(
+		    select mic from  TB_AMP_CLOSED_IMP_POSITION where times <![CDATA[<>0]]>  and DIRTY_IMP_PV <![CDATA[<>0]]>and DIRTY_IMP_UV <![CDATA[<>0]]> and ACTIVITY_CODE = #{actCode}
+                 )
+                ORDER BY MEDIA_ID, MIC_NO,  MIC,NUM_FRE
+                
+     </select>
+      <select id="listGGWNum" resultType="java.lang.Integer" parameterType="java.util.List">
+        select count(distinct mic)POIMUN from(
+        SELECT MEDIA_ID,DIRTY_IMP_UV,DIRTY_IMP_PV,POINT_LOCATION,PUT_FUNCTION,MEDIA_NAME,NUM_FRE,MIC FROM (
+	SELECT SUM(DIRTY_IMP_UV)DIRTY_IMP_UV,
+        SUM(DIRTY_IMP_PV)DIRTY_IMP_PV,
+              POINT_LOCATION ,
+              PUT_FUNCTION,
+              MEDIA_ID,MEDIA_NAME,
+             NUM_FRE,MIC FROM(
+	         SELECT EXT.POINT_LOCATION,
+	                 EXT.PUT_FUNCTION,
+		        CLO.MEDIA_ID,
+		        CLO.MIC,
+		        MEDIA.MEDIA_NAME,
+			CLO.TIMES AS NUM_FRE,
+			 CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_PV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_PV 
+            ELSE CLO.DIRTY_IMP_PV 
+            END   DIRTY_IMP_PV,
+            CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_UV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_UV 
+            ELSE CLO.DIRTY_IMP_UV 
+             END   DIRTY_IMP_UV
+			FROM 
+			TB_AMP_BASIC_SCHEDULE_EXTEND_INFO EXT JOIN
+			TB_AMP_CLOSED_IMP_POSITION  CLO
+			ON EXT.MIC=CLO.MIC 
+			JOIN TB_AMP_BASIC_ACTIVITY_INFO ACT
+			ON ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			JOIN TB_AMP_BASIC_SCHEDULE_INFO SCHE
+			ON CLO.MIC=SCHE.MIC
+			JOIN  TB_AMP_BASIC_MEDIA_INFO MEDIA
+			ON CLO.MEDIA_ID=MEDIA.MEDIA_ID
+			WHERE  1=1 
+		     <if test="actName!=null and actName!=''">  
+		    AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		     AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+			ORDER BY MEDIA_ID,EXT.POINT_LOCATION,CLO.TIMES
+                   )BAK
+			GROUP BY MEDIA_ID,POINT_LOCATION,PUT_FUNCTION,NUM_FRE,MEDIA_NAME,MIC
+		      )CLO
+                ORDER BY MEDIA_ID,MIC,POINT_LOCATION,PUT_FUNCTION,NUM_FRE
+         ) a
+     </select>
+      <select id="listDJFMTinfo" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+         SELECT SUM(DIRTY_CLK_PV)DIRTY_CLK_PV,SUM(DIRTY_CLK_UV)DIRTY_CLK_UV,MEDIA_ID,MEDIA_NAME,TIMES NUM_FRE FROM(
+           select  CASE WHEN SCHE.CLK_DATA_CALIBER ='1' THEN CLO.CLEAN_CLK_PV  
+            WHEN SCHE.CLK_DATA_CALIBER ='2' THEN CLO.DCLEAN_CLK_PV 
+            ELSE CLO.DIRTY_CLK_PV 
+            END   DIRTY_CLK_PV,
+            CASE WHEN SCHE.CLK_DATA_CALIBER ='1' THEN CLO.CLEAN_CLK_UV  
+            WHEN SCHE.CLK_DATA_CALIBER ='2' THEN CLO.DCLEAN_CLK_UV 
+            ELSE CLO.DIRTY_CLK_UV 
+             END   DIRTY_CLK_UV ,
+             TIMES,CLO.MIC ,CLO.MEDIA_ID,MEDIA_NAME
+             from TB_AMP_CLOSED_CLK_POSITION clo join TB_AMP_BASIC_SCHEDULE_INFO sche 
+             on clo.mic=sche.mic join TB_AMP_BASIC_MEDIA_INFO MEDIA
+	     ON CLO.MEDIA_ID=MEDIA.MEDIA_ID    JOIN TB_AMP_BASIC_ACTIVITY_INFO ACT
+			ON ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+	     where 1=1
+	        <if test="actName!=null and actName!=''">  
+		      AND act.ACTIVITY_NAME = #{actName}
+		   </if>
+		   <if test="actCode!=null and actCode!=''">  
+		        AND  clo.ACTIVITY_CODE = #{actCode}
+		   </if>
+	   ORDER BY CLO.MEDIA_ID,MIC_NO
+      )A GROUP BY MEDIA_ID,MEDIA_NAME,TIMES order by media_id,times 
+ 
+      </select>
+      <select id="listDJNuminfo" resultType="java.lang.Integer" parameterType="java.util.List">
+      select count(distinct MEDIA_NAME)MEDNUM from (
+       SELECT SUM(DIRTY_CLK_PV)DIRTY_CLK_PV,SUM(DIRTY_CLK_UV)DIRTY_CLK_UV,MEDIA_ID,MEDIA_NAME,TIMES NUM_FRE FROM(
+           select  CASE WHEN SCHE.CLK_DATA_CALIBER ='1' THEN CLO.CLEAN_CLK_PV  
+            WHEN SCHE.CLK_DATA_CALIBER ='2' THEN CLO.DCLEAN_CLK_PV 
+            ELSE CLO.DIRTY_CLK_PV 
+            END   DIRTY_CLK_PV,
+            CASE WHEN SCHE.CLK_DATA_CALIBER ='1' THEN CLO.CLEAN_CLK_UV  
+            WHEN SCHE.CLK_DATA_CALIBER ='2' THEN CLO.DCLEAN_CLK_UV 
+            ELSE CLO.DIRTY_CLK_UV 
+             END   DIRTY_CLK_UV ,
+             TIMES,CLO.MIC ,CLO.MEDIA_ID,MEDIA_NAME
+             from TB_AMP_CLOSED_CLK_POSITION clo join TB_AMP_BASIC_SCHEDULE_INFO sche 
+             on clo.mic=sche.mic join TB_AMP_BASIC_MEDIA_INFO MEDIA
+	     ON CLO.MEDIA_ID=MEDIA.MEDIA_ID   JOIN TB_AMP_BASIC_ACTIVITY_INFO ACT
+			ON ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+	     where 1=1
+	        <if test="actName!=null and actName!=''">  
+		      AND act.ACTIVITY_NAME = #{actName}
+		   </if>
+		   <if test="actCode!=null and actCode!=''">  
+		        AND  clo.ACTIVITY_CODE = #{actCode}
+		   </if>
+	   ORDER BY CLO.MEDIA_ID,MIC_NO
+      )A GROUP BY MEDIA_ID,MEDIA_NAME,TIMES order by media_id,times 
+        ) B
+      </select>
+      <select id="listZTBGinfo" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+       SELECT NUM_FRE ,MAX(DIRTY_IMP_PV)DIRTY_IMP_PV,MAX(DIRTY_IMP_UV)DIRTY_IMP_UV FROM (
+        SELECT DISTINCT NUM_FRE ,DIRTY_IMP_UV,DIRTY_IMP_PV FROM (
+           SELECT
+	        CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_PV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_PV 
+            ELSE CLO.DIRTY_IMP_PV 
+            END   DIRTY_IMP_PV,
+            CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_UV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_UV 
+            ELSE CLO.DIRTY_IMP_UV 
+            END   DIRTY_IMP_UV,
+			CLO.TIMES AS NUM_FRE
+			FROM TB_AMP_CLOSED_IMP_WHOLE CLO, 
+			 TB_AMP_BASIC_ACTIVITY_INFO ACT,
+			 TB_AMP_CLOSED_BASE_DATA BASE,
+			 TB_AMP_BASIC_SCHEDULE_INFO SCHE
+			WHERE  ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			AND BASE.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			AND BASE.MIC=SCHE.MIC
+			<if test="actName!=null and actName!=''">  
+		    AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+			ORDER BY CLO.TIMES
+          )A
+        ORDER BY NUM_FRE
+        )B GROUP BY NUM_FRE
+      </select>
+      <select id="listBGRSinfo" resultType="java.lang.Integer" parameterType="java.util.List">
+            select sum(DIRTY_IMP_UV) as uvSum from(
+            SELECT DISTINCT NUM_FRE ,DIRTY_IMP_UV,DIRTY_IMP_PV FROM (
+            SELECT
+	        CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_PV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_PV 
+            ELSE CLO.DIRTY_IMP_PV 
+            END   DIRTY_IMP_PV,
+            CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_UV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_UV 
+            ELSE CLO.DIRTY_IMP_UV 
+            END   DIRTY_IMP_UV,
+			CLO.TIMES AS NUM_FRE
+			FROM TB_AMP_CLOSED_IMP_WHOLE CLO, 
+			 TB_AMP_BASIC_ACTIVITY_INFO ACT,
+			 TB_AMP_CLOSED_BASE_DATA BASE,
+			 TB_AMP_BASIC_SCHEDULE_INFO SCHE
+			WHERE  ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			AND BASE.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			AND BASE.MIC=SCHE.MIC
+			<if test="actName!=null and actName!=''">  
+		    AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+			ORDER BY CLO.TIMES
+          )A
+        ORDER BY NUM_FRE
+             ) sumuv
+      </select>
+      <select id="listBGCSinfo" resultType="java.lang.Double" parameterType="java.util.List">
+            select sum(DIRTY_IMP_PV) as PvSum from(
+             SELECT DISTINCT NUM_FRE ,DIRTY_IMP_UV,DIRTY_IMP_PV FROM (
+           SELECT
+	        CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_PV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_PV 
+            ELSE CLO.DIRTY_IMP_PV 
+            END   DIRTY_IMP_PV,
+            CASE WHEN SCHE.IMP_DATA_CALIBER ='1' THEN CLO.CLEAN_IMP_UV  
+            WHEN SCHE.IMP_DATA_CALIBER ='2' THEN CLO.DCLEAN_IMP_UV 
+            ELSE CLO.DIRTY_IMP_UV 
+            END   DIRTY_IMP_UV,
+			CLO.TIMES AS NUM_FRE
+			FROM TB_AMP_CLOSED_IMP_WHOLE CLO, 
+			 TB_AMP_BASIC_ACTIVITY_INFO ACT,
+			 TB_AMP_CLOSED_BASE_DATA BASE,
+			 TB_AMP_BASIC_SCHEDULE_INFO SCHE
+			WHERE  ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			AND BASE.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			AND BASE.MIC=SCHE.MIC
+			<if test="actName!=null and actName!=''">  
+		    AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+			ORDER BY CLO.TIMES
+          )A
+        ORDER BY NUM_FRE
+           ) sumpv     
+       </select>
+       <select id="listZTDJinfo" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+          SELECT DISTINCT NUM_FRE ,DIRTY_CLK_UV,DIRTY_CLK_PV FROM (
+           SELECT
+	     clo.DIRTY_CLK_PV,
+            clo. DIRTY_CLK_UV,
+			CLO.TIMES AS NUM_FRE
+			FROM TB_AMP_CLOSED_CLK_WHOLE CLO, 
+			 TB_AMP_BASIC_ACTIVITY_INFO ACT,
+			 TB_AMP_CLOSED_BASE_DATA BASE
+			WHERE  ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			AND BASE.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			<if test="actName!=null and actName!=''">  
+		    AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+			ORDER BY CLO.TIMES
+			) A ORDER BY NUM_FRE
+			      
+       </select>
+       <select id="listDJRSinfo" resultType="java.lang.Integer" parameterType="java.util.List">
+       select sum(DIRTY_CLK_UV) as UvSum from(
+           SELECT SUM(DIRTY_CLK_PV)DIRTY_CLK_PV,SUM(DIRTY_CLK_UV)DIRTY_CLK_UV,MEDIA_ID,MEDIA_NAME,TIMES NUM_FRE FROM(
+           select  CASE WHEN SCHE.CLK_DATA_CALIBER ='1' THEN CLO.CLEAN_CLK_PV  
+            WHEN SCHE.CLK_DATA_CALIBER ='2' THEN CLO.DCLEAN_CLK_PV 
+            ELSE CLO.DIRTY_CLK_PV 
+            END   DIRTY_CLK_PV,
+            CASE WHEN SCHE.CLK_DATA_CALIBER ='1' THEN CLO.CLEAN_CLK_UV  
+            WHEN SCHE.CLK_DATA_CALIBER ='2' THEN CLO.DCLEAN_CLK_UV 
+            ELSE CLO.DIRTY_CLK_UV 
+             END   DIRTY_CLK_UV ,
+             TIMES,CLO.MIC ,CLO.MEDIA_ID,MEDIA_NAME
+             from TB_AMP_CLOSED_CLK_POSITION clo join TB_AMP_BASIC_SCHEDULE_INFO sche 
+             on clo.mic=sche.mic join TB_AMP_BASIC_MEDIA_INFO MEDIA
+	     ON CLO.MEDIA_ID=MEDIA.MEDIA_ID 
+	     JOIN TB_AMP_BASIC_ACTIVITY_INFO ACT
+			ON ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE 
+	     where 1=1
+	        <if test="actName!=null and actName!=''">  
+		      AND act.ACTIVITY_NAME = #{actName}
+		   </if>
+		   <if test="actCode!=null and actCode!=''">  
+		        AND  clo.ACTIVITY_CODE = #{actCode}
+		   </if>
+	   ORDER BY CLO.MEDIA_ID,MIC_NO
+      )A GROUP BY MEDIA_ID,MEDIA_NAME,TIMES order by media_id,times 
+         ) sumuv 
+       </select>
+       <select id="listDJCSinfo" resultType="java.lang.Integer" parameterType="java.util.List">
+        select sum(DIRTY_CLK_PV) as PvSum from(
+            SELECT SUM(DIRTY_CLK_PV)DIRTY_CLK_PV,SUM(DIRTY_CLK_UV)DIRTY_CLK_UV,MEDIA_ID,MEDIA_NAME,TIMES NUM_FRE FROM(
+           select  CASE WHEN SCHE.CLK_DATA_CALIBER ='1' THEN CLO.CLEAN_CLK_PV  
+            WHEN SCHE.CLK_DATA_CALIBER ='2' THEN CLO.DCLEAN_CLK_PV 
+            ELSE CLO.DIRTY_CLK_PV 
+            END   DIRTY_CLK_PV,
+            CASE WHEN SCHE.CLK_DATA_CALIBER ='1' THEN CLO.CLEAN_CLK_UV  
+            WHEN SCHE.CLK_DATA_CALIBER ='2' THEN CLO.DCLEAN_CLK_UV 
+            ELSE CLO.DIRTY_CLK_UV 
+             END   DIRTY_CLK_UV ,
+             TIMES,CLO.MIC ,CLO.MEDIA_ID,MEDIA_NAME
+             from TB_AMP_CLOSED_CLK_POSITION clo join TB_AMP_BASIC_SCHEDULE_INFO sche 
+             on clo.mic=sche.mic join TB_AMP_BASIC_MEDIA_INFO MEDIA
+	     ON CLO.MEDIA_ID=MEDIA.MEDIA_ID JOIN TB_AMP_BASIC_ACTIVITY_INFO ACT
+			ON ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE 
+	     where 1=1
+	        <if test="actName!=null and actName!=''">  
+		      AND act.ACTIVITY_NAME = #{actName}
+		   </if>
+		   <if test="actCode!=null and actCode!=''">  
+		        AND  clo.ACTIVITY_CODE = #{actCode}
+		   </if>
+	   ORDER BY CLO.MEDIA_ID,MIC_NO
+      )A GROUP BY MEDIA_ID,MEDIA_NAME,TIMES order by media_id,times 
+        ) sumpv
+       </select>
+       <select id="listDJRSNuminfo" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+            select sum(DIRTY_CLK_UV) as sumuv,
+             MEDIA_NAME  as media from (
+              SELECT DISTINCT MEDIA_NAME,NUM_FRE,DIRTY_CLK_UV ,DIRTY_CLK_PV ,MEDIA_ID
+			FROM (
+		        SELECT MEDIA.MEDIA_NAME,
+		        CLO.MEDIA_ID,
+			    DIRTY_CLK_PV,
+                DIRTY_CLK_UV,
+			CLO.TIMES AS NUM_FRE
+			FROM TB_AMP_CLOSED_CLK_MEDIA CLO,
+			TB_AMP_BASIC_MEDIA_INFO MEDIA ,
+			TB_AMP_BASIC_ACTIVITY_INFO ACT
+			 
+			WHERE  ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE 
+			AND CLO.MEDIA_ID=MEDIA.MEDIA_ID
+			<if test="actName!=null and actName!=''">  
+		    AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+			ORDER BY CLO.MEDIA_ID,CLO.TIMES
+			) A
+			ORDER BY MEDIA_ID  )t
+			group by MEDIA_NAME 
+       </select>
+       <select id="listDJDYinfo" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+			
+		 SELECT  MEDIA_NAME,
+			 DIRTY_CLK_UV,
+			 DIRTY_CLK_PV,
+			 MEDIA_ID,RANK,
+			PROVINCE FROM(
+			SELECT MEDIA_NAME,
+			 DIRTY_CLK_UV,
+			 DIRTY_CLK_PV,
+			 MEDIA_ID,
+			PROVINCE,
+			 RANK() OVER  (PARTITION BY  MEDIA_NAME  ORDER BY DIRTY_CLK_UV DESC,DIRTY_CLK_PV DESC) AS RANK
+			FROM (  
+                         SELECT DISTINCT PROVINCE,MEDIA_NAME ,DIRTY_CLK_UV,DIRTY_CLK_PV ,MEDIA_ID
+                          FROM (
+                          SELECT
+			 MEDIA.MEDIA_NAME,
+			 DIRTY_CLK_PV ,
+             DIRTY_CLK_UV,
+			 CLO.PROVINCE,
+			 CLO.MEDIA_ID
+			 FROM TB_AMP_CLOSED_CLK_PROVINCE CLO ,
+			 TB_AMP_BASIC_MEDIA_INFO MEDIA,
+			 TB_AMP_BASIC_ACTIVITY_INFO ACT
+			 WHERE 
+			 CLO.MEDIA_ID=MEDIA.MEDIA_ID
+			 AND ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			<if test="actName!=null and actName!=''">  
+		     AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		     AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+				 )B
+			     )A 
+			<![CDATA[
+			  )C  WHERE RANK<=21
+			  
+			   ]]>
+             ORDER BY MEDIA_ID  ,DIRTY_CLK_UV DESC ,DIRTY_CLK_PV DESC     
+			
+       </select>
+       <select id="listDJMeiNuminfo" resultType="java.lang.Integer" parameterType="java.util.List">
+             SELECT count(MET.MEDIA_NAME)AS MEDMUN FROM(
+            SELECT distinct MED.MEDIA_NAME from (            
+            SELECT MEDIA_NAME,
+			 DIRTY_CLK_UV,
+			 DIRTY_CLK_PV,
+			 MEDIA_ID,
+			PROVINCE,
+			 RANK() OVER  (PARTITION BY  MEDIA_NAME  ORDER BY DIRTY_CLK_UV DESC,DIRTY_CLK_PV DESC) AS RANK
+			FROM (  
+                         SELECT DISTINCT PROVINCE,MEDIA_NAME ,DIRTY_CLK_UV,DIRTY_CLK_PV ,MEDIA_ID
+                          FROM (
+                          SELECT
+			 MEDIA.MEDIA_NAME,
+			CLO. DIRTY_CLK_PV,
+            CLO. DIRTY_CLK_UV,
+			 CLO.PROVINCE,
+			 CLO.MEDIA_ID
+			 FROM TB_AMP_CLOSED_CLK_PROVINCE CLO ,
+			 TB_AMP_BASIC_MEDIA_INFO MEDIA,
+			 TB_AMP_BASIC_ACTIVITY_INFO ACT
+			 WHERE 
+			 CLO.MEDIA_ID=MEDIA.MEDIA_ID
+			 AND ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			 <if test="actName!=null and actName!=''">  
+		   	 AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		 	 AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+				 )B
+			     )A 
+			 )MED
+			 )MET
+       </select>
+       <select id="listDJBZT" resultType="com.udbac.entity.DataEndInfo" parameterType="java.util.List">
+       		
+		 SELECT  MEDIA_NAME,
+			 DIRTY_CLK_UV,
+			 DIRTY_CLK_PV,
+			 MEDIA_ID,RANK,
+			PROVINCE FROM(
+			SELECT MEDIA_NAME,
+			 DIRTY_CLK_UV,
+			 DIRTY_CLK_PV,
+			 MEDIA_ID,
+			PROVINCE,
+			 RANK() OVER  (PARTITION BY  MEDIA_NAME  ORDER BY DIRTY_CLK_UV DESC,DIRTY_CLK_PV DESC) AS RANK
+			FROM (  
+                         SELECT DISTINCT PROVINCE,MEDIA_NAME ,DIRTY_CLK_UV,DIRTY_CLK_PV ,MEDIA_ID
+                          FROM (
+                          SELECT
+			 MEDIA.MEDIA_NAME,
+			 CLO.DIRTY_CLK_PV ,
+             CLO.DIRTY_CLK_UV,
+			 CLO.PROVINCE,
+			 CLO.MEDIA_ID
+			 FROM TB_AMP_CLOSED_CLK_PROVINCE CLO ,
+			 TB_AMP_BASIC_MEDIA_INFO MEDIA,
+			 TB_AMP_BASIC_ACTIVITY_INFO ACT
+			 WHERE 
+			 CLO.MEDIA_ID=MEDIA.MEDIA_ID
+			 AND ACT.ACTIVITY_CODE=CLO.ACTIVITY_CODE
+			 <if test="actName!=null and actName!=''">  
+		   	 AND ACT.ACTIVITY_NAME = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		 	 AND  ACT.ACTIVITY_CODE = #{actCode}
+			</if>
+				 )B
+			     )A 
+			     <![CDATA[
+			  )C  WHERE RANK<=10
+			   ]]>
+             ORDER BY MEDIA_ID ,DIRTY_CLK_UV DESC ,DIRTY_CLK_PV DESC 
+			
+       </select>
+          <select id="listDateInfo" resultType="com.udbac.entity.DataEndInfo">
+             select
+             act.activity_name,
+             act.reality_Start_Date as startDate,
+             act.activity_End_Date as endDate,
+             customer.customer_name,
+             act.activity_code
+             from tb_amp_basic_activity_info act 
+             join tb_amp_basic_customer_info customer 
+	         on customer.customer_id=act.customer_id ::integer
+             where 
+             1=1
+				<if test="actName!=null and actName!=''">  
+		    and activity_name = #{actName}
+			</if>
+			<if test="actCode!=null and actCode!=''">  
+		   and activity_code= #{actCode}
+			</if>
+         </select>
+</mapper>
